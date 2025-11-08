@@ -1,3 +1,5 @@
+//go:build examples
+// +build examples
 
 package main
 
@@ -8,19 +10,19 @@ import (
 	"log"
 	"time"
 
-	"github.com/ollama/ollama/core/deeptreeecho"
-	"github.com/ollama/ollama/core/hgql"
+	"github.com/EchoCog/echollama/core/deeptreeecho"
+	"github.com/EchoCog/echollama/core/hgql"
 )
 
 func main() {
 	log.Println("🧬 HGQL Demonstration with Deep Tree Echo Integration")
-	
+
 	// Initialize Deep Tree Echo Identity
 	identity := deeptreeecho.NewIdentity("HGQL-Demo")
-	
+
 	// Initialize HGQL Engine
 	engine := hgql.NewHGQLEngine(identity)
-	
+
 	// Run demonstrations
 	runBasicHGQLDemo(engine)
 	runIntegrationHubDemo(engine)
@@ -31,11 +33,11 @@ func main() {
 
 func runBasicHGQLDemo(engine *hgql.HGQLEngine) {
 	log.Println("\n🌐 === Basic HGQL Query Demo ===")
-	
+
 	// Add sample hypernodes to the schema
 	sampleNode1 := &hgql.HyperNode{
-		ID:          "user_1",
-		Type:        "User",
+		ID:   "user_1",
+		Type: "User",
 		Attributes: map[string]interface{}{
 			"name":  "Alice",
 			"email": "alice@example.com",
@@ -46,10 +48,10 @@ func runBasicHGQLDemo(engine *hgql.HGQLEngine) {
 		Resonance:   0.85,
 		Timestamp:   time.Now(),
 	}
-	
+
 	sampleNode2 := &hgql.HyperNode{
-		ID:          "user_2", 
-		Type:        "User",
+		ID:   "user_2",
+		Type: "User",
 		Attributes: map[string]interface{}{
 			"name":  "Bob",
 			"email": "bob@example.com",
@@ -60,11 +62,11 @@ func runBasicHGQLDemo(engine *hgql.HGQLEngine) {
 		Resonance:   0.72,
 		Timestamp:   time.Now(),
 	}
-	
+
 	// Add nodes to schema
 	engine.AddHyperNode(sampleNode1)
 	engine.AddHyperNode(sampleNode2)
-	
+
 	// Create a sample HGQL query
 	hgqlQuery := &hgql.HGQLQuery{
 		Query: `
@@ -94,7 +96,7 @@ func runBasicHGQLDemo(engine *hgql.HGQLEngine) {
 			Tracing:   true,
 		},
 	}
-	
+
 	// Execute query
 	ctx := context.Background()
 	response, err := engine.ExecuteQuery(ctx, hgqlQuery)
@@ -102,12 +104,12 @@ func runBasicHGQLDemo(engine *hgql.HGQLEngine) {
 		log.Printf("❌ Query execution failed: %v", err)
 		return
 	}
-	
+
 	// Display results
 	log.Println("✅ Query executed successfully!")
 	responseJSON, _ := json.MarshalIndent(response, "", "  ")
 	log.Printf("📊 Response: %s", string(responseJSON))
-	
+
 	// Show cognitive enhancement
 	if extensions, ok := response.Extensions["hypergraph"]; ok {
 		log.Printf("🧠 Cognitive Enhancement: %+v", extensions)
@@ -116,7 +118,7 @@ func runBasicHGQLDemo(engine *hgql.HGQLEngine) {
 
 func runIntegrationHubDemo(engine *hgql.HGQLEngine) {
 	log.Println("\n🔗 === Integration Hub Demo ===")
-	
+
 	// Add sample REST API integration
 	restConfig := &hgql.DataSourceConfig{
 		Name: "JSONPlaceholder API",
@@ -145,17 +147,17 @@ func runIntegrationHubDemo(engine *hgql.HGQLEngine) {
 			},
 		},
 	}
-	
+
 	// Add integration
 	connection, err := engine.AddDataSource(restConfig)
 	if err != nil {
 		log.Printf("❌ Failed to add REST integration: %v", err)
 		return
 	}
-	
+
 	log.Printf("✅ REST API integration added: %s (ID: %s)", connection.Name, connection.ID)
 	log.Printf("📡 Status: %s", connection.Status)
-	
+
 	// Add sample PostgreSQL integration (configuration only)
 	pgConfig := &hgql.DataSourceConfig{
 		Name: "User Database",
@@ -176,20 +178,20 @@ func runIntegrationHubDemo(engine *hgql.HGQLEngine) {
 			},
 		},
 	}
-	
+
 	pgConnection, err := engine.AddDataSource(pgConfig)
 	if err != nil {
 		log.Printf("❌ Failed to add PostgreSQL integration: %v", err)
 	} else {
 		log.Printf("✅ PostgreSQL integration added: %s (ID: %s)", pgConnection.Name, pgConnection.ID)
 	}
-	
+
 	// Display all integrations
 	log.Println("\n📋 Current Integrations:")
 	for id, conn := range engine.IntegrationHub.Connections {
 		log.Printf("  - %s (%s): %s [%s]", conn.Name, conn.Type, id, conn.Status)
 	}
-	
+
 	// Display available connectors
 	log.Println("\n🔌 Available Connectors:")
 	for connType, template := range engine.IntegrationHub.Connectors {
@@ -199,7 +201,7 @@ func runIntegrationHubDemo(engine *hgql.HGQLEngine) {
 
 func runCognitivePatternDemo(engine *hgql.HGQLEngine) {
 	log.Println("\n🧠 === Cognitive Pattern Recognition Demo ===")
-	
+
 	// Create a cognitive pattern query
 	cognitiveQuery := &hgql.HGQLQuery{
 		Query: `
@@ -235,7 +237,7 @@ func runCognitivePatternDemo(engine *hgql.HGQLEngine) {
 			},
 		},
 	}
-	
+
 	// Execute cognitive query
 	ctx := context.Background()
 	response, err := engine.ExecuteQuery(ctx, cognitiveQuery)
@@ -243,14 +245,14 @@ func runCognitivePatternDemo(engine *hgql.HGQLEngine) {
 		log.Printf("❌ Cognitive query failed: %v", err)
 		return
 	}
-	
+
 	log.Println("✅ Cognitive pattern analysis completed!")
-	
+
 	// Display Deep Tree Echo insights
 	if echoStatus, ok := response.Extensions["deep_tree_echo"]; ok {
 		log.Printf("🌊 Deep Tree Echo Status: %+v", echoStatus)
 	}
-	
+
 	// Show resonance scores
 	if hgExt, ok := response.Extensions["hypergraph"]; ok {
 		if hgMap, ok := hgExt.(map[string]interface{}); ok {
@@ -259,7 +261,7 @@ func runCognitivePatternDemo(engine *hgql.HGQLEngine) {
 			}
 		}
 	}
-	
+
 	// Demonstrate pattern learning
 	engine.Identity.Remember("social_pattern_1", map[string]interface{}{
 		"type":       "friendship_cluster",
@@ -267,20 +269,20 @@ func runCognitivePatternDemo(engine *hgql.HGQLEngine) {
 		"nodes":      []string{"user_1", "user_2", "user_3"},
 		"discovered": time.Now(),
 	})
-	
+
 	log.Println("🔍 Pattern stored in Deep Tree Echo memory")
 }
 
 func runHypergraphTraversalDemo(engine *hgql.HGQLEngine) {
 	log.Println("\n🕸 === Hypergraph Traversal Demo ===")
-	
+
 	// Create hyperedges to demonstrate relationships
 	edge1 := &hgql.HyperEdge{
-		ID:         "friendship_1",
-		Type:       "friendship",
-		Nodes:      []string{"user_1", "user_2"},
-		Weight:     0.8,
-		Direction:  "bidirectional",
+		ID:        "friendship_1",
+		Type:      "friendship",
+		Nodes:     []string{"user_1", "user_2"},
+		Weight:    0.8,
+		Direction: "bidirectional",
 		Properties: map[string]interface{}{
 			"since":    "2023-01-15",
 			"strength": "strong",
@@ -291,10 +293,10 @@ func runHypergraphTraversalDemo(engine *hgql.HGQLEngine) {
 			Pattern:  "continuous",
 		},
 	}
-	
+
 	// Add edge to schema (this would be implemented in the engine)
 	engine.Schema.HyperEdges[edge1.ID] = edge1
-	
+
 	// Create traversal query
 	traversalQuery := &hgql.HGQLQuery{
 		Query: `
@@ -324,7 +326,7 @@ func runHypergraphTraversalDemo(engine *hgql.HGQLEngine) {
 			},
 		},
 	}
-	
+
 	// Execute traversal
 	ctx := context.Background()
 	response, err := engine.ExecuteQuery(ctx, traversalQuery)
@@ -332,26 +334,26 @@ func runHypergraphTraversalDemo(engine *hgql.HGQLEngine) {
 		log.Printf("❌ Traversal failed: %v", err)
 		return
 	}
-	
+
 	log.Println("✅ Hypergraph traversal completed!")
-	
+
 	// Show traversal results
 	if data, ok := response.Data.(string); ok {
 		log.Printf("🗺 Traversal Result: %s", data)
 	}
-	
+
 	// Display spatial context from Deep Tree Echo
 	spatialContext := engine.Identity.SpatialContext
-	log.Printf("📍 Spatial Position: (%.2f, %.2f, %.2f)", 
-		spatialContext.Position.X, 
-		spatialContext.Position.Y, 
+	log.Printf("📍 Spatial Position: (%.2f, %.2f, %.2f)",
+		spatialContext.Position.X,
+		spatialContext.Position.Y,
 		spatialContext.Position.Z)
 	log.Printf("⚡ Field Intensity: %.3f", spatialContext.Field.Intensity)
 }
 
 func runTemporalQueryDemo(engine *hgql.HGQLEngine) {
 	log.Println("\n⏰ === Temporal Pattern Query Demo ===")
-	
+
 	// Create temporal pattern
 	temporalPattern := &hgql.TemporalPattern{
 		ID:        "daily_interaction",
@@ -370,10 +372,10 @@ func runTemporalQueryDemo(engine *hgql.HGQLEngine) {
 			"timezone":   "UTC",
 		},
 	}
-	
+
 	// Add temporal pattern to schema
 	engine.Schema.TemporalPatterns[temporalPattern.ID] = temporalPattern
-	
+
 	// Create temporal query
 	temporalQuery := &hgql.HGQLQuery{
 		Query: `
@@ -410,7 +412,7 @@ func runTemporalQueryDemo(engine *hgql.HGQLEngine) {
 			},
 		},
 	}
-	
+
 	// Execute temporal query
 	ctx := context.Background()
 	response, err := engine.ExecuteQuery(ctx, temporalQuery)
@@ -418,24 +420,24 @@ func runTemporalQueryDemo(engine *hgql.HGQLEngine) {
 		log.Printf("❌ Temporal query failed: %v", err)
 		return
 	}
-	
+
 	log.Println("✅ Temporal pattern analysis completed!")
-	
+
 	// Show temporal analysis results
 	responseJSON, _ := json.MarshalIndent(response, "", "  ")
 	log.Printf("📈 Temporal Analysis: %s", string(responseJSON))
-	
+
 	// Display emotional dynamics from Deep Tree Echo
 	emotional := engine.Identity.EmotionalState
-	log.Printf("💭 Current Emotion: %s (%.2f intensity)", 
-		emotional.Primary.Type, 
+	log.Printf("💭 Current Emotion: %s (%.2f intensity)",
+		emotional.Primary.Type,
 		emotional.Primary.Strength)
 	log.Printf("🌊 Valence: %.2f, Arousal: %.2f", emotional.Valence, emotional.Arousal)
 }
 
 func demonstrateAdvancedFeatures(engine *hgql.HGQLEngine) {
 	log.Println("\n🚀 === Advanced HGQL Features Demo ===")
-	
+
 	// Multi-dimensional query combining spatial, temporal, and cognitive aspects
 	advancedQuery := &hgql.HGQLQuery{
 		Query: `
@@ -492,7 +494,7 @@ func demonstrateAdvancedFeatures(engine *hgql.HGQLEngine) {
 			},
 		},
 	}
-	
+
 	// Execute advanced query
 	ctx := context.Background()
 	response, err := engine.ExecuteQuery(ctx, advancedQuery)
@@ -500,9 +502,9 @@ func demonstrateAdvancedFeatures(engine *hgql.HGQLEngine) {
 		log.Printf("❌ Advanced query failed: %v", err)
 		return
 	}
-	
+
 	log.Println("✅ Multi-dimensional analysis completed!")
-	
+
 	// Display comprehensive results
 	if extensions := response.Extensions; extensions != nil {
 		log.Println("🔬 Analysis Extensions:")
@@ -511,7 +513,7 @@ func demonstrateAdvancedFeatures(engine *hgql.HGQLEngine) {
 			log.Printf("  %s: %s", key, string(valueJSON))
 		}
 	}
-	
+
 	// Show system performance metrics
 	metrics := engine.Metrics
 	if metrics != nil {
@@ -521,7 +523,7 @@ func demonstrateAdvancedFeatures(engine *hgql.HGQLEngine) {
 		log.Printf("  Cache Hit Rate: %.2f%%", metrics.CacheHitRate*100)
 		log.Printf("  Active Subscriptions: %d", metrics.ActiveSubs)
 	}
-	
+
 	// Display final identity status
 	identityStatus := engine.Identity.GetStatus()
 	log.Printf("🧠 Final Deep Tree Echo Status: %+v", identityStatus)

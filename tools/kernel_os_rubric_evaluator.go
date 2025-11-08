@@ -1,3 +1,6 @@
+//go:build tools
+// +build tools
+
 package main
 
 import (
@@ -31,13 +34,13 @@ type OSService struct {
 
 // Evidence represents found evidence for a category
 type Evidence struct {
-	Files            []string
-	MatchedKeywords  []string
-	EstimatedSLOC    int
-	EstimatedFuncs   int
-	PresenceScore    float64
+	Files             []string
+	MatchedKeywords   []string
+	EstimatedSLOC     int
+	EstimatedFuncs    int
+	PresenceScore     float64
 	CompletenessScore float64
-	WeightedScore    float64
+	WeightedScore     float64
 }
 
 // EvaluationResult contains the complete evaluation
@@ -222,7 +225,7 @@ func main() {
 		evidence := evaluateCategory(repoPath, primitive.Keywords, primitive.TargetFunctions, primitive.TargetSLOC)
 		evidence.WeightedScore = evidence.PresenceScore * evidence.CompletenessScore * float64(primitive.Weight)
 		result.KernelPrimitives[primitive.Name] = evidence
-		
+
 		fmt.Printf("\n%s (Weight: %d):\n", primitive.Name, primitive.Weight)
 		fmt.Printf("  Files Found: %d\n", len(evidence.Files))
 		if len(evidence.Files) > 0 {
@@ -249,7 +252,7 @@ func main() {
 		evidence := evaluateCategory(repoPath, service.Keywords, service.TargetFunctions, service.TargetSLOC)
 		evidence.WeightedScore = evidence.PresenceScore * evidence.CompletenessScore * float64(service.Weight)
 		result.OSServices[service.Name] = evidence
-		
+
 		fmt.Printf("\n%s (Weight: %d):\n", service.Name, service.Weight)
 		fmt.Printf("  Files Found: %d\n", len(evidence.Files))
 		if len(evidence.Files) > 0 {
@@ -330,7 +333,7 @@ func evaluateCategory(repoPath string, keywords []string, targetFuncs, targetSLO
 				relPath, _ := filepath.Rel(repoPath, path)
 				matchedFiles[relPath] = true
 				keywordMatches[keyword] = true
-				
+
 				// Estimate SLOC for this file
 				lines := strings.Count(string(content), "\n")
 				evidence.EstimatedSLOC += lines
@@ -364,7 +367,7 @@ func evaluateCategory(repoPath string, keywords []string, targetFuncs, targetSLO
 	// Calculate completeness score
 	slocRatio := float64(evidence.EstimatedSLOC) / float64(targetSLOC)
 	funcRatio := float64(evidence.EstimatedFuncs) / float64(targetFuncs)
-	
+
 	// Use the average of both ratios, capped at 1.0
 	avgRatio := (slocRatio + funcRatio) / 2.0
 	if avgRatio > 1.0 {
@@ -390,10 +393,10 @@ func classifyRepository(kernelScore, osScore float64) string {
 
 func generateSummary(result *EvaluationResult) string {
 	var summary strings.Builder
-	
+
 	summary.WriteString("Summary:\n")
 	summary.WriteString("--------\n")
-	
+
 	if result.Classification == "Application / other" {
 		summary.WriteString("This repository is primarily an application-level codebase and does not\n")
 		summary.WriteString("implement significant kernel or OS primitives. It appears to be focused on\n")
@@ -513,7 +516,7 @@ func generateMarkdownReport(result *EvaluationResult) string {
 	md.WriteString("## Kernel Primitives Evaluation\n\n")
 	md.WriteString("| Primitive | Weight | Presence | Completeness | Weighted Score | Files Found |\n")
 	md.WriteString("|-----------|--------|----------|--------------|----------------|-------------|\n")
-	
+
 	for _, primitive := range kernelPrimitives {
 		evidence := result.KernelPrimitives[primitive.Name]
 		md.WriteString(fmt.Sprintf("| %s | %d | %.2f | %.2f | %.2f | %d |\n",
@@ -524,7 +527,7 @@ func generateMarkdownReport(result *EvaluationResult) string {
 	md.WriteString("\n## OS Platform Services Evaluation\n\n")
 	md.WriteString("| Service | Weight | Presence | Completeness | Weighted Score | Files Found |\n")
 	md.WriteString("|---------|--------|----------|--------------|----------------|-------------|\n")
-	
+
 	for _, service := range osServices {
 		evidence := result.OSServices[service.Name]
 		md.WriteString(fmt.Sprintf("| %s | %d | %.2f | %.2f | %.2f | %d |\n",

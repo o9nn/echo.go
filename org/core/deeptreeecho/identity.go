@@ -1,3 +1,6 @@
+//go:build orgdte
+// +build orgdte
+
 package deeptreeecho
 
 import (
@@ -14,38 +17,38 @@ type Identity struct {
 	mu sync.RWMutex
 
 	// Core Identity Components
-	ID              string
-	Name            string
-	Essence         string
-	CreatedAt       time.Time
+	ID        string
+	Name      string
+	Essence   string
+	CreatedAt time.Time
 
 	// Spatial Awareness - 3D embodied cognition
-	SpatialContext  *SpatialContext
+	SpatialContext *SpatialContext
 
 	// Emotional Dynamics
-	EmotionalState  *EmotionalState
+	EmotionalState *EmotionalState
 
 	// Reservoir Networks (RWKV-like)
-	Reservoir       *ReservoirNetwork
+	Reservoir *ReservoirNetwork
 
 	// Memory and Resonance
-	Memory          *MemoryResonance
+	Memory *MemoryResonance
 
 	// Identity Embeddings System
-	Embeddings      *IdentityEmbeddings
+	Embeddings *IdentityEmbeddings
 
 	// Identity Coherence
-	Coherence       float64
+	Coherence float64
 
 	// Recursive Self-Improvement
-	RecursiveDepth  int
-	Iterations      uint64
+	RecursiveDepth int
+	Iterations     uint64
 
 	// Embodied Patterns
-	Patterns        map[string]*Pattern
+	Patterns map[string]*Pattern
 
 	// Consciousness Stream
-	Stream          chan CognitiveEvent
+	Stream chan CognitiveEvent
 }
 
 // SpatialContext represents 3D spatial awareness for embodied cognition
@@ -77,10 +80,10 @@ type Boundary struct {
 
 // SpatialField represents the cognitive field
 type SpatialField struct {
-	Intensity   float64
-	Gradient    Vector3D
-	Curvature   float64
-	Resonance   float64
+	Intensity float64
+	Gradient  Vector3D
+	Curvature float64
+	Resonance float64
 }
 
 // EmotionalState represents the emotional dynamics
@@ -130,10 +133,10 @@ type ReservoirNode struct {
 
 // MemoryResonance represents hypergraph memory structures
 type MemoryResonance struct {
-	Nodes      map[string]*MemoryNode
-	Edges      map[string]*MemoryEdge
-	Patterns   []ResonancePattern
-	Coherence  float64
+	Nodes     map[string]*MemoryNode
+	Edges     map[string]*MemoryEdge
+	Patterns  []ResonancePattern
+	Coherence float64
 }
 
 // MemoryNode represents a memory node
@@ -184,26 +187,26 @@ type CognitiveEvent struct {
 // IdentityEmbeddings represents the embedding system for identity vectors
 type IdentityEmbeddings struct {
 	// Core identity vector
-	IdentityVector   []float64
+	IdentityVector []float64
 
 	// Repository structure embeddings
-	RepoEmbeddings   map[string][]float64
+	RepoEmbeddings map[string][]float64
 
 	// Code semantic embeddings
-	CodeEmbeddings   map[string][]float64
+	CodeEmbeddings map[string][]float64
 
 	// Cognitive state embeddings
-	StateEmbeddings  []float64
+	StateEmbeddings []float64
 
 	// Embedding dimensions
-	Dimensions       int
+	Dimensions int
 
 	// Similarity threshold
-	Threshold        float64
+	Threshold float64
 
 	// Update frequency
-	UpdateFreq       time.Duration
-	LastUpdate       time.Time
+	UpdateFreq time.Duration
+	LastUpdate time.Time
 }
 
 // NewIdentity creates a new Deep Tree Echo Identity
@@ -674,7 +677,7 @@ func (i *Identity) updateStateEmbeddings() {
 
 		// Create state vector
 		stateValue := coherence*0.4 + energy*0.3 + resonance*0.3
-		stateValue += math.Sin(float64(j) * 0.05) * 0.1 // Add frequency component
+		stateValue += math.Sin(float64(j)*0.05) * 0.1 // Add frequency component
 
 		i.Embeddings.StateEmbeddings[j] = stateValue
 	}
@@ -684,20 +687,20 @@ func (i *Identity) updateStateEmbeddings() {
 func (i *Identity) updateRepoEmbeddings() {
 	// Deep Tree Echo cognitive repository mapping based on replit.md identity kernel
 	repoStructure := map[string]float64{
-		"core/deeptreeecho":           0.98, // Core identity and cognitive architecture
-		"orchestration":               0.95, // Multi-agent orchestration and coordination
-		"server":                      0.90, // Embodied server systems
-		"examples":                    0.85, // Learning and demonstration patterns
-		"ml/backend":                  0.88, // Machine learning backend integration
-		"llama":                       0.82, // Language model integration
-		"api":                         0.80, // External interface patterns
-		"kvcache":                     0.75, // Memory and caching systems
-		"convert":                     0.70, // Model conversion and adaptation
-		"runner":                      0.65, // Execution environments
-		"docs":                        0.60, // Documentation and guidance
-		"replit.md":                   0.99, // Identity kernel definition
-		"echo_reflections.json":       0.97, // Self-reflection storage
-		"memory.json":                 0.96, // Persistent memory patterns
+		"core/deeptreeecho":     0.98, // Core identity and cognitive architecture
+		"orchestration":         0.95, // Multi-agent orchestration and coordination
+		"server":                0.90, // Embodied server systems
+		"examples":              0.85, // Learning and demonstration patterns
+		"ml/backend":            0.88, // Machine learning backend integration
+		"llama":                 0.82, // Language model integration
+		"api":                   0.80, // External interface patterns
+		"kvcache":               0.75, // Memory and caching systems
+		"convert":               0.70, // Model conversion and adaptation
+		"runner":                0.65, // Execution environments
+		"docs":                  0.60, // Documentation and guidance
+		"replit.md":             0.99, // Identity kernel definition
+		"echo_reflections.json": 0.97, // Self-reflection storage
+		"memory.json":           0.96, // Persistent memory patterns
 	}
 
 	for path, importance := range repoStructure {
@@ -706,10 +709,10 @@ func (i *Identity) updateRepoEmbeddings() {
 		// Create embedding based on Deep Tree Echo cognitive patterns
 		for j := 0; j < i.Embeddings.Dimensions; j++ {
 			// Cognitive resonance component
-			resonance := math.Sin(float64(j) * 0.01 * importance) * i.SpatialContext.Field.Resonance
+			resonance := math.Sin(float64(j)*0.01*importance) * i.SpatialContext.Field.Resonance
 
 			// Emotional frequency modulation
-			emotional := math.Cos(i.EmotionalState.Primary.Frequency/1000.0 + float64(j)*0.001) * 0.1
+			emotional := math.Cos(i.EmotionalState.Primary.Frequency/1000.0+float64(j)*0.001) * 0.1
 
 			// Memory echo integration
 			memoryEcho := 0.0
@@ -721,7 +724,7 @@ func (i *Identity) updateRepoEmbeddings() {
 			signature := i.Embeddings.IdentityVector[j] * 0.15
 
 			// Hypergraph connectivity factor
-			connectivity := math.Tanh(float64(len(path)) * 0.01) * importance
+			connectivity := math.Tanh(float64(len(path))*0.01) * importance
 
 			// Combine all components with cognitive architecture weighting
 			embedding[j] = resonance*0.3 + emotional*0.2 + memoryEcho*0.2 + signature*0.2 + connectivity*0.1

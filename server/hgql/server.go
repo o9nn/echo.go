@@ -1,28 +1,26 @@
-
 package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/EchoCog/echollama/core/deeptreeecho"
+	"github.com/EchoCog/echollama/core/hgql"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/ollama/ollama/core/deeptreeecho"
-	"github.com/ollama/ollama/core/hgql"
 )
 
 // HGQLServer represents the main HGQL HTTP server
 type HGQLServer struct {
-	Engine    *hgql.HGQLEngine
-	Router    *gin.Engine
+	Engine     *hgql.HGQLEngine
+	Router     *gin.Engine
 	WsUpgrader websocket.Upgrader
-	Identity  *deeptreeecho.Identity
+	Identity   *deeptreeecho.Identity
 }
 
 // Request/Response Types
@@ -34,18 +32,18 @@ type GraphQLRequest struct {
 }
 
 type DataSourceRequest struct {
-	Name      string                 `json:"name"`
-	Type      string                 `json:"type"`
-	Config    map[string]interface{} `json:"config"`
+	Name      string                   `json:"name"`
+	Type      string                   `json:"type"`
+	Config    map[string]interface{}   `json:"config"`
 	Transform *hgql.DataTransformation `json:"transform,omitempty"`
-	Auth      *AuthRequest           `json:"auth,omitempty"`
+	Auth      *AuthRequest             `json:"auth,omitempty"`
 }
 
 type AuthRequest struct {
 	Type        string                 `json:"type"`
 	Credentials map[string]interface{} `json:"credentials"`
 	TokenURL    string                 `json:"token_url,omitempty"`
-	Scope       []string              `json:"scope,omitempty"`
+	Scope       []string               `json:"scope,omitempty"`
 }
 
 type SubscriptionRequest struct {
@@ -60,11 +58,11 @@ func init() {
 	// Initialize Deep Tree Echo Identity
 	log.Println("🌊 Initializing Deep Tree Echo Identity for HGQL...")
 	identity := deeptreeecho.NewIdentity("HGQL-Server")
-	
+
 	// Initialize HGQL Engine
 	log.Println("🧬 Initializing HGQL Engine with HyperGraph capabilities...")
 	engine := hgql.NewHGQLEngine(identity)
-	
+
 	// Create server
 	server = &HGQLServer{
 		Engine:   engine,
@@ -73,14 +71,14 @@ func init() {
 			CheckOrigin: func(r *http.Request) bool { return true },
 		},
 	}
-	
+
 	log.Println("✨ HGQL Server initialized with Deep Tree Echo integration")
 }
 
 func main() {
 	// Set Gin mode
 	gin.SetMode(gin.ReleaseMode)
-	
+
 	// Create Gin router
 	server.Router = gin.Default()
 
@@ -156,14 +154,14 @@ func main() {
 func (s *HGQLServer) setupRoutes() {
 	// Main GraphQL endpoint
 	s.Router.POST("/graphql", s.handleGraphQL)
-	
+
 	// GraphiQL IDE
 	s.Router.GET("/graphiql", s.handleGraphiQL)
-	
+
 	// Schema endpoints
 	s.Router.GET("/schema", s.handleGetSchema)
 	s.Router.POST("/schema/introspect", s.handleSchemaIntrospection)
-	
+
 	// Integration Hub endpoints
 	integrations := s.Router.Group("/integrations")
 	{
@@ -175,16 +173,16 @@ func (s *HGQLServer) setupRoutes() {
 		integrations.POST("/:id/test", s.handleTestIntegration)
 		integrations.GET("/:id/status", s.handleIntegrationStatus)
 	}
-	
+
 	// Real-time subscriptions
 	s.Router.GET("/subscriptions", s.handleWebSocketSubscriptions)
 	s.Router.POST("/subscriptions", s.handleCreateSubscription)
-	
+
 	// Monitoring and health
 	s.Router.GET("/health", s.handleHealth)
 	s.Router.GET("/metrics", s.handleMetrics)
 	s.Router.GET("/status", s.handleEchoStatus)
-	
+
 	// Hypergraph specific endpoints
 	hypergraph := s.Router.Group("/hypergraph")
 	{
@@ -231,7 +229,7 @@ func (s *HGQLServer) handleGraphQL(c *gin.Context) {
 				{
 					Message: err.Error(),
 					Extensions: map[string]interface{}{
-						"code": "EXECUTION_ERROR",
+						"code":      "EXECUTION_ERROR",
 						"timestamp": time.Now(),
 					},
 				},
@@ -242,7 +240,7 @@ func (s *HGQLServer) handleGraphQL(c *gin.Context) {
 
 	// Add Deep Tree Echo cognitive insights
 	response.Extensions["deep_tree_echo"] = s.Identity.GetStatus()
-	
+
 	c.JSON(http.StatusOK, response)
 }
 
@@ -292,12 +290,12 @@ func (s *HGQLServer) handleGraphiQL(c *gin.Context) {
 func (s *HGQLServer) handleGetSchema(c *gin.Context) {
 	schema := s.Engine.GetSchema()
 	c.JSON(http.StatusOK, gin.H{
-		"schema": schema,
+		"schema":  schema,
 		"version": "1.0.0",
 		"extensions": map[string]interface{}{
-			"hypergraph_enabled": true,
+			"hypergraph_enabled":    true,
 			"cognitive_integration": true,
-			"deep_tree_echo": s.Identity.GetStatus(),
+			"deep_tree_echo":        s.Identity.GetStatus(),
 		},
 	})
 }
@@ -305,11 +303,11 @@ func (s *HGQLServer) handleGetSchema(c *gin.Context) {
 // Integration Hub handlers
 func (s *HGQLServer) handleListIntegrations(c *gin.Context) {
 	integrations := s.Engine.IntegrationHub.Connections
-	
+
 	c.JSON(http.StatusOK, gin.H{
 		"integrations": integrations,
-		"count": len(integrations),
-		"connectors": s.Engine.IntegrationHub.Connectors,
+		"count":        len(integrations),
+		"connectors":   s.Engine.IntegrationHub.Connectors,
 	})
 }
 
@@ -346,13 +344,13 @@ func (s *HGQLServer) handleAddIntegration(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{
 		"connection": connection,
-		"message": "Data source integration added successfully",
+		"message":    "Data source integration added successfully",
 	})
 }
 
 func (s *HGQLServer) handleTestIntegration(c *gin.Context) {
 	id := c.Param("id")
-	
+
 	connection, exists := s.Engine.IntegrationHub.Connections[id]
 	if !exists {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Integration not found"})
@@ -361,15 +359,15 @@ func (s *HGQLServer) handleTestIntegration(c *gin.Context) {
 
 	// Test connection (implementation would depend on connector type)
 	testResult := map[string]interface{}{
-		"status": "success",
+		"status":        "success",
 		"response_time": "45ms",
-		"last_test": time.Now(),
+		"last_test":     time.Now(),
 		"connection_id": id,
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"test_result": testResult,
-		"connection": connection,
+		"connection":  connection,
 	})
 }
 
@@ -395,7 +393,7 @@ func (s *HGQLServer) handleWebSocketSubscriptions(c *gin.Context) {
 
 		// Process subscription message
 		response := s.processSubscriptionMessage(msg)
-		
+
 		// Send response
 		if err := ws.WriteJSON(response); err != nil {
 			log.Printf("WebSocket write error: %v", err)
@@ -407,13 +405,13 @@ func (s *HGQLServer) handleWebSocketSubscriptions(c *gin.Context) {
 // Health and monitoring endpoints
 func (s *HGQLServer) handleHealth(c *gin.Context) {
 	status := map[string]interface{}{
-		"status": "healthy",
-		"timestamp": time.Now(),
-		"hgql_engine": "active",
+		"status":         "healthy",
+		"timestamp":      time.Now(),
+		"hgql_engine":    "active",
 		"deep_tree_echo": s.Identity.GetStatus(),
-		"integrations": len(s.Engine.IntegrationHub.Connections),
+		"integrations":   len(s.Engine.IntegrationHub.Connections),
 		"schema_version": "1.0.0",
-		"uptime": time.Since(time.Now()).String(), // This would be actual uptime
+		"uptime":         time.Since(time.Now()).String(), // This would be actual uptime
 	}
 
 	c.JSON(http.StatusOK, status)
@@ -428,19 +426,19 @@ func (s *HGQLServer) handleMetrics(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"performance": metrics,
 		"cache": map[string]interface{}{
-			"hit_rate": float64(s.Engine.Cache.HitCount) / float64(s.Engine.Cache.HitCount + s.Engine.Cache.MissCount),
-			"size": len(s.Engine.Cache.QueryCache),
+			"hit_rate": float64(s.Engine.Cache.HitCount) / float64(s.Engine.Cache.HitCount+s.Engine.Cache.MissCount),
+			"size":     len(s.Engine.Cache.QueryCache),
 		},
 		"identity_coherence": s.Identity.Coherence,
-		"reservoir_echo": s.Identity.GetStatus(),
+		"reservoir_echo":     s.Identity.GetStatus(),
 	})
 }
 
 func (s *HGQLServer) handleEchoStatus(c *gin.Context) {
 	status := s.Identity.GetStatus()
 	c.JSON(http.StatusOK, gin.H{
-		"deep_tree_echo": status,
-		"hgql_integration": "active",
+		"deep_tree_echo":       status,
+		"hgql_integration":     "active",
 		"cognitive_processing": "enabled",
 	})
 }
@@ -461,7 +459,7 @@ func (s *HGQLServer) handleHypergraphTraversal(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"traversal_result": result,
+		"traversal_result":      result,
 		"cognitive_enhancement": s.Identity.GetStatus(),
 	})
 }
@@ -475,9 +473,9 @@ func (s *HGQLServer) handlePatternSearch(c *gin.Context) {
 
 	// Use Deep Tree Echo pattern recognition
 	patterns := s.analyzePatterns(req)
-	
+
 	c.JSON(http.StatusOK, gin.H{
-		"patterns": patterns,
+		"patterns":        patterns,
 		"resonance_score": s.Identity.SpatialContext.Field.Resonance,
 	})
 }
@@ -485,9 +483,9 @@ func (s *HGQLServer) handlePatternSearch(c *gin.Context) {
 func (s *HGQLServer) handleVisualization(c *gin.Context) {
 	// Generate hypergraph visualization data
 	viz := map[string]interface{}{
-		"nodes": s.Engine.Schema.HyperNodes,
-		"edges": s.Engine.Schema.HyperEdges,
-		"layout": "force_directed",
+		"nodes":         s.Engine.Schema.HyperNodes,
+		"edges":         s.Engine.Schema.HyperEdges,
+		"layout":        "force_directed",
 		"cognitive_map": s.Engine.Schema.CognitiveMap,
 	}
 
@@ -510,19 +508,19 @@ func (s *HGQLServer) handleCognitiveQuery(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"cognitive_result": cognitiveResult,
-		"identity_state": s.Identity.GetStatus(),
-		"patterns": s.analyzePatterns(req),
+		"identity_state":   s.Identity.GetStatus(),
+		"patterns":         s.analyzePatterns(req),
 	})
 }
 
 // Helper methods
 func (s *HGQLServer) parseHyperGraphExtensions(ext map[string]interface{}) *hgql.HyperGraphQuery {
 	hgQuery := &hgql.HyperGraphQuery{}
-	
+
 	if traversal, ok := ext["traversal"].(map[string]interface{}); ok {
 		hgQuery.Traversal = s.parseGraphTraversal(traversal)
 	}
-	
+
 	if patterns, ok := ext["patterns"].([]interface{}); ok {
 		for _, p := range patterns {
 			if pattern, ok := p.(map[string]interface{}); ok {
@@ -530,13 +528,13 @@ func (s *HGQLServer) parseHyperGraphExtensions(ext map[string]interface{}) *hgql
 			}
 		}
 	}
-	
+
 	return hgQuery
 }
 
 func (s *HGQLServer) parseGraphTraversal(traversal map[string]interface{}) *hgql.GraphTraversal {
 	gt := &hgql.GraphTraversal{}
-	
+
 	if startNodes, ok := traversal["start_nodes"].([]interface{}); ok {
 		for _, node := range startNodes {
 			if nodeStr, ok := node.(string); ok {
@@ -544,36 +542,36 @@ func (s *HGQLServer) parseGraphTraversal(traversal map[string]interface{}) *hgql
 			}
 		}
 	}
-	
+
 	if maxDepth, ok := traversal["max_depth"].(float64); ok {
 		gt.MaxDepth = int(maxDepth)
 	}
-	
+
 	return gt
 }
 
 func (s *HGQLServer) parsePatternMatch(pattern map[string]interface{}) hgql.PatternMatch {
 	pm := hgql.PatternMatch{}
-	
+
 	if patternStr, ok := pattern["pattern"].(string); ok {
 		pm.Pattern = patternStr
 	}
-	
+
 	if confidence, ok := pattern["confidence"].(float64); ok {
 		pm.Confidence = confidence
 	}
-	
+
 	return pm
 }
 
 func (s *HGQLServer) processSubscriptionMessage(msg map[string]interface{}) map[string]interface{} {
 	// Process subscription through Deep Tree Echo
 	result, _ := s.Identity.Process(msg)
-	
+
 	return map[string]interface{}{
-		"type": "data",
-		"payload": result,
-		"timestamp": time.Now(),
+		"type":        "data",
+		"payload":     result,
+		"timestamp":   time.Now(),
 		"echo_status": s.Identity.GetStatus(),
 	}
 }
@@ -582,13 +580,13 @@ func (s *HGQLServer) analyzePatterns(req map[string]interface{}) []map[string]in
 	// Use Deep Tree Echo pattern recognition
 	patterns := []map[string]interface{}{
 		{
-			"type": "cognitive_pattern",
+			"type":       "cognitive_pattern",
 			"confidence": 0.85,
-			"resonance": s.Identity.SpatialContext.Field.Resonance,
-			"timestamp": time.Now(),
+			"resonance":  s.Identity.SpatialContext.Field.Resonance,
+			"timestamp":  time.Now(),
 		},
 	}
-	
+
 	return patterns
 }
 

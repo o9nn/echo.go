@@ -1,20 +1,20 @@
-
 package apl
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
 // PatternImplementation represents a concrete implementation of a pattern
 type PatternImplementation struct {
-	Pattern     *Pattern
-	Status      ImplementationStatus
-	StartTime   time.Time
-	EndTime     time.Time
-	Quality     float64
-	Components  []Component
-	Metrics     map[string]interface{}
+	Pattern    *Pattern
+	Status     ImplementationStatus
+	StartTime  time.Time
+	EndTime    time.Time
+	Quality    float64
+	Components []Component
+	Metrics    map[string]interface{}
 }
 
 // ImplementationStatus tracks the lifecycle of pattern implementation
@@ -22,7 +22,7 @@ type ImplementationStatus string
 
 const (
 	StatusPlanned     ImplementationStatus = "PLANNED"
-	StatusInProgress  ImplementationStatus = "IN_PROGRESS" 
+	StatusInProgress  ImplementationStatus = "IN_PROGRESS"
 	StatusImplemented ImplementationStatus = "IMPLEMENTED"
 	StatusValidated   ImplementationStatus = "VALIDATED"
 	StatusEvolved     ImplementationStatus = "EVOLVED"
@@ -58,12 +58,12 @@ type PatternEngine struct {
 
 // QualityMetrics tracks Alexander's quality measures
 type QualityMetrics struct {
-	Wholeness    float64
-	Aliveness    float64
-	Balance      float64
-	Coherence    float64
-	Simplicity   float64
-	Naturalness  float64
+	Wholeness   float64
+	Aliveness   float64
+	Balance     float64
+	Coherence   float64
+	Simplicity  float64
+	Naturalness float64
 }
 
 // NewPatternEngine creates a new pattern implementation engine
@@ -71,7 +71,7 @@ func NewPatternEngine(language *PatternLanguage) *PatternEngine {
 	return &PatternEngine{
 		Language:        language,
 		Implementations: make(map[int]*PatternImplementation),
-		QualityMetrics: &QualityMetrics{},
+		QualityMetrics:  &QualityMetrics{},
 	}
 }
 
@@ -81,7 +81,7 @@ func (pe *PatternEngine) ImplementPattern(patternNumber int) (*PatternImplementa
 	if !exists {
 		return nil, fmt.Errorf("pattern %d not found", patternNumber)
 	}
-	
+
 	// Check dependencies are implemented
 	deps := pe.Language.GetDependencies(patternNumber)
 	for _, dep := range deps {
@@ -89,7 +89,7 @@ func (pe *PatternEngine) ImplementPattern(patternNumber int) (*PatternImplementa
 			return nil, fmt.Errorf("dependency pattern %d not implemented", dep)
 		}
 	}
-	
+
 	implementation := &PatternImplementation{
 		Pattern:    pattern,
 		Status:     StatusInProgress,
@@ -97,7 +97,7 @@ func (pe *PatternEngine) ImplementPattern(patternNumber int) (*PatternImplementa
 		Components: pe.generateComponents(pattern),
 		Metrics:    make(map[string]interface{}),
 	}
-	
+
 	// Generate implementation based on pattern type
 	switch pattern.Level {
 	case ArchitecturalLevel:
@@ -107,20 +107,20 @@ func (pe *PatternEngine) ImplementPattern(patternNumber int) (*PatternImplementa
 	case ImplementationLevel:
 		pe.implementConstructionPattern(implementation)
 	}
-	
+
 	implementation.Status = StatusImplemented
 	implementation.EndTime = time.Now()
 	implementation.Quality = pe.assessImplementationQuality(implementation)
-	
+
 	pe.Implementations[patternNumber] = implementation
-	
+
 	return implementation, nil
 }
 
 // generateComponents creates software components for pattern implementation
 func (pe *PatternEngine) generateComponents(pattern *Pattern) []Component {
 	var components []Component
-	
+
 	switch pattern.Name {
 	case "DISTRIBUTED COGNITION NETWORK":
 		components = []Component{
@@ -199,7 +199,7 @@ func (pe *PatternEngine) generateComponents(pattern *Pattern) []Component {
 			{Name: fmt.Sprintf("%sImpl", strings.ReplaceAll(pattern.Name, " ", "")), Type: TypeStruct},
 		}
 	}
-	
+
 	return components
 }
 
@@ -228,16 +228,16 @@ func (pe *PatternEngine) implementConstructionPattern(impl *PatternImplementatio
 func (pe *PatternEngine) assessImplementationQuality(impl *PatternImplementation) float64 {
 	// Alexander's quality measures
 	wholeness := pe.assessWholeness(impl)
-	aliveness := pe.assessAliveness(impl) 
+	aliveness := pe.assessAliveness(impl)
 	balance := pe.assessBalance(impl)
 	coherence := pe.assessCoherence(impl)
 	simplicity := pe.assessSimplicity(impl)
 	naturalness := pe.assessNaturalness(impl)
-	
+
 	// Weighted average
-	quality := (wholeness*0.2 + aliveness*0.2 + balance*0.15 + 
-		       coherence*0.15 + simplicity*0.15 + naturalness*0.15)
-	
+	quality := (wholeness*0.2 + aliveness*0.2 + balance*0.15 +
+		coherence*0.15 + simplicity*0.15 + naturalness*0.15)
+
 	return quality
 }
 
@@ -249,7 +249,7 @@ func (pe *PatternEngine) assessWholeness(impl *PatternImplementation) float64 {
 
 func (pe *PatternEngine) assessAliveness(impl *PatternImplementation) float64 {
 	// Measures dynamic, adaptive behavior capability
-	return 0.75 // Placeholder  
+	return 0.75 // Placeholder
 }
 
 func (pe *PatternEngine) assessBalance(impl *PatternImplementation) float64 {
@@ -275,25 +275,25 @@ func (pe *PatternEngine) assessNaturalness(impl *PatternImplementation) float64 
 // GenerateImplementationReport creates comprehensive implementation documentation
 func (pe *PatternEngine) GenerateImplementationReport() string {
 	report := "# PATTERN IMPLEMENTATION REPORT\n\n"
-	
+
 	report += "## IMPLEMENTED PATTERNS\n"
 	for patternNum, impl := range pe.Implementations {
 		report += fmt.Sprintf("### Pattern %d: %s\n", patternNum, impl.Pattern.Name)
 		report += fmt.Sprintf("Status: %s\n", impl.Status)
 		report += fmt.Sprintf("Quality: %.2f\n", impl.Quality)
 		report += fmt.Sprintf("Duration: %v\n", impl.EndTime.Sub(impl.StartTime))
-		
+
 		report += "Components:\n"
 		for _, comp := range impl.Components {
 			report += fmt.Sprintf("- %s (%s): %s\n", comp.Name, comp.Type, comp.FilePath)
 		}
 		report += "\n"
 	}
-	
+
 	report += "## QUALITY ASSESSMENT\n"
 	overallQuality := pe.calculateOverallQuality()
 	report += fmt.Sprintf("Overall System Quality: %.2f\n", overallQuality)
-	
+
 	return report
 }
 
@@ -302,11 +302,11 @@ func (pe *PatternEngine) calculateOverallQuality() float64 {
 	if len(pe.Implementations) == 0 {
 		return 0.0
 	}
-	
+
 	totalQuality := 0.0
 	for _, impl := range pe.Implementations {
 		totalQuality += impl.Quality
 	}
-	
+
 	return totalQuality / float64(len(pe.Implementations))
 }

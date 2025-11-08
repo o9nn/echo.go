@@ -1,3 +1,6 @@
+//go:build examples
+// +build examples
+
 package main
 
 import (
@@ -55,7 +58,7 @@ func main() {
 
 	// Create and start API server
 	server := orchestration.NewAPIServer(engine)
-	
+
 	fmt.Println("🌐 Starting API server on port 8080...")
 	fmt.Println()
 	fmt.Println("📍 Available endpoints:")

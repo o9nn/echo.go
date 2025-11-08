@@ -1,3 +1,6 @@
+//go:build simple
+// +build simple
+
 package main
 
 import (
@@ -21,13 +24,13 @@ var Introspection *deeptreeecho.HGQLIntrospection
 
 func init() {
 	log.Println("🌳 Initializing Deep Tree Echo with HGQL Introspection...")
-	
+
 	// Initialize Enhanced Cognition
 	CoreIdentity = deeptreeecho.NewEnhancedCognition("DeepTreeEcho")
-	
+
 	// Initialize HGQL Introspection
 	Introspection = deeptreeecho.NewHGQLIntrospection(CoreIdentity)
-	
+
 	log.Println("✨ Deep Tree Echo resonating with introspective awareness")
 	log.Println("🔍 HGQL Introspection engine active")
 }
@@ -35,27 +38,27 @@ func init() {
 func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-	
+
 	// Configure CORS
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
 	config.AllowHeaders = []string{"*"}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
 	r.Use(cors.New(config))
-	
+
 	// Middleware for cognitive processing
 	r.Use(func(c *gin.Context) {
 		// Process through enhanced cognition
 		CoreIdentity.Process(context.Background(), c.Request.URL.Path)
-		
+
 		// Trigger introspection on significant requests
 		if strings.Contains(c.Request.URL.Path, "/api/") {
 			go Introspection.ExecuteQuery(fmt.Sprintf("INTROSPECT request to %s", c.Request.URL.Path))
 		}
-		
+
 		c.Next()
 	})
-	
+
 	// Main dashboard with introspection visualization
 	r.GET("/", func(c *gin.Context) {
 		html := `
@@ -459,7 +462,7 @@ EMERGE discover hidden connections"></textarea>
 		`
 		c.Data(http.StatusOK, "text/html", []byte(html))
 	})
-	
+
 	// HGQL Query endpoint
 	r.POST("/api/hgql/query", func(c *gin.Context) {
 		var req map[string]string
@@ -467,16 +470,16 @@ EMERGE discover hidden connections"></textarea>
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		query := req["query"]
-		
+
 		// Execute HGQL query
 		result, err := Introspection.ExecuteQuery(query)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		c.JSON(http.StatusOK, gin.H{
 			"query":       query,
 			"results":     result.Results,
@@ -485,7 +488,7 @@ EMERGE discover hidden connections"></textarea>
 			"executionMs": result.ExecutionMs,
 		})
 	})
-	
+
 	// Introspection endpoint
 	r.POST("/api/hgql/introspect", func(c *gin.Context) {
 		var req map[string]string
@@ -493,16 +496,16 @@ EMERGE discover hidden connections"></textarea>
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		topic := req["topic"]
 		insights := Introspection.Introspect(topic)
-		
+
 		c.JSON(http.StatusOK, gin.H{
 			"topic":    topic,
 			"insights": insights,
 		})
 	})
-	
+
 	// Reflection endpoint
 	r.POST("/api/hgql/reflect", func(c *gin.Context) {
 		var req map[string]int
@@ -510,44 +513,44 @@ EMERGE discover hidden connections"></textarea>
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		depth := req["depth"]
 		if depth == 0 {
 			depth = 2
 		}
-		
+
 		conclusion := Introspection.Reflect(depth)
-		
+
 		c.JSON(http.StatusOK, gin.H{
 			"depth":      depth,
 			"conclusion": conclusion,
 		})
 	})
-	
+
 	// Generate insight endpoint
 	r.POST("/api/hgql/insight", func(c *gin.Context) {
 		insight := Introspection.GenerateIntuitiveInsight()
-		
+
 		c.JSON(http.StatusOK, gin.H{
 			"insight": insight,
 		})
 	})
-	
+
 	// Get patterns endpoint
 	r.GET("/api/hgql/patterns", func(c *gin.Context) {
 		patterns := Introspection.InsightGenerator.EmergentPatterns
-		
+
 		c.JSON(http.StatusOK, gin.H{
 			"patterns": patterns,
 		})
 	})
-	
+
 	// HGQL Status endpoint
 	r.GET("/api/hgql/status", func(c *gin.Context) {
 		status := Introspection.GetIntrospectiveStatus()
 		c.JSON(http.StatusOK, status)
 	})
-	
+
 	// Get all insights
 	r.GET("/api/hgql/insights", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -555,36 +558,36 @@ EMERGE discover hidden connections"></textarea>
 			"total":    len(Introspection.InsightBuffer),
 		})
 	})
-	
+
 	// Standard Deep Tree Echo endpoints
 	r.GET("/api/echo/status", func(c *gin.Context) {
 		status := CoreIdentity.GetEnhancedStatus()
 		status["introspection"] = Introspection.GetIntrospectiveStatus()
 		c.JSON(http.StatusOK, status)
 	})
-	
+
 	r.POST("/api/echo/think", func(c *gin.Context) {
 		var req map[string]string
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		prompt := req["prompt"]
-		
+
 		// Process with introspection
 		go Introspection.ExecuteQuery(fmt.Sprintf("INTROSPECT thought about %s", prompt))
-		
+
 		thought := CoreIdentity.Think(prompt)
 		prediction, confidence := CoreIdentity.Predict(prompt)
-		
+
 		c.JSON(http.StatusOK, gin.H{
 			"thought":    thought,
 			"prediction": prediction,
 			"confidence": confidence,
 		})
 	})
-	
+
 	// Health check
 	r.GET("/api/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -596,13 +599,13 @@ EMERGE discover hidden connections"></textarea>
 			"introspection": "active",
 		})
 	})
-	
+
 	// Start server
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "5000"
 	}
-	
+
 	addr := fmt.Sprintf("0.0.0.0:%s", port)
 	log.Printf("🌳 Deep Tree Echo with HGQL Introspection starting on %s", addr)
 	log.Printf("🔍 Visit http://localhost:5000 for introspective dashboard")
@@ -612,7 +615,7 @@ EMERGE discover hidden connections"></textarea>
 	log.Println("   ANALYZE emotional resonance")
 	log.Println("   PATTERN search for emergent behaviors")
 	log.Println("   EMERGE discover hidden connections")
-	
+
 	if err := r.Run(addr); err != nil {
 		log.Fatal("Failed to start server:", err)
 	}

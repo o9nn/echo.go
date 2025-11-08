@@ -1,3 +1,6 @@
+//go:build examples
+// +build examples
+
 package main
 
 import (
@@ -26,8 +29,8 @@ func main() {
 	orchestration.RegisterDefaultTools(engine)
 	orchestration.RegisterDefaultPlugins(engine)
 
-	fmt.Printf("✅ Initialized engine with %d tools and %d plugins\n", 
-		len(engine.GetAvailableTools()), 
+	fmt.Printf("✅ Initialized engine with %d tools and %d plugins\n",
+		len(engine.GetAvailableTools()),
 		len(engine.GetAvailablePlugins()))
 
 	// Initialize Deep Tree Echo System
@@ -41,7 +44,7 @@ func main() {
 
 	// Create specialized agents
 	fmt.Println("\n🤖 Creating Specialized Agents...")
-	
+
 	// Create a performance-optimized agent
 	performanceAgent, err := engine.CreateSpecializedAgent(ctx, orchestration.AgentTypeSpecialist, "performance-optimization")
 	if err != nil {
@@ -65,7 +68,7 @@ func main() {
 
 	// Demonstrate optimized task execution
 	fmt.Println("\n⚡ Demonstrating Performance-Optimized Task Execution...")
-	
+
 	task1 := &orchestration.Task{
 		Type:  orchestration.TaskTypeTool,
 		Input: "Calculate the performance impact of recent optimizations",
@@ -90,7 +93,7 @@ func main() {
 
 	// Demonstrate learning system
 	fmt.Println("\n🧠 Demonstrating Learning System...")
-	
+
 	// Execute several tasks to build learning history
 	for i := 0; i < 3; i++ {
 		task := &orchestration.Task{
@@ -98,7 +101,7 @@ func main() {
 			Type:  orchestration.TaskTypeReflect,
 			Input: fmt.Sprintf("Perform learning iteration %d: analyze patterns and improve", i+1),
 		}
-		
+
 		_, err := engine.ExecuteTask(ctx, task, learningAgent)
 		if err != nil {
 			log.Printf("Learning task %d failed: %v", i+1, err)
@@ -110,7 +113,7 @@ func main() {
 	// Get learning model for the agent
 	learningSystem := engine.GetLearningSystem()
 	model := learningSystem.GetLearningModel(learningAgent.ID)
-	
+
 	fmt.Printf("📊 Learning Model Stats:\n")
 	fmt.Printf("   - Current Performance: %.1f%%\n", model.LearningTrajectory.CurrentPerformance*100)
 	fmt.Printf("   - Learning Rate: %.1f%%\n", model.LearningRate*100)
@@ -165,7 +168,7 @@ func main() {
 	resourceUsage := engine.GetResourceUsage()
 	if len(resourceUsage) > 0 {
 		for agentID, usage := range resourceUsage {
-			fmt.Printf("   - Agent %s: CPU=%.1f%%, Memory=%.1fGB\n", 
+			fmt.Printf("   - Agent %s: CPU=%.1f%%, Memory=%.1fGB\n",
 				truncateString(agentID, 8), usage.CPUUsage*100, usage.MemoryUsageGB)
 		}
 	} else {
@@ -185,7 +188,7 @@ func main() {
 
 	// Multi-agent workflow demonstration
 	fmt.Println("\n🤝 Demonstrating Multi-Agent Workflow...")
-	
+
 	workflow := &orchestration.ConversationWorkflow{
 		ID:           "enhanced-workflow",
 		Name:         "Enhanced Orchestration Workflow",

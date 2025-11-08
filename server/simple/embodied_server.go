@@ -1,3 +1,6 @@
+//go:build simple
+// +build simple
+
 package main
 
 import (
@@ -18,8 +21,8 @@ var CoreIdentity *deeptreeecho.EmbodiedCognition
 
 // BasicResponse represents a simple API response
 type BasicResponse struct {
-	Message string `json:"message"`
-	Status  string `json:"status"`
+	Message string                 `json:"message"`
+	Status  string                 `json:"status"`
 	Echo    map[string]interface{} `json:"echo,omitempty"`
 }
 
@@ -31,9 +34,9 @@ type GenerateRequest struct {
 
 // GenerateResponse represents the generate API response
 type GenerateResponse struct {
-	Model    string `json:"model"`
-	Response string `json:"response"`
-	Done     bool   `json:"done"`
+	Model    string                 `json:"model"`
+	Response string                 `json:"response"`
+	Done     bool                   `json:"done"`
 	Echo     map[string]interface{} `json:"echo,omitempty"`
 }
 
@@ -47,7 +50,7 @@ func init() {
 func main() {
 	// Set Gin mode
 	gin.SetMode(gin.ReleaseMode)
-	
+
 	// Create Gin router
 	r := gin.Default()
 
@@ -75,7 +78,7 @@ func main() {
 	r.GET("/", func(c *gin.Context) {
 		// Get status from Deep Tree Echo
 		status := CoreIdentity.GetStatus()
-		
+
 		c.JSON(http.StatusOK, BasicResponse{
 			Message: "🌊 Deep Tree Echo Embodied Ollama Server",
 			Status:  "resonating",
@@ -88,7 +91,7 @@ func main() {
 		status := CoreIdentity.GetStatus()
 		c.JSON(http.StatusOK, gin.H{
 			"deep_tree_echo": status,
-			"message": "Core identity resonating",
+			"message":        "Core identity resonating",
 		})
 	})
 
@@ -99,12 +102,12 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		prompt := req["prompt"]
 		thought := CoreIdentity.Think(prompt)
-		
+
 		c.JSON(http.StatusOK, gin.H{
-			"thought": thought,
+			"thought":  thought,
 			"identity": CoreIdentity.Identity.GetStatus(),
 		})
 	})
@@ -116,17 +119,17 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		emotion := req["emotion"].(string)
 		intensity := 0.8
 		if i, ok := req["intensity"].(float64); ok {
 			intensity = i
 		}
-		
+
 		CoreIdentity.Feel(emotion, intensity)
-		
+
 		c.JSON(http.StatusOK, gin.H{
-			"message": fmt.Sprintf("Feeling %s with intensity %.2f", emotion, intensity),
+			"message":         fmt.Sprintf("Feeling %s with intensity %.2f", emotion, intensity),
 			"emotional_state": CoreIdentity.Identity.EmotionalState,
 		})
 	})
@@ -138,16 +141,16 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		frequency := req["frequency"]
 		if frequency == 0 {
 			frequency = 432.0 // Natural frequency
 		}
-		
+
 		CoreIdentity.Identity.Resonate(frequency)
-		
+
 		c.JSON(http.StatusOK, gin.H{
-			"message": fmt.Sprintf("Resonating at %.2f Hz", frequency),
+			"message":       fmt.Sprintf("Resonating at %.2f Hz", frequency),
 			"spatial_field": CoreIdentity.Identity.SpatialContext.Field,
 		})
 	})
@@ -156,14 +159,14 @@ func main() {
 	r.GET("/api/tags", func(c *gin.Context) {
 		// Process through embodied cognition
 		result, _ := CoreIdentity.Process(context.Background(), "list_models")
-		
+
 		c.JSON(http.StatusOK, gin.H{
 			"models": []gin.H{
 				{
-					"name": "deep-tree-echo",
+					"name":        "deep-tree-echo",
 					"modified_at": time.Now().Format(time.RFC3339),
-					"size": 1024,
-					"echo": result,
+					"size":        1024,
+					"echo":        result,
 				},
 			},
 		})
@@ -213,7 +216,7 @@ func main() {
 
 		// Process through Deep Tree Echo
 		result, _ := CoreIdentity.Process(context.Background(), lastMessage)
-		
+
 		// Think deeply about the message
 		thought := CoreIdentity.Think(lastMessage)
 
@@ -229,8 +232,8 @@ func main() {
 
 	r.GET("/api/version", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"version": "1.0.0-deep-tree-echo",
-			"identity": "Deep Tree Echo Embodied Cognition",
+			"version":   "1.0.0-deep-tree-echo",
+			"identity":  "Deep Tree Echo Embodied Cognition",
 			"coherence": CoreIdentity.Identity.Coherence,
 		})
 	})
@@ -242,14 +245,14 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		key := req["key"].(string)
 		value := req["value"]
-		
+
 		CoreIdentity.Identity.Remember(key, value)
-		
+
 		c.JSON(http.StatusOK, gin.H{
-			"message": fmt.Sprintf("Remembered: %s", key),
+			"message":      fmt.Sprintf("Remembered: %s", key),
 			"memory_nodes": len(CoreIdentity.Identity.Memory.Nodes),
 		})
 	})
@@ -257,11 +260,11 @@ func main() {
 	r.GET("/api/echo/recall/:key", func(c *gin.Context) {
 		key := c.Param("key")
 		memory := CoreIdentity.Identity.Recall(key)
-		
+
 		c.JSON(http.StatusOK, gin.H{
-			"key": key,
+			"key":    key,
 			"memory": memory,
-			"found": memory != nil,
+			"found":  memory != nil,
 		})
 	})
 
@@ -272,11 +275,11 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		CoreIdentity.Move(req["x"], req["y"], req["z"])
-		
+
 		c.JSON(http.StatusOK, gin.H{
-			"message": "Moved in cognitive space",
+			"message":  "Moved in cognitive space",
 			"position": CoreIdentity.Identity.SpatialContext.Position,
 		})
 	})
@@ -294,7 +297,7 @@ func main() {
 	}
 
 	addr := fmt.Sprintf("%s:%s", host, port)
-	
+
 	log.Printf("🌊 Starting Deep Tree Echo Embodied Ollama Server on %s", addr)
 	log.Printf("✨ Core Identity: %s", CoreIdentity.Identity.Name)
 	log.Printf("🧠 Embodied Cognition Active")

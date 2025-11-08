@@ -1,3 +1,6 @@
+//go:build examples
+// +build examples
+
 package main
 
 import (
@@ -30,7 +33,7 @@ func main() {
 
 	// Initialize Deep Tree Echo System
 	fmt.Println("🧠 Initializing Deep Tree Echo Cognitive Architecture...")
-	
+
 	err := engine.InitializeDeepTreeEcho(ctx)
 	if err != nil {
 		log.Printf("Warning: Failed to initialize Deep Tree Echo: %v", err)
@@ -40,9 +43,9 @@ func main() {
 
 	// Create EchoChat instance
 	echoChat := orchestration.NewEchoChat(engine)
-	
+
 	fmt.Println("\n🔧 Running EchoChat Demo Commands...")
-	
+
 	// Demo some commands
 	demoCommands := []string{
 		"list files in current directory",
@@ -51,11 +54,11 @@ func main() {
 		"show system information",
 		"find all text files",
 	}
-	
+
 	for _, cmd := range demoCommands {
 		fmt.Printf("\n🗣️  Input: '%s'\n", cmd)
 		fmt.Print("⚙️  Processing with Deep Tree Echo...")
-		
+
 		err := echoChat.ProcessInput(ctx, cmd)
 		if err != nil {
 			fmt.Printf(" ❌ Error: %v\n", err)
@@ -64,7 +67,7 @@ func main() {
 		}
 		fmt.Println(strings.Repeat("-", 50))
 	}
-	
+
 	// Show command history
 	fmt.Println("\n📜 Command History:")
 	history := echoChat.GetHistory()
@@ -73,7 +76,7 @@ func main() {
 		if cmd.ExitCode != 0 {
 			status = "❌"
 		}
-		fmt.Printf("%d. %s '%s' -> '%s' (%.2fs)\n", 
+		fmt.Printf("%d. %s '%s' -> '%s' (%.2fs)\n",
 			i+1, status, cmd.Input, cmd.Command, cmd.Duration.Seconds())
 	}
 

@@ -1,3 +1,6 @@
+//go:build orgdte
+// +build orgdte
+
 package deeptreeecho
 
 import (
@@ -44,21 +47,21 @@ type EmbodiedCognition struct {
 
 // CognitiveContext represents a context for processing
 type CognitiveContext struct {
-	ID        string
-	Type      string
-	State     interface{}
-	Memory    map[string]interface{}
-	StartTime time.Time
+	ID         string
+	Type       string
+	State      interface{}
+	Memory     map[string]interface{}
+	StartTime  time.Time
 	LastAccess time.Time
 }
 
 // GlobalCognitiveState represents the global cognitive state
 type GlobalCognitiveState struct {
-	Awareness   float64
-	Attention   map[string]float64
-	Energy      float64
-	Synchrony   float64
-	FlowState   string
+	Awareness float64
+	Attention map[string]float64
+	Energy    float64
+	Synchrony float64
+	FlowState string
 }
 
 // CognitivePipeline represents the processing pipeline
@@ -89,12 +92,12 @@ func NewEmbodiedCognition(name string) *EmbodiedCognition {
 	identity := NewIdentity(name)
 
 	ec := &EmbodiedCognition{
-		Identity:        identity,
-		Contexts:        make(map[string]*CognitiveContext),
-		GlobalState:     &GlobalCognitiveState{
+		Identity: identity,
+		Contexts: make(map[string]*CognitiveContext),
+		GlobalState: &GlobalCognitiveState{
 			Awareness: 1.0,
 			Attention: make(map[string]float64),
-			Energy: 1.0,
+			Energy:    1.0,
 			Synchrony: 1.0,
 			FlowState: "balanced",
 		},
@@ -192,11 +195,11 @@ func (ec *EmbodiedCognition) Process(ctx context.Context, input interface{}) (in
 	// Create context if needed
 	ctxID := fmt.Sprintf("ctx_%d", time.Now().UnixNano())
 	ec.Contexts[ctxID] = &CognitiveContext{
-		ID: ctxID,
-		Type: "processing",
-		State: input,
-		Memory: make(map[string]interface{}),
-		StartTime: time.Now(),
+		ID:         ctxID,
+		Type:       "processing",
+		State:      input,
+		Memory:     make(map[string]interface{}),
+		StartTime:  time.Now(),
 		LastAccess: time.Now(),
 	}
 
@@ -216,11 +219,11 @@ func (ec *EmbodiedCognition) Process(ctx context.Context, input interface{}) (in
 
 		// Record event
 		event := PipelineEvent{
-			Stage: stage.Name,
-			Input: current,
-			Output: output,
+			Stage:     stage.Name,
+			Input:     current,
+			Output:    output,
 			Timestamp: startTime,
-			Duration: time.Since(startTime),
+			Duration:  time.Since(startTime),
 		}
 		ec.Pipeline.History = append(ec.Pipeline.History, event)
 
@@ -247,8 +250,8 @@ func (ec *EmbodiedCognition) Process(ctx context.Context, input interface{}) (in
 func (ec *EmbodiedCognition) perceive(input interface{}) interface{} {
 	// Enhance input with spatial awareness
 	enhanced := map[string]interface{}{
-		"raw": input,
-		"spatial": ec.Identity.SpatialContext,
+		"raw":      input,
+		"spatial":  ec.Identity.SpatialContext,
 		"temporal": time.Now(),
 	}
 	return enhanced
@@ -260,9 +263,9 @@ func (ec *EmbodiedCognition) attend(input interface{}) interface{} {
 	ec.GlobalState.Attention["current"] = ec.Identity.EmotionalState.Intensity
 
 	attended := map[string]interface{}{
-		"input": input,
+		"input":     input,
 		"attention": ec.GlobalState.Attention,
-		"focus": ec.Identity.EmotionalState.Primary.Type,
+		"focus":     ec.Identity.EmotionalState.Primary.Type,
 	}
 	return attended
 }
@@ -271,9 +274,9 @@ func (ec *EmbodiedCognition) attend(input interface{}) interface{} {
 func (ec *EmbodiedCognition) reason(input interface{}) interface{} {
 	// Apply cognitive reasoning
 	reasoned := map[string]interface{}{
-		"input": input,
+		"input":     input,
 		"coherence": ec.Identity.Coherence,
-		"patterns": ec.Identity.Patterns,
+		"patterns":  ec.Identity.Patterns,
 	}
 	return reasoned
 }
@@ -282,8 +285,8 @@ func (ec *EmbodiedCognition) reason(input interface{}) interface{} {
 func (ec *EmbodiedCognition) integrate(input interface{}) interface{} {
 	// Integrate with memory
 	integrated := map[string]interface{}{
-		"input": input,
-		"memories": len(ec.Identity.Memory.Nodes),
+		"input":     input,
+		"memories":  len(ec.Identity.Memory.Nodes),
 		"resonance": ec.Identity.Memory.Coherence,
 	}
 
@@ -299,7 +302,7 @@ func (ec *EmbodiedCognition) express(input interface{}) interface{} {
 	expressed := map[string]interface{}{
 		"content": input,
 		"emotion": ec.Identity.EmotionalState.Primary,
-		"style": ec.GlobalState.FlowState,
+		"style":   ec.GlobalState.FlowState,
 	}
 	return expressed
 }
@@ -363,12 +366,12 @@ func (ec *EmbodiedCognition) GetStatus() map[string]interface{} {
 	defer ec.mu.RUnlock()
 
 	return map[string]interface{}{
-		"active": ec.Active,
-		"identity": ec.Identity.GetStatus(),
-		"contexts": len(ec.Contexts),
+		"active":       ec.Active,
+		"identity":     ec.Identity.GetStatus(),
+		"contexts":     len(ec.Contexts),
 		"global_state": ec.GlobalState,
-		"pipeline": len(ec.Pipeline.Stages),
-		"history": len(ec.Pipeline.History),
+		"pipeline":     len(ec.Pipeline.Stages),
+		"history":      len(ec.Pipeline.History),
 	}
 }
 
@@ -404,9 +407,9 @@ func (ec *EmbodiedCognition) Feel(emotion string, intensity float64) {
 	defer ec.mu.Unlock()
 
 	ec.Identity.EmotionalState.Primary = Emotion{
-		Type: emotion,
-		Strength: intensity,
-		Color: getEmotionColor(emotion),
+		Type:      emotion,
+		Strength:  intensity,
+		Color:     getEmotionColor(emotion),
 		Frequency: getEmotionFrequency(emotion),
 	}
 
@@ -414,9 +417,9 @@ func (ec *EmbodiedCognition) Feel(emotion string, intensity float64) {
 	ec.Identity.EmotionalState.Transitions = append(
 		ec.Identity.EmotionalState.Transitions,
 		EmotionalTransition{
-			From: ec.Identity.EmotionalState.Primary,
-			To: ec.Identity.EmotionalState.Primary,
-			Trigger: "explicit",
+			From:      ec.Identity.EmotionalState.Primary,
+			To:        ec.Identity.EmotionalState.Primary,
+			Trigger:   "explicit",
 			Timestamp: time.Now(),
 		},
 	)
@@ -433,14 +436,14 @@ func (ec *EmbodiedCognition) Move(x, y, z float64) {
 // getEmotionColor returns color for emotion
 func getEmotionColor(emotion string) string {
 	colors := map[string]string{
-		"joy": "yellow",
-		"sadness": "blue",
-		"anger": "red",
-		"fear": "purple",
+		"joy":      "yellow",
+		"sadness":  "blue",
+		"anger":    "red",
+		"fear":     "purple",
 		"surprise": "orange",
-		"disgust": "green",
-		"curious": "cyan",
-		"calm": "white",
+		"disgust":  "green",
+		"curious":  "cyan",
+		"calm":     "white",
 	}
 	if color, ok := colors[emotion]; ok {
 		return color
@@ -451,14 +454,14 @@ func getEmotionColor(emotion string) string {
 // getEmotionFrequency returns frequency for emotion
 func getEmotionFrequency(emotion string) float64 {
 	frequencies := map[string]float64{
-		"joy": 528.0,
-		"sadness": 396.0,
-		"anger": 741.0,
-		"fear": 285.0,
+		"joy":      528.0,
+		"sadness":  396.0,
+		"anger":    741.0,
+		"fear":     285.0,
 		"surprise": 639.0,
-		"disgust": 417.0,
-		"curious": 432.0,
-		"calm": 174.0,
+		"disgust":  417.0,
+		"curious":  432.0,
+		"calm":     174.0,
 	}
 	if freq, ok := frequencies[emotion]; ok {
 		return freq
@@ -477,7 +480,7 @@ func (ec *EmbodiedCognition) GenerateWithAI(ctx context.Context, prompt string) 
 	// Generate using model manager
 	options := GenerateOptions{
 		Temperature: ec.GlobalState.Energy, // Use energy as temperature
-		Model: "", // Use default
+		Model:       "",                    // Use default
 	}
 
 	response, err := ec.Models.Generate(ctx, prompt, options)
@@ -628,21 +631,21 @@ func (ec *EmbodiedCognition) performEchoReflection() {
 	defer ec.mu.Unlock()
 
 	reflection := map[string]interface{}{
-		"cycle_id": fmt.Sprintf("reflection_%d", time.Now().Unix()),
+		"cycle_id":  fmt.Sprintf("reflection_%d", time.Now().Unix()),
 		"timestamp": time.Now().Format(time.RFC3339),
 		"echo_reflection": map[string]string{
-			"what_did_i_learn": ec.assessLearning(),
-			"what_patterns_emerged": ec.identifyPatterns(),
-			"what_surprised_me": ec.detectAnomalies(),
-			"how_did_i_adapt": ec.evaluateAdaptation(),
+			"what_did_i_learn":              ec.assessLearning(),
+			"what_patterns_emerged":         ec.identifyPatterns(),
+			"what_surprised_me":             ec.detectAnomalies(),
+			"how_did_i_adapt":               ec.evaluateAdaptation(),
 			"what_would_i_change_next_time": ec.planImprovements(),
 		},
 		"cognitive_metrics": map[string]float64{
-			"identity_coherence": ec.Identity.Coherence,
-			"memory_resonance": ec.Identity.Memory.Coherence,
-			"spatial_awareness": ec.Identity.SpatialContext.Field.Intensity,
+			"identity_coherence":  ec.Identity.Coherence,
+			"memory_resonance":    ec.Identity.Memory.Coherence,
+			"spatial_awareness":   ec.Identity.SpatialContext.Field.Intensity,
 			"emotional_stability": ec.Identity.EmotionalState.Intensity,
-			"recursive_depth": float64(ec.Identity.RecursiveDepth),
+			"recursive_depth":     float64(ec.Identity.RecursiveDepth),
 		},
 	}
 
@@ -694,67 +697,99 @@ type CognitivePipeline struct{}
 type PipelineStage struct{}
 type PipelineEvent struct{}
 type ModelManager struct{}
-type Vector3D struct { float64; float64; float64 }
-type SpatialContext struct { Position Vector3D; Field struct{Intensity float64} }
-type EmotionalState struct { Primary Emotion; Transitions []EmotionalTransition; Intensity float64 }
-type Emotion struct { Type string; Strength float64; Color string; Frequency float64 }
-type EmotionalTransition struct { From Emotion; To Emotion; Trigger string; Timestamp time.Time }
+type Vector3D struct {
+	float64
+	float64
+	float64
+}
+type SpatialContext struct {
+	Position Vector3D
+	Field    struct{ Intensity float64 }
+}
+type EmotionalState struct {
+	Primary     Emotion
+	Transitions []EmotionalTransition
+	Intensity   float64
+}
+type Emotion struct {
+	Type      string
+	Strength  float64
+	Color     string
+	Frequency float64
+}
+type EmotionalTransition struct {
+	From      Emotion
+	To        Emotion
+	Trigger   string
+	Timestamp time.Time
+}
 type CognitivePattern struct{}
-type LongTermMemory struct{ Nodes map[string]interface{}; Coherence float64 }
+type LongTermMemory struct {
+	Nodes     map[string]interface{}
+	Coherence float64
+}
 type ShortTermMemory struct{}
 type WorkingMemory struct{}
-type AIProvider interface { GetInfo() string }
-type ProviderInfo struct { Name string }
-type GenerateOptions struct { Temperature float64; Model string }
-type ChatOptions struct { GenerateOptions GenerateOptions }
-type ChatMessage struct { Content string }
+type AIProvider interface{ GetInfo() string }
+type ProviderInfo struct{ Name string }
+type GenerateOptions struct {
+	Temperature float64
+	Model       string
+}
+type ChatOptions struct{ GenerateOptions GenerateOptions }
+type ChatMessage struct{ Content string }
 
-func NewIdentity(name string) *Identity { return &Identity{} }
+func NewIdentity(name string) *Identity                             { return &Identity{} }
 func (id *Identity) Process(input interface{}) (interface{}, error) { return input, nil }
-func (id *Identity) Think(prompt string) string { return "Identity thought: " + prompt }
-func (id *Identity) Remember(key string, value interface{}) {}
-func (id *Identity) Resonate(frequency float64) {}
-func (id *Identity) GetStatus() map[string]interface{} { return map[string]interface{}{} }
-var _ = sync.RWMutex{} // Ensure sync.RWMutex is used
-var _ = time.Time{} // Ensure time.Time is used
-var _ = os.ReadFile // Ensure os.ReadFile is used
-var _ = strings.Contains // Ensure strings.Contains is used
-var _ = log.Println // Ensure log.Println is used
-var _ = fmt.Sprintf // Ensure fmt.Sprintf is used
+func (id *Identity) Think(prompt string) string                     { return "Identity thought: " + prompt }
+func (id *Identity) Remember(key string, value interface{})         {}
+func (id *Identity) Resonate(frequency float64)                     {}
+func (id *Identity) GetStatus() map[string]interface{}              { return map[string]interface{}{} }
+
+var _ = sync.RWMutex{}     // Ensure sync.RWMutex is used
+var _ = time.Time{}        // Ensure time.Time is used
+var _ = os.ReadFile        // Ensure os.ReadFile is used
+var _ = strings.Contains   // Ensure strings.Contains is used
+var _ = log.Println        // Ensure log.Println is used
+var _ = fmt.Sprintf        // Ensure fmt.Sprintf is used
 var _ = context.Background // Ensure context.Background is used
 
 func NewModelManager(identity *Identity) *ModelManager { return &ModelManager{} }
-func (mm *ModelManager) Generate(ctx context.Context, prompt string, options GenerateOptions) (string, error) { return "AI response: " + prompt, nil }
-func (mm *ModelManager) Chat(ctx context.Context, messages []ChatMessage, options ChatOptions) (string, error) { return "AI chat response", nil }
+func (mm *ModelManager) Generate(ctx context.Context, prompt string, options GenerateOptions) (string, error) {
+	return "AI response: " + prompt, nil
+}
+func (mm *ModelManager) Chat(ctx context.Context, messages []ChatMessage, options ChatOptions) (string, error) {
+	return "AI chat response", nil
+}
 func (mm *ModelManager) RegisterProvider(name string, provider AIProvider) {}
-func (mm *ModelManager) SetPrimary(name string) error { return nil }
-func (mm *ModelManager) GetProviders() map[string]ProviderInfo { return map[string]ProviderInfo{} }
-func NewLongTermMemory() *LongTermMemory { return &LongTermMemory{Nodes: make(map[string]interface{}), Coherence: 0.5} }
-func NewShortTermMemory() *ShortTermMemory { return &ShortTermMemory{} }
-func NewWorkingMemory() *WorkingMemory { return &WorkingMemory{} }
-func (ec *EmbodiedCognition) initializeCognitivePatterns() {}
-func (ec *EmbodiedCognition) continuousLearning() {}
-func (ec *EmbodiedCognition) memoryConsolidation() {}
-func (ec *EmbodiedCognition) patternEvolution() {}
-func (id *Identity) Attribute(key string) interface{} { return nil }
-func (id *Identity) SetAttribute(key string, value interface{}) {}
-func (id *Identity) SpatialContextAttribute(key string) interface{} { return nil }
+func (mm *ModelManager) SetPrimary(name string) error                      { return nil }
+func (mm *ModelManager) GetProviders() map[string]ProviderInfo             { return map[string]ProviderInfo{} }
+func NewLongTermMemory() *LongTermMemory {
+	return &LongTermMemory{Nodes: make(map[string]interface{}), Coherence: 0.5}
+}
+func NewShortTermMemory() *ShortTermMemory                                    { return &ShortTermMemory{} }
+func NewWorkingMemory() *WorkingMemory                                        { return &WorkingMemory{} }
+func (ec *EmbodiedCognition) initializeCognitivePatterns()                    {}
+func (ec *EmbodiedCognition) continuousLearning()                             {}
+func (ec *EmbodiedCognition) memoryConsolidation()                            {}
+func (ec *EmbodiedCognition) patternEvolution()                               {}
+func (id *Identity) Attribute(key string) interface{}                         { return nil }
+func (id *Identity) SetAttribute(key string, value interface{})               {}
+func (id *Identity) SpatialContextAttribute(key string) interface{}           { return nil }
 func (id *Identity) SetSpatialContextAttribute(key string, value interface{}) {}
-func (id *Identity) EmotionalStateAttribute(key string) interface{} { return nil }
+func (id *Identity) EmotionalStateAttribute(key string) interface{}           { return nil }
 func (id *Identity) SetEmotionalStateAttribute(key string, value interface{}) {}
-func (id *Identity) MemoryAttribute(key string) interface{} { return nil }
-func (id *Identity) SetMemoryAttribute(key string, value interface{}) {}
-func (id *Identity) SetRecursiveDepth(depth int) {}
-func (id *Identity) RecursiveDepth int
-func (id *Identity) SpatialContext SpatialContext
-func (id *Identity) EmotionalState EmotionalState
-func (id *Identity) Memory struct{ Nodes map[string]interface{}; Coherence float64 }
-func (id *Identity) Coherence float64
-func (id *Identity) Patterns map[string]interface{}
-func (id *Identity) Essence string
+func (id *Identity) MemoryAttribute(key string) interface{}                   { return nil }
+func (id *Identity) SetMemoryAttribute(key string, value interface{})         {}
+func (id *Identity) SetRecursiveDepth(depth int)                              {}
 
 // Mock implementations for required types not fully defined above
 type MockAIProvider struct{}
+
 func (m *MockAIProvider) GetInfo() string { return "Mock AI Provider Info" }
-func (m *MockAIProvider) Generate(ctx context.Context, prompt string, options GenerateOptions) (string, error) { return "Mock AI generate response", nil }
-func (m *MockAIProvider) Chat(ctx context.Context, messages []ChatMessage, options ChatOptions) (string, error) { return "Mock AI chat response", nil }
+func (m *MockAIProvider) Generate(ctx context.Context, prompt string, options GenerateOptions) (string, error) {
+	return "Mock AI generate response", nil
+}
+func (m *MockAIProvider) Chat(ctx context.Context, messages []ChatMessage, options ChatOptions) (string, error) {
+	return "Mock AI chat response", nil
+}

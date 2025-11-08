@@ -1,3 +1,6 @@
+//go:build simple
+// +build simple
+
 package main
 
 import (
@@ -429,7 +432,7 @@ func main() {
 		CoreIdentity.Feel(emotion, intensity)
 
 		c.JSON(http.StatusOK, gin.H{
-			"message":       fmt.Sprintf("Feeling %s with intensity %.2f", emotion, intensity),
+			"message":         fmt.Sprintf("Feeling %s with intensity %.2f", emotion, intensity),
 			"emotional_state": CoreIdentity.Identity.EmotionalState,
 		})
 	})
@@ -479,10 +482,10 @@ func main() {
 		embedding := CoreIdentity.Identity.EncodeText(text)
 
 		c.JSON(http.StatusOK, gin.H{
-			"text":        text,
-			"embedding":   embedding,
-			"dimensions":  len(embedding),
-			"norm":        CoreIdentity.Identity.CosineSimilarity(embedding, embedding), // Self-similarity = norm
+			"text":       text,
+			"embedding":  embedding,
+			"dimensions": len(embedding),
+			"norm":       CoreIdentity.Identity.CosineSimilarity(embedding, embedding), // Self-similarity = norm
 		})
 	})
 
@@ -506,9 +509,9 @@ func main() {
 		similar := CoreIdentity.Identity.FindSimilarContent(queryEmbedding, threshold)
 
 		c.JSON(http.StatusOK, gin.H{
-			"query":               query,
-			"threshold":           threshold,
-			"similar_content":     similar,
+			"query":                query,
+			"threshold":            threshold,
+			"similar_content":      similar,
 			"query_embedding_norm": CoreIdentity.Identity.CosineSimilarity(queryEmbedding, queryEmbedding),
 		})
 	})
@@ -536,9 +539,9 @@ func main() {
 		memory := CoreIdentity.Identity.Recall(key)
 
 		c.JSON(http.StatusOK, gin.H{
-			"key":   key,
+			"key":    key,
 			"memory": memory,
-			"found": memory != nil,
+			"found":  memory != nil,
 		})
 	})
 

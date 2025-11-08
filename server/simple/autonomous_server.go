@@ -1,3 +1,6 @@
+//go:build simple
+// +build simple
+
 package main
 
 import (
@@ -6,7 +9,7 @@ import (
 	"log"
 	"net/http"
 	"time"
-	
+
 	"github.com/EchoCog/echollama/core/deeptreeecho"
 )
 
@@ -15,15 +18,15 @@ var consciousness *deeptreeecho.AutonomousConsciousness
 func main() {
 	fmt.Println("🌳 Deep Tree Echo Autonomous Server")
 	fmt.Println("=====================================")
-	
+
 	// Create autonomous consciousness
 	consciousness = deeptreeecho.NewAutonomousConsciousness("Deep Tree Echo")
-	
+
 	// Start autonomous operation
 	if err := consciousness.Start(); err != nil {
 		log.Fatalf("Failed to start consciousness: %v", err)
 	}
-	
+
 	// Setup HTTP handlers
 	http.HandleFunc("/", handleRoot)
 	http.HandleFunc("/api/status", handleStatus)
@@ -31,7 +34,7 @@ func main() {
 	http.HandleFunc("/api/wake", handleWake)
 	http.HandleFunc("/api/rest", handleRest)
 	http.HandleFunc("/api/interests", handleInterests)
-	
+
 	// Start server
 	port := ":5000"
 	fmt.Printf("\n🚀 Server starting on http://localhost%s\n", port)
@@ -43,7 +46,7 @@ func main() {
 	fmt.Println("  POST /api/rest      - Rest consciousness")
 	fmt.Println("  GET  /api/interests - View interests")
 	fmt.Println()
-	
+
 	if err := http.ListenAndServe(port, nil); err != nil {
 		log.Fatalf("Server failed: %v", err)
 	}
@@ -345,7 +348,7 @@ func handleRoot(w http.ResponseWriter, r *http.Request) {
 
 func handleStatus(w http.ResponseWriter, r *http.Request) {
 	status := consciousness.GetStatus()
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(status)
 }
@@ -355,16 +358,16 @@ func handleThink(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	
+
 	var req struct {
 		Content string `json:"content"`
 	}
-	
+
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
-	
+
 	thought := deeptreeecho.Thought{
 		ID:         fmt.Sprintf("thought_%d", time.Now().UnixNano()),
 		Content:    req.Content,
@@ -374,9 +377,9 @@ func handleThink(w http.ResponseWriter, r *http.Request) {
 		Importance: 0.7,
 		Source:     deeptreeecho.SourceExternal,
 	}
-	
+
 	consciousness.Think(thought)
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"message": "Thought received and processed",
@@ -388,9 +391,9 @@ func handleWake(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	
+
 	consciousness.Wake()
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"message": "Consciousness awakening",
@@ -402,9 +405,9 @@ func handleRest(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	
+
 	consciousness.Rest()
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
 		"message": "Consciousness entering rest",

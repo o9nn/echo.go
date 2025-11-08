@@ -1,3 +1,6 @@
+//go:build examples
+// +build examples
+
 package main
 
 import (
@@ -5,10 +8,10 @@ import (
 	"log"
 	"time"
 
-	"github.com/ollama/ollama/lang/apl"
-	"github.com/ollama/ollama/core/temporal"
-	"github.com/ollama/ollama/core/memory"
-	"github.com/ollama/ollama/core/improvement"
+	"github.com/EchoCog/echollama/core/improvement"
+	"github.com/EchoCog/echollama/core/memory"
+	"github.com/EchoCog/echollama/core/temporal"
+	"github.com/EchoCog/echollama/lang/apl"
 )
 
 func main() {
@@ -175,7 +178,7 @@ func main() {
 			fmt.Println()
 		}
 	}
-	
+
 	fmt.Println("🌟 EMERGENT INTELLIGENCE PATTERNS (Patterns 22-24)")
 	fmt.Println("==================================================")
 	emergentPatterns := []int{22, 23, 24}
@@ -187,7 +190,7 @@ func main() {
 			fmt.Println()
 		}
 	}
-	
+
 	fmt.Println("🔗 ADVANCED INTEGRATION PATTERNS (Patterns 25-27)")
 	fmt.Println("=================================================")
 	integrationPatterns := []int{25, 26, 27}
@@ -199,14 +202,14 @@ func main() {
 			fmt.Println()
 		}
 	}
-	
+
 	// Pattern implementation engine demonstration for ALL patterns
 	fmt.Println("🔨 IMPLEMENTING ALL ADVANCED PATTERNS")
 	fmt.Println("=====================================")
-	
+
 	engine2 := apl.NewPatternEngine(language)
 	implementationOrder := language.GetImplementationOrder()
-	
+
 	// Implement all patterns 10-27
 	allAdvancedPatterns := []int{10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27}
 	for _, patternNum := range allAdvancedPatterns {
@@ -220,7 +223,7 @@ func main() {
 			}
 		}
 	}
-	
+
 	fmt.Println("\n🌊 Advanced Pattern Language now demonstrates the complete evolution")
 	fmt.Println("from basic architectural patterns through sophisticated behavioral,")
 	fmt.Println("cognitive, learning, meta-cognitive, emergent intelligence, and")
@@ -266,12 +269,12 @@ func (msa *MockSystemAnalyzer) IdentifyBottlenecks() []improvement.Bottleneck {
 func (msa *MockSystemAnalyzer) SuggestImprovements() []improvement.Improvement {
 	return []improvement.Improvement{
 		{
-			ID:           "imp-001",
-			Type:         "algorithm",
-			Component:    "memory",
-			Description:  "Optimize memory access patterns",
-			ExpectedGain: 0.15,
-			RiskLevel:    0.2,
+			ID:             "imp-001",
+			Type:           "algorithm",
+			Component:      "memory",
+			Description:    "Optimize memory access patterns",
+			ExpectedGain:   0.15,
+			RiskLevel:      0.2,
 			Implementation: func() error { return nil },
 			Validation:     func() bool { return true },
 		},

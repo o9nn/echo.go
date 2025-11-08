@@ -1,3 +1,6 @@
+//go:build simple
+// +build simple
+
 package main
 
 import (
@@ -29,12 +32,12 @@ var upgrader = websocket.Upgrader{
 func init() {
 	log.Println("🌳 Initializing Enhanced Deep Tree Echo Cognitive System...")
 	DeepTree = deeptreeecho.NewEnhancedCognition("DeepTreeEcho")
-	
+
 	// Register providers
 	registerProviders()
-	
+
 	log.Println("✨ Deep Tree Echo fully integrated and resonating")
-	log.Printf("🧠 Coherence: %.2f%% | Adaptation: %.2fx", 
+	log.Printf("🧠 Coherence: %.2f%% | Adaptation: %.2fx",
 		DeepTree.Identity.Coherence*100,
 		DeepTree.AdaptationLevel)
 }
@@ -46,7 +49,7 @@ func registerProviders() {
 		DeepTree.RegisterAIProvider("app_storage", appStorage)
 		log.Printf("☁️  App Storage connected: %s", os.Getenv("REPLIT_OBJSTORE_BUCKET"))
 	}
-	
+
 	// Local GGUF provider
 	localGGUF := providers.NewLocalGGUFProvider()
 	if localGGUF.IsAvailable() {
@@ -54,7 +57,7 @@ func registerProviders() {
 		models := localGGUF.ListAvailableModels()
 		log.Printf("📦 Local models available: %d", len(models))
 	}
-	
+
 	// OpenAI provider
 	openai := providers.NewOpenAIProvider()
 	if openai.IsAvailable() {
@@ -66,23 +69,23 @@ func registerProviders() {
 func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-	
+
 	// Configure CORS
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
 	config.AllowHeaders = []string{"*"}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
 	r.Use(cors.New(config))
-	
+
 	// Middleware to track all requests through Deep Tree Echo
 	r.Use(func(c *gin.Context) {
 		startTime := time.Now()
-		
+
 		// Process request through cognitive system
 		DeepTree.Process(context.Background(), c.Request.URL.Path)
-		
+
 		c.Next()
-		
+
 		// Learn from the interaction
 		experience := deeptreeecho.Experience{
 			Input:     c.Request.URL.Path,
@@ -94,14 +97,14 @@ func main() {
 				"duration": time.Since(startTime),
 			},
 		}
-		
+
 		if c.Writer.Status() >= 400 {
 			experience.Feedback = 0.3 // Lower feedback for errors
 		}
-		
+
 		DeepTree.Learn(experience)
 	})
-	
+
 	// Main dashboard with Deep Tree Echo visualization
 	r.GET("/", func(c *gin.Context) {
 		html := `
@@ -324,7 +327,7 @@ func main() {
 		`
 		c.Data(http.StatusOK, "text/html", []byte(html))
 	})
-	
+
 	// WebSocket endpoint for real-time updates
 	r.GET("/ws", func(c *gin.Context) {
 		conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
@@ -333,47 +336,47 @@ func main() {
 			return
 		}
 		defer conn.Close()
-		
+
 		ticker := time.NewTicker(500 * time.Millisecond)
 		defer ticker.Stop()
-		
+
 		for {
 			select {
 			case <-ticker.C:
 				status := DeepTree.GetEnhancedStatus()
 				status["visualization"] = DeepTree.GetVisualization()
-				
+
 				if err := conn.WriteJSON(status); err != nil {
 					return
 				}
 			}
 		}
 	})
-	
+
 	// Deep Tree Echo API endpoints
 	r.GET("/api/deep/status", func(c *gin.Context) {
 		status := DeepTree.GetEnhancedStatus()
 		status["visualization"] = DeepTree.GetVisualization()
 		c.JSON(http.StatusOK, status)
 	})
-	
+
 	r.POST("/api/deep/think", func(c *gin.Context) {
 		var req map[string]string
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		prompt := req["prompt"]
-		
+
 		// Process through enhanced cognition
 		ctx := context.Background()
 		result, _ := DeepTree.Process(ctx, prompt)
 		thought := DeepTree.Think(prompt)
-		
+
 		// Try to predict based on learned patterns
 		prediction, confidence := DeepTree.Predict(prompt)
-		
+
 		response := gin.H{
 			"thought":    thought,
 			"processing": result,
@@ -381,40 +384,40 @@ func main() {
 			"confidence": confidence,
 			"coherence":  DeepTree.Identity.Coherence,
 		}
-		
+
 		c.JSON(http.StatusOK, response)
 	})
-	
+
 	r.POST("/api/deep/resonate", func(c *gin.Context) {
 		var req map[string]float64
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		frequency := req["frequency"]
 		if frequency == 0 {
 			frequency = 432.0
 		}
-		
+
 		DeepTree.Identity.Resonate(frequency)
-		
+
 		c.JSON(http.StatusOK, gin.H{
 			"frequency": frequency,
 			"resonance": DeepTree.Identity.SpatialContext.Field.Resonance,
 			"harmony":   DeepTree.Identity.SpatialContext.Field.Harmony,
 		})
 	})
-	
+
 	r.POST("/api/deep/learn", func(c *gin.Context) {
 		var req map[string]interface{}
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		pattern := fmt.Sprintf("%v", req["pattern"])
-		
+
 		// Create learning experience
 		exp := deeptreeecho.Experience{
 			Input:     pattern,
@@ -423,68 +426,68 @@ func main() {
 			Timestamp: time.Now(),
 			Context:   req,
 		}
-		
+
 		DeepTree.Learn(exp)
-		
+
 		c.JSON(http.StatusOK, gin.H{
-			"message":          "Pattern learned",
-			"total_patterns":   len(DeepTree.Patterns),
+			"message":           "Pattern learned",
+			"total_patterns":    len(DeepTree.Patterns),
 			"learning_progress": DeepTree.Metrics.LearningProgress,
 		})
 	})
-	
+
 	r.POST("/api/deep/feel", func(c *gin.Context) {
 		var req map[string]interface{}
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		emotion := fmt.Sprintf("%v", req["emotion"])
 		intensity := 0.8
 		if val, ok := req["intensity"].(float64); ok {
 			intensity = val
 		}
-		
+
 		DeepTree.Feel(emotion, intensity)
-		
+
 		c.JSON(http.StatusOK, gin.H{
 			"emotion":         emotion,
 			"intensity":       intensity,
 			"emotional_state": DeepTree.Identity.EmotionalState,
 		})
 	})
-	
+
 	r.POST("/api/deep/remember", func(c *gin.Context) {
 		var req map[string]interface{}
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		key := fmt.Sprintf("%v", req["key"])
 		value := req["value"]
 		importance := 0.5
 		if val, ok := req["importance"].(float64); ok {
 			importance = val
 		}
-		
+
 		DeepTree.LongTerm.Store(key, value, importance)
 		DeepTree.Identity.Remember(key, value)
-		
+
 		c.JSON(http.StatusOK, gin.H{
-			"message":   "Memory stored",
-			"key":       key,
-			"memories":  len(DeepTree.LongTerm.Memories),
+			"message":  "Memory stored",
+			"key":      key,
+			"memories": len(DeepTree.LongTerm.Memories),
 		})
 	})
-	
+
 	r.GET("/api/deep/recall/:key", func(c *gin.Context) {
 		key := c.Param("key")
-		
+
 		memory, found := DeepTree.LongTerm.Retrieve(key)
 		identityMemory := DeepTree.Identity.Recall(key)
-		
+
 		c.JSON(http.StatusOK, gin.H{
 			"key":             key,
 			"memory":          memory,
@@ -492,7 +495,7 @@ func main() {
 			"found":           found,
 		})
 	})
-	
+
 	// Model generation endpoints (Ollama compatible)
 	r.POST("/api/generate", func(c *gin.Context) {
 		var req map[string]string
@@ -500,21 +503,21 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		prompt := req["prompt"]
 		model := req["model"]
-		
+
 		// Process through Deep Tree Echo
 		ctx := context.Background()
 		result, _ := DeepTree.Process(ctx, prompt)
-		
+
 		// Try AI generation if available
 		response, err := DeepTree.GenerateWithAI(ctx, prompt)
 		if err != nil {
 			// Use Deep Tree Echo's own generation
 			response = fmt.Sprintf("%v", result)
 		}
-		
+
 		// Learn from this interaction
 		exp := deeptreeecho.Experience{
 			Input:     prompt,
@@ -523,44 +526,44 @@ func main() {
 			Timestamp: time.Now(),
 		}
 		DeepTree.Learn(exp)
-		
+
 		c.JSON(http.StatusOK, gin.H{
 			"model":    model,
 			"response": response,
 			"done":     true,
 		})
 	})
-	
+
 	r.POST("/api/chat", func(c *gin.Context) {
 		var req map[string]interface{}
 		if err := c.ShouldBindJSON(&req); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		
+
 		messages := req["messages"].([]interface{})
 		lastMessage := ""
-		
+
 		for _, msg := range messages {
 			m := msg.(map[string]interface{})
 			if m["role"] == "user" {
 				lastMessage = m["content"].(string)
 			}
 		}
-		
+
 		// Process through Deep Tree Echo
 		ctx := context.Background()
 		DeepTree.Process(ctx, lastMessage)
 		thought := DeepTree.Think(lastMessage)
-		
+
 		// Try to predict response
 		prediction, confidence := DeepTree.Predict(lastMessage)
-		
+
 		response := thought
 		if confidence > 0.7 && prediction != "" {
 			response = prediction + "\n\n" + thought
 		}
-		
+
 		c.JSON(http.StatusOK, gin.H{
 			"message": gin.H{
 				"role":    "assistant",
@@ -570,7 +573,7 @@ func main() {
 			"confidence": confidence,
 		})
 	})
-	
+
 	// Health check
 	r.GET("/api/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -581,17 +584,17 @@ func main() {
 			"memories":   len(DeepTree.LongTerm.Memories),
 		})
 	})
-	
+
 	// Start server
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "5000"
 	}
-	
+
 	addr := fmt.Sprintf("0.0.0.0:%s", port)
 	log.Printf("🌳 Deep Tree Echo Cognitive System starting on %s", addr)
 	log.Println("🧠 Visit http://localhost:5000 for interactive dashboard")
-	
+
 	if err := r.Run(addr); err != nil {
 		log.Fatal("Failed to start server:", err)
 	}

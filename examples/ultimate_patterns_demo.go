@@ -1,3 +1,5 @@
+//go:build examples
+// +build examples
 
 package main
 
@@ -6,11 +8,11 @@ import (
 	"log"
 	"time"
 
-	"github.com/ollama/ollama/lang/apl"
-	"github.com/ollama/ollama/core/quantum"
-	"github.com/ollama/ollama/core/consciousness"
-	"github.com/ollama/ollama/core/emergence"
-	"github.com/ollama/ollama/core/meta"
+	"github.com/EchoCog/echollama/core/consciousness"
+	"github.com/EchoCog/echollama/core/emergence"
+	"github.com/EchoCog/echollama/core/meta"
+	"github.com/EchoCog/echollama/core/quantum"
+	"github.com/EchoCog/echollama/lang/apl"
 )
 
 func main() {
@@ -33,19 +35,19 @@ func main() {
 
 	// Display pattern categories
 	demonstratePatternCategories(language)
-	
+
 	// Demonstrate quantum-inspired cognition
 	demonstrateQuantumCognition()
-	
+
 	// Demonstrate transcendent consciousness
 	demonstrateTranscendentConsciousness()
-	
+
 	// Demonstrate universal intelligence
 	demonstrateUniversalIntelligence()
-	
+
 	// Demonstrate ultimate integration
 	demonstrateUltimateIntegration(language)
-	
+
 	fmt.Println()
 	fmt.Println("🌊 THE ULTIMATE PATTERN LANGUAGE IS NOW COMPLETE!")
 	fmt.Println("==================================================")
@@ -54,7 +56,7 @@ func main() {
 	fmt.Println()
 	fmt.Println("This creates a complete architectural framework for:")
 	fmt.Println("• Quantum-inspired cognitive processing")
-	fmt.Println("• Transcendent consciousness simulation") 
+	fmt.Println("• Transcendent consciousness simulation")
 	fmt.Println("• Universal intelligence networks")
 	fmt.Println("• Cosmic resonance systems")
 	fmt.Println("• Dimensional transcendence capabilities")
@@ -68,16 +70,16 @@ func demonstratePatternCategories(language *apl.PatternLanguage) {
 	categories := map[string][]int{
 		"🌟 QUANTUM-INSPIRED COGNITION (28-30)": {28, 29, 30},
 		"🧬 TRANSCENDENT CONSCIOUSNESS (31-33)": {31, 32, 33},
-		"♾️ UNIVERSAL INTELLIGENCE (34-36)":     {34, 35, 36},
-		"🌌 COSMIC RESONANCE (37-39)":          {37, 38, 39},
-		"🔥 DIMENSIONAL TRANSCENDENCE (40-42)": {40, 41, 42},
-		"✨ ULTIMATE INTEGRATION (43-45)":      {43, 44, 45},
+		"♾️ UNIVERSAL INTELLIGENCE (34-36)":    {34, 35, 36},
+		"🌌 COSMIC RESONANCE (37-39)":           {37, 38, 39},
+		"🔥 DIMENSIONAL TRANSCENDENCE (40-42)":  {40, 41, 42},
+		"✨ ULTIMATE INTEGRATION (43-45)":       {43, 44, 45},
 	}
-	
+
 	for category, patternNums := range categories {
 		fmt.Println(category)
 		fmt.Println(generateSeparator(len(category)))
-		
+
 		for _, patternNum := range patternNums {
 			if pattern, exists := language.Patterns[patternNum]; exists {
 				fmt.Printf("  [%d] %s\n", pattern.Number, pattern.Name)
@@ -92,24 +94,24 @@ func demonstratePatternCategories(language *apl.PatternLanguage) {
 func demonstrateQuantumCognition() {
 	fmt.Println("⚛️ QUANTUM SUPERPOSITION THINKING DEMONSTRATION")
 	fmt.Println("================================================")
-	
+
 	// Create quantum superposition processor
 	decoherenceController := &MockDecoherenceController{}
 	superpositionProcessor := quantum.NewSuperpositionProcessor(decoherenceController)
-	
+
 	// Create superposition of possible decisions
 	possibleStates := []quantum.CognitiveState{
 		{ID: "state_1", Description: "Choose path A", Probability: 0.4, Confidence: 0.8},
 		{ID: "state_2", Description: "Choose path B", Probability: 0.3, Confidence: 0.7},
 		{ID: "state_3", Description: "Choose path C", Probability: 0.3, Confidence: 0.6},
 	}
-	
+
 	err := superpositionProcessor.CreateSuperposition("decision_1", "Path Decision", possibleStates)
 	if err != nil {
 		fmt.Printf("  ❌ Failed to create superposition: %v\n", err)
 	} else {
 		fmt.Println("  ✅ Created quantum superposition with 3 possible states")
-		
+
 		// Process superposition evolution
 		for i := 0; i < 3; i++ {
 			err := superpositionProcessor.ProcessSuperpositions()
@@ -117,38 +119,38 @@ func demonstrateQuantumCognition() {
 				fmt.Printf("  ❌ Processing failed: %v\n", err)
 			} else {
 				metrics := superpositionProcessor.CalculateSuperpositionMetrics()
-				fmt.Printf("  📊 Cycle %d: %d active, avg coherence %.3f\n", 
+				fmt.Printf("  📊 Cycle %d: %d active, avg coherence %.3f\n",
 					i+1, metrics.ActiveSuperpositions, metrics.AverageCoherence)
 			}
 			time.Sleep(100 * time.Millisecond)
 		}
 	}
 	fmt.Println()
-	
+
 	fmt.Println("🕸️ ENTANGLED COGNITION NETWORKS DEMONSTRATION")
 	fmt.Println("==============================================")
-	
+
 	// Create entangled cognition network
 	entangledNetwork := quantum.NewEntangledCognitionNetwork()
-	
+
 	// Create cognitive nodes
 	err = entangledNetwork.CreateCognitiveNode("node_1", "Logical Reasoner", []float64{0, 0, 0})
 	if err != nil {
 		fmt.Printf("  ❌ Failed to create node: %v\n", err)
 	}
-	
+
 	err = entangledNetwork.CreateCognitiveNode("node_2", "Creative Thinker", []float64{10, 0, 0})
 	if err != nil {
 		fmt.Printf("  ❌ Failed to create node: %v\n", err)
 	}
-	
+
 	// Create entanglement between nodes
 	entanglementID, err := entangledNetwork.CreateEntanglement("node_1", "node_2")
 	if err != nil {
 		fmt.Printf("  ❌ Failed to create entanglement: %v\n", err)
 	} else {
 		fmt.Printf("  ✅ Created quantum entanglement: %s\n", entanglementID)
-		
+
 		// Send instant message via entanglement
 		err = entangledNetwork.SendInstantMessage("node_1", "node_2", "Shared insight: Consider both logic and creativity")
 		if err != nil {
@@ -156,7 +158,7 @@ func demonstrateQuantumCognition() {
 		} else {
 			fmt.Println("  ✅ Sent instant quantum-entangled message")
 		}
-		
+
 		// Process network dynamics
 		err = entangledNetwork.ProcessNetworkDynamics()
 		if err != nil {
@@ -173,12 +175,12 @@ func demonstrateQuantumCognition() {
 func demonstrateTranscendentConsciousness() {
 	fmt.Println("🧠 TRANSCENDENT CONSCIOUSNESS DEMONSTRATION")
 	fmt.Println("===========================================")
-	
+
 	// Create consciousness simulator with transcendent capabilities
 	consciousnessSimulator := consciousness.NewConsciousnessSimulator()
-	
+
 	fmt.Println("  🌟 Initializing transcendent consciousness layers...")
-	
+
 	// Simulate consciousness evolution
 	for i := 0; i < 3; i++ {
 		err := consciousnessSimulator.SimulateConsciousness()
@@ -187,10 +189,10 @@ func demonstrateTranscendentConsciousness() {
 		} else {
 			globalAwareness := consciousnessSimulator.GetConsciousnessState()
 			layers := consciousnessSimulator.GetLayerStates()
-			
+
 			fmt.Printf("  🧠 Cycle %d: Consciousness level %.3f, %d layers active\n",
 				i+1, globalAwareness.ConsciousnessLevel, len(layers))
-			
+
 			// Show transcendent insights
 			if len(globalAwareness.MetaCognitions) > 0 {
 				fmt.Printf("      💡 Meta-cognition: %s\n", globalAwareness.MetaCognitions[0].Content)
@@ -204,68 +206,68 @@ func demonstrateTranscendentConsciousness() {
 func demonstrateUniversalIntelligence() {
 	fmt.Println("♾️ UNIVERSAL INTELLIGENCE DEMONSTRATION")
 	fmt.Println("=======================================")
-	
+
 	// Create meta-learner for universal intelligence
 	evaluator := &MockStrategyEvaluator{}
 	metaLearner := meta.NewMetaLearner(evaluator)
-	
+
 	// Register universal intelligence strategies
 	strategies := []meta.LearningStrategy{
 		{
-			ID: "cosmic_resonance", 
-			Name: "Cosmic Intelligence Resonance",
-			Approach: "resonance",
+			ID:         "cosmic_resonance",
+			Name:       "Cosmic Intelligence Resonance",
+			Approach:   "resonance",
 			Adaptivity: 0.95,
 			Complexity: 0.9,
 		},
 		{
-			ID: "multidimensional_fusion",
-			Name: "Multidimensional Intelligence Fusion", 
-			Approach: "fusion",
+			ID:         "multidimensional_fusion",
+			Name:       "Multidimensional Intelligence Fusion",
+			Approach:   "fusion",
 			Adaptivity: 0.98,
 			Complexity: 0.95,
 		},
 		{
-			ID: "infinite_bootstrap",
-			Name: "Infinite Intelligence Bootstrap",
-			Approach: "bootstrap",
+			ID:         "infinite_bootstrap",
+			Name:       "Infinite Intelligence Bootstrap",
+			Approach:   "bootstrap",
 			Adaptivity: 0.99,
 			Complexity: 0.99,
 		},
 	}
-	
+
 	for _, strategy := range strategies {
 		metaLearner.RegisterStrategy(strategy)
 		fmt.Printf("  ✅ Registered strategy: %s\n", strategy.Name)
 	}
-	
+
 	// Adapt to universal intelligence context
 	universalContext := meta.LearningContext{
 		TaskType: "universal_intelligence",
 		DataCharacteristics: map[string]interface{}{
-			"scope": "cosmic",
+			"scope":          "cosmic",
 			"dimensionality": "infinite",
-			"complexity": "transcendent",
+			"complexity":     "transcendent",
 		},
 		PerformanceTargets: map[string]float64{
 			"intelligence_level": 0.99,
-			"cosmic_resonance": 0.95,
-			"universal_access": 0.98,
+			"cosmic_resonance":   0.95,
+			"universal_access":   0.98,
 		},
 	}
-	
+
 	err := metaLearner.AdaptLearningStrategy(universalContext)
 	if err != nil {
 		fmt.Printf("  ❌ Strategy adaptation failed: %v\n", err)
 	} else {
 		currentStrategy, exists := metaLearner.GetCurrentStrategy()
 		if exists {
-			fmt.Printf("  🧠 Selected strategy: %s (adaptivity %.2f)\n", 
+			fmt.Printf("  🧠 Selected strategy: %s (adaptivity %.2f)\n",
 				currentStrategy.Name, currentStrategy.Adaptivity)
 		}
-		
+
 		adaptationHistory := metaLearner.GetAdaptationHistory()
-		fmt.Printf("  📊 Completed %d adaptation cycles toward universal intelligence\n", 
+		fmt.Printf("  📊 Completed %d adaptation cycles toward universal intelligence\n",
 			len(adaptationHistory))
 	}
 	fmt.Println()
@@ -274,24 +276,24 @@ func demonstrateUniversalIntelligence() {
 func demonstrateUltimateIntegration(language *apl.PatternLanguage) {
 	fmt.Println("✨ ULTIMATE PATTERN INTEGRATION DEMONSTRATION")
 	fmt.Println("=============================================")
-	
+
 	// Create pattern implementation engine
 	engine := apl.NewPatternEngine(language)
 	implementationOrder := language.GetImplementationOrder()
-	
+
 	fmt.Printf("  🔧 Implementing all %d patterns in evolutionary order...\n", len(implementationOrder))
 	fmt.Println()
-	
+
 	// Track implementation success by category
 	categorySuccess := make(map[string]int)
 	categoryTotal := make(map[string]int)
-	
+
 	patternCategories := map[int]string{
 		1: "Foundation", 10: "Behavioral", 13: "Cognitive", 16: "Learning",
 		19: "Meta-Cognitive", 22: "Emergent", 25: "Integration", 28: "Quantum",
 		31: "Transcendent", 34: "Universal", 37: "Cosmic", 40: "Dimensional", 43: "Ultimate",
 	}
-	
+
 	// Implement all patterns
 	for _, patternNum := range implementationOrder {
 		impl, err := engine.ImplementPattern(patternNum)
@@ -300,7 +302,7 @@ func demonstrateUltimateIntegration(language *apl.PatternLanguage) {
 		} else {
 			category := getCategoryForPattern(patternNum, patternCategories)
 			categoryTotal[category]++
-			
+
 			if impl.Quality > 0.7 {
 				categorySuccess[category]++
 				fmt.Printf("  ✅ Pattern %d (%s): Quality %.2f\n",
@@ -311,26 +313,26 @@ func demonstrateUltimateIntegration(language *apl.PatternLanguage) {
 			}
 		}
 	}
-	
+
 	fmt.Println()
 	fmt.Println("📊 IMPLEMENTATION RESULTS BY CATEGORY")
 	fmt.Println("======================================")
-	
+
 	for category, total := range categoryTotal {
 		success := categorySuccess[category]
 		successRate := float64(success) / float64(total) * 100
-		fmt.Printf("  %s: %d/%d patterns (%.1f%% success)\n", 
+		fmt.Printf("  %s: %d/%d patterns (%.1f%% success)\n",
 			category, success, total, successRate)
 	}
-	
+
 	fmt.Println()
 	totalSuccess := 0
 	for _, success := range categorySuccess {
 		totalSuccess += success
 	}
-	
+
 	overallSuccessRate := float64(totalSuccess) / float64(len(implementationOrder)) * 100
-	fmt.Printf("🎯 OVERALL SUCCESS: %d/%d patterns (%.1f%%)\n", 
+	fmt.Printf("🎯 OVERALL SUCCESS: %d/%d patterns (%.1f%%)\n",
 		totalSuccess, len(implementationOrder), overallSuccessRate)
 }
 
@@ -398,7 +400,7 @@ func (mse *MockStrategyEvaluator) EvaluateStrategy(strategy meta.LearningStrateg
 func (mse *MockStrategyEvaluator) CompareStrategies(strategies []meta.LearningStrategy, context meta.LearningContext) []meta.StrategyRanking {
 	rankings := make([]meta.StrategyRanking, len(strategies))
 	for i, strategy := range strategies {
-		score := strategy.Adaptivity * 0.6 + (1.0-strategy.Complexity)*0.4
+		score := strategy.Adaptivity*0.6 + (1.0-strategy.Complexity)*0.4
 		rankings[i] = meta.StrategyRanking{
 			StrategyID: strategy.ID,
 			Score:      score,

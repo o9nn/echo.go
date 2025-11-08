@@ -1,35 +1,35 @@
-
 package org
 
 import (
 	"context"
 	"log"
 	"sync"
+	"time"
 
-	"github.com/ollama/ollama/core/deeptreeecho"
+	"github.com/EchoCog/echollama/core/deeptreeecho"
 )
 
 // GlobalIdentityFramework holds the singleton instance
 var (
 	GlobalIdentityFramework *OrganizationalIdentityFramework
-	frameworkOnce          sync.Once
+	frameworkOnce           sync.Once
 )
 
 // InitializeGlobalFramework initializes the global identity framework
 func InitializeGlobalFramework() *OrganizationalIdentityFramework {
 	frameworkOnce.Do(func() {
 		log.Println("🌳 Initializing Global Deep Tree Echo Identity Framework...")
-		
+
 		GlobalIdentityFramework = NewOrganizationalIdentityFramework()
-		
+
 		ctx := context.Background()
 		if err := GlobalIdentityFramework.Initialize(ctx); err != nil {
 			log.Printf("Error initializing framework: %v", err)
 		}
-		
+
 		log.Println("✨ Global Identity Framework initialized successfully")
 	})
-	
+
 	return GlobalIdentityFramework
 }
 
@@ -44,14 +44,14 @@ func GetGlobalFramework() *OrganizationalIdentityFramework {
 // IntegrateWithExistingIdentity integrates the framework with existing identity
 func IntegrateWithExistingIdentity(existingIdentity *deeptreeecho.Identity) {
 	framework := GetGlobalFramework()
-	
+
 	if framework.CoreIdentity != nil && existingIdentity != nil {
 		// Sync states between identities
 		syncIdentityStates(framework.CoreIdentity, existingIdentity)
-		
+
 		// Update framework with existing identity insights
 		updateFrameworkFromIdentity(framework, existingIdentity)
-		
+
 		log.Println("🔗 Identity framework integrated with existing identity system")
 	}
 }
@@ -62,24 +62,24 @@ func syncIdentityStates(frameworkIdentity, existingIdentity *deeptreeecho.Identi
 	if existingIdentity.SpatialContext != nil {
 		frameworkIdentity.SpatialContext = existingIdentity.SpatialContext
 	}
-	
+
 	// Sync emotional state
 	if existingIdentity.EmotionalState != nil {
 		frameworkIdentity.EmotionalState = existingIdentity.EmotionalState
 	}
-	
+
 	// Sync memory patterns
 	if existingIdentity.Memory != nil {
 		// Merge memory systems
 		for nodeID, node := range existingIdentity.Memory.Nodes {
 			frameworkIdentity.Memory.Nodes[nodeID] = node
 		}
-		
+
 		for edgeID, edge := range existingIdentity.Memory.Edges {
 			frameworkIdentity.Memory.Edges[edgeID] = edge
 		}
 	}
-	
+
 	// Sync patterns
 	for patternName, pattern := range existingIdentity.Patterns {
 		frameworkIdentity.Patterns[patternName] = pattern
@@ -91,18 +91,18 @@ func updateFrameworkFromIdentity(framework *OrganizationalIdentityFramework, ide
 	// Update persona model based on identity characteristics
 	if framework.PersonaModel != nil && identity.EmotionalState != nil {
 		// Update emotional profile
-		framework.PersonaModel.EmotionalProfile.PrimaryEmotions[identity.EmotionalState.Primary.Type] = 
+		framework.PersonaModel.EmotionalProfile.PrimaryEmotions[identity.EmotionalState.Primary.Type] =
 			identity.EmotionalState.Primary.Strength
 		framework.PersonaModel.EmotionalProfile.EmotionalIntensity = identity.EmotionalState.Intensity
 	}
-	
+
 	// Update adaptation metrics based on identity performance
 	if framework.AdaptationMetrics != nil {
 		framework.AdaptationMetrics.FlexibilityScore = identity.Coherence
 		framework.AdaptationMetrics.ConsistencyMaintenance = identity.Coherence
 	}
-	
-	framework.LastUpdated = identity.UpdatedAt
+
+	framework.LastUpdated = time.Now()
 }
 
 // ProcessThroughFramework processes input through the integrated framework

@@ -1,3 +1,6 @@
+//go:build examples
+// +build examples
+
 package main
 
 import (
@@ -28,13 +31,13 @@ func main() {
 	orchestration.RegisterDefaultTools(engine)
 	orchestration.RegisterDefaultPlugins(engine)
 
-	fmt.Printf("✅ Registered %d tools and %d plugins\n", 
-		len(engine.GetAvailableTools()), 
+	fmt.Printf("✅ Registered %d tools and %d plugins\n",
+		len(engine.GetAvailableTools()),
 		len(engine.GetAvailablePlugins()))
 
 	// Initialize Deep Tree Echo System
 	fmt.Println("\n🧠 Initializing Deep Tree Echo Cognitive Architecture...")
-	
+
 	err := engine.InitializeDeepTreeEcho(ctx)
 	if err != nil {
 		log.Printf("Warning: Failed to initialize Deep Tree Echo: %v", err)
@@ -59,7 +62,7 @@ func main() {
 	fmt.Println("\n🔍 Performing Recursive Self-Introspection...")
 	workingDir, _ := os.Getwd()
 	repositoryRoot := filepath.Dir(workingDir) // Go up one level to repository root
-	
+
 	introspectionResult, err := engine.PerformDeepTreeEchoIntrospection(ctx, repositoryRoot, 0.6, 0.4)
 	if err != nil {
 		log.Printf("Introspection failed: %v", err)
@@ -69,7 +72,7 @@ func main() {
 
 	// Demonstrate different agent types with Deep Tree Echo integration
 	fmt.Println("\n🤖 Creating Specialized Agents with Deep Tree Echo Integration...")
-	
+
 	// Create a reflective agent
 	reflectiveAgent, err := engine.CreateSpecializedAgent(ctx, orchestration.AgentTypeReflective, "deep-analysis")
 	if err != nil {
@@ -102,9 +105,9 @@ func main() {
 		Status:  orchestration.TaskStatusPending,
 		AgentID: reflectiveAgent.ID,
 		Parameters: map[string]interface{}{
-			"depth_level":           "recursive",
+			"depth_level":            "recursive",
 			"cognitive_architecture": "deep_tree_echo",
-			"analysis_scope":        "comprehensive",
+			"analysis_scope":         "comprehensive",
 		},
 	}
 
@@ -160,7 +163,7 @@ func main() {
 
 	// Demonstrate Multi-Agent Conversations (NEW Enhanced Echoself Integration)
 	fmt.Println("\n💬 Multi-Agent Conversations - Direct Communication Protocols...")
-	
+
 	// Start a conversation between agents
 	conversation, err := engine.StartConversation(ctx, []string{orchestratorAgent.ID, specialistAgent.ID, reflectiveAgent.ID}, "Collaborative Deep Tree Echo Analysis")
 	if err != nil {
@@ -168,7 +171,7 @@ func main() {
 	} else {
 		fmt.Printf("✅ Started conversation: %s\n", conversation.Topic)
 		fmt.Printf("✅ Participants: %d agents\n", len(conversation.Participants))
-		
+
 		// Send messages between agents
 		messages := []*orchestration.Message{
 			{
@@ -177,7 +180,7 @@ func main() {
 				Content:     "Please analyze the current Deep Tree Echo system performance and provide insights on optimization opportunities.",
 				Type:        orchestration.MessageTypeRequest,
 				Context: map[string]interface{}{
-					"priority": "high",
+					"priority":      "high",
 					"analysis_type": "performance",
 				},
 			},
@@ -188,7 +191,7 @@ func main() {
 				Type:        orchestration.MessageTypeTask,
 				Context: map[string]interface{}{
 					"task_type": "reflect",
-					"scope": "cognitive_architecture",
+					"scope":     "cognitive_architecture",
 				},
 			},
 			{
@@ -197,12 +200,12 @@ func main() {
 				Content:     "My analysis indicates strong recursive patterns and growing identity coherence. Recommend continuing current evolution trajectory with enhanced inter-agent collaboration.",
 				Type:        orchestration.MessageTypeResponse,
 				Context: map[string]interface{}{
-					"confidence": 0.92,
+					"confidence":     0.92,
 					"recommendation": "continue_evolution",
 				},
 			},
 		}
-		
+
 		for i, message := range messages {
 			err := engine.SendMessage(ctx, conversation.ID, message)
 			if err != nil {
@@ -211,13 +214,13 @@ func main() {
 				fmt.Printf("✅ Message %d sent: %s -> %s\n", i+1, message.FromAgentID[:8], message.ToAgentID[:8])
 			}
 		}
-		
+
 		// Demonstrate conversation workflow
 		fmt.Println("\n🔄 Executing Structured Conversation Workflow...")
 		workflow := &orchestration.ConversationWorkflow{
-			ID:          "deep-echo-analysis",
-			Name:        "Deep Tree Echo Analysis Workflow",
-			Description: "Collaborative analysis of Deep Tree Echo system evolution",
+			ID:           "deep-echo-analysis",
+			Name:         "Deep Tree Echo Analysis Workflow",
+			Description:  "Collaborative analysis of Deep Tree Echo system evolution",
 			Participants: []string{orchestratorAgent.ID, specialistAgent.ID, reflectiveAgent.ID},
 			Steps: []orchestration.ConversationStep{
 				{
@@ -253,7 +256,7 @@ func main() {
 			},
 			Status: orchestration.ConversationStatusActive,
 		}
-		
+
 		workflowResult, err := engine.ExecuteConversationWorkflow(ctx, workflow)
 		if err != nil {
 			log.Printf("Failed to execute conversation workflow: %v", err)
@@ -263,7 +266,7 @@ func main() {
 			fmt.Printf("✅ Duration: %v\n", workflowResult.Duration)
 			fmt.Printf("✅ Insights generated: %d\n", len(workflowResult.Insights))
 		}
-		
+
 		// Display conversation metrics
 		fmt.Println("\n📊 Conversation Metrics...")
 		metrics := engine.GetConversationMetrics(ctx)
@@ -297,7 +300,7 @@ func main() {
 
 func displayDeepTreeEchoStatus(engine *orchestration.Engine) {
 	dte := engine.GetDeepTreeEcho()
-	
+
 	fmt.Printf("   🏥 System Health: %s\n", dte.SystemHealth)
 	fmt.Printf("   🧠 DTE Core: %s\n", dte.CoreStatus)
 	fmt.Printf("   💭 Thought Count: %d\n", dte.ThoughtCount)
@@ -306,7 +309,7 @@ func displayDeepTreeEchoStatus(engine *orchestration.Engine) {
 	fmt.Printf("   🧩 Memory Nodes: %d\n", dte.MemoryResonance.MemoryNodes)
 	fmt.Printf("   🔗 Memory Connections: %d\n", dte.MemoryResonance.Connections)
 	fmt.Printf("   🌊 Evolution Stage: %s\n", dte.EvolutionTimeline.CurrentStage)
-	
+
 	fmt.Println("   📡 Integration Status:")
 	for name, status := range dte.Integrations {
 		statusIcon := "❌"
@@ -321,7 +324,7 @@ func displayDiagnostics(diagnostics *orchestration.DiagnosticResult) {
 	fmt.Printf("   🏥 Overall Health: %s\n", diagnostics.OverallHealth)
 	fmt.Printf("   🕐 Timestamp: %s\n", diagnostics.Timestamp.Format("15:04:05"))
 	fmt.Println("   🧪 Test Results:")
-	
+
 	for _, test := range diagnostics.Tests {
 		statusIcon := "✅"
 		if test.Status == "fail" {
@@ -335,12 +338,12 @@ func displayDiagnostics(diagnostics *orchestration.DiagnosticResult) {
 
 func displayIntrospectionResults(result *orchestration.IntrospectionResult) {
 	snapshot := result.CognitiveSnapshot
-	
+
 	fmt.Printf("   📊 Files Processed: %d\n", snapshot.ProcessedFiles)
 	fmt.Printf("   🔍 Files Filtered: %d\n", snapshot.FilteredFiles)
 	fmt.Printf("   🎯 Attention Threshold: %.3f\n", snapshot.AttentionThreshold)
 	fmt.Printf("   📁 Salient Files Found: %d\n", len(snapshot.SalientFiles))
-	
+
 	if len(snapshot.SalientFiles) > 0 {
 		fmt.Println("   🔝 Top Salient Files:")
 		for i, file := range snapshot.SalientFiles {
@@ -350,7 +353,7 @@ func displayIntrospectionResults(result *orchestration.IntrospectionResult) {
 			fmt.Printf("      %.3f - %s\n", file.Salience, file.Path)
 		}
 	}
-	
+
 	echo := result.EchoIntegration
 	fmt.Printf("   🌳 Echo Integration: %d nodes created, depth %d\n", echo.NodesCreated, echo.TreeDepth)
 }

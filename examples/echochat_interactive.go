@@ -1,3 +1,6 @@
+//go:build examples
+// +build examples
+
 package main
 
 import (
@@ -39,18 +42,18 @@ func main() {
 	// Show initial status
 	fmt.Println("\n📊 Initial Deep Tree Echo Status:")
 	status := engine.GetDeepTreeEchoStatus()
-	
+
 	if health, ok := status["system_health"].(string); ok {
 		fmt.Printf("   🏥 System Health: %s\n", health)
 	}
-	
+
 	if coreStatus, ok := status["core_status"].(string); ok {
 		fmt.Printf("   🧠 Core Status: %s\n", coreStatus)
 	}
 
 	// Create EchoChat instance
 	echoChat := orchestration.NewEchoChat(engine)
-	
+
 	// Start interactive session
 	fmt.Println()
 	if err := echoChat.StartInteractiveSession(ctx); err != nil {

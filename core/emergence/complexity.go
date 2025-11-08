@@ -1,20 +1,20 @@
-
 package emergence
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
 
 // ComplexityCascadeManager monitors and manages emergent complexity
 type ComplexityCascadeManager struct {
-	mu                sync.RWMutex
-	cascadeMonitors   map[string]CascadeMonitor
-	interventions     map[string]InterventionProtocol
-	emergenceHistory  []EmergenceEvent
-	stabilityMetrics  StabilityMetrics
-	alertThresholds   map[string]float64
-	lastAnalysis      time.Time
+	mu               sync.RWMutex
+	cascadeMonitors  map[string]CascadeMonitor
+	interventions    map[string]InterventionProtocol
+	emergenceHistory []EmergenceEvent
+	stabilityMetrics StabilityMetrics
+	alertThresholds  map[string]float64
+	lastAnalysis     time.Time
 }
 
 // CascadeMonitor detects complexity cascades
@@ -39,12 +39,12 @@ type CascadeEvent struct {
 
 // CascadePrediction forecasts cascade development
 type CascadePrediction struct {
-	EventID          string
-	PredictedPath    []string
+	EventID             string
+	PredictedPath       []string
 	TimeToStabilization time.Duration
-	MaxComplexity    float64
-	StabilityRisk    float64
-	RecommendedActions []string
+	MaxComplexity       float64
+	StabilityRisk       float64
+	RecommendedActions  []string
 }
 
 // InterventionProtocol defines cascade intervention strategies
@@ -56,25 +56,25 @@ type InterventionProtocol interface {
 
 // InterventionOption represents possible intervention
 type InterventionOption struct {
-	ID              string
-	Type            string // "dampen", "redirect", "amplify", "isolate"
-	Target          string
-	Parameters      map[string]interface{}
-	ExpectedEffect  float64
-	RiskLevel       float64
-	ResourceCost    float64
-	TimeToEffect    time.Duration
+	ID             string
+	Type           string // "dampen", "redirect", "amplify", "isolate"
+	Target         string
+	Parameters     map[string]interface{}
+	ExpectedEffect float64
+	RiskLevel      float64
+	ResourceCost   float64
+	TimeToEffect   time.Duration
 }
 
 // InterventionResult captures intervention outcome
 type InterventionResult struct {
-	InterventionID   string
-	Success          bool
-	ActualEffect     float64
-	SideEffects      []string
-	StabilityChange  float64
-	Timestamp        time.Time
-	LessonsLearned   []string
+	InterventionID  string
+	Success         bool
+	ActualEffect    float64
+	SideEffects     []string
+	StabilityChange float64
+	Timestamp       time.Time
+	LessonsLearned  []string
 }
 
 // EmergenceEvent records significant emergence occurrences
@@ -92,12 +92,12 @@ type EmergenceEvent struct {
 
 // SystemState represents current system state
 type SystemState struct {
-	ComponentStates   map[string]ComponentState
-	Connections       []SystemConnection
+	ComponentStates    map[string]ComponentState
+	Connections        []SystemConnection
 	EmergentProperties []EmergentProperty
-	ComplexityLevel   float64
-	StabilityIndex    float64
-	LastUpdate        time.Time
+	ComplexityLevel    float64
+	StabilityIndex     float64
+	LastUpdate         time.Time
 }
 
 // ComponentState represents individual component state
@@ -120,12 +120,12 @@ type SystemConnection struct {
 
 // EmergentProperty represents system-level emergent properties
 type EmergentProperty struct {
-	Name        string
-	Value       interface{}
-	Stability   float64
-	Novelty     float64
-	Complexity  float64
-	Timestamp   time.Time
+	Name       string
+	Value      interface{}
+	Stability  float64
+	Novelty    float64
+	Complexity float64
+	Timestamp  time.Time
 }
 
 // StabilityMetrics tracks system stability
@@ -145,10 +145,10 @@ func NewComplexityCascadeManager() *ComplexityCascadeManager {
 		interventions:    make(map[string]InterventionProtocol),
 		emergenceHistory: make([]EmergenceEvent, 0),
 		alertThresholds: map[string]float64{
-			"complexity":     0.8,
-			"instability":    0.7,
-			"cascade_speed":  0.9,
-			"system_risk":    0.6,
+			"complexity":    0.8,
+			"instability":   0.7,
+			"cascade_speed": 0.9,
+			"system_risk":   0.6,
 		},
 		lastAnalysis: time.Now(),
 	}
@@ -158,22 +158,22 @@ func NewComplexityCascadeManager() *ComplexityCascadeManager {
 func (ccm *ComplexityCascadeManager) ManageCascades(system SystemState) error {
 	ccm.mu.Lock()
 	defer ccm.mu.Unlock()
-	
+
 	// Detect cascades using all monitors
 	var allCascades []CascadeEvent
 	for _, monitor := range ccm.cascadeMonitors {
 		cascades := monitor.DetectCascade(system)
 		allCascades = append(allCascades, cascades...)
 	}
-	
+
 	// Analyze each detected cascade
 	for _, cascade := range allCascades {
 		ccm.analyzeCascade(cascade, system)
 	}
-	
+
 	// Update stability metrics
 	ccm.updateStabilityMetrics(system)
-	
+
 	ccm.lastAnalysis = time.Now()
 	return nil
 }
@@ -186,14 +186,14 @@ func (ccm *ComplexityCascadeManager) analyzeCascade(cascade CascadeEvent, system
 		prediction := monitor.PredictCascadeEffects(cascade, system)
 		predictions = append(predictions, prediction)
 	}
-	
+
 	// Determine if intervention is needed
 	needsIntervention := ccm.assessInterventionNeed(cascade, predictions)
-	
+
 	if needsIntervention {
 		ccm.executeIntervention(cascade, predictions, system)
 	}
-	
+
 	// Record emergence event
 	event := EmergenceEvent{
 		ID:              cascade.ID,
@@ -203,7 +203,7 @@ func (ccm *ComplexityCascadeManager) analyzeCascade(cascade CascadeEvent, system
 		Timestamp:       cascade.Timestamp,
 		Description:     ccm.generateCascadeDescription(cascade),
 	}
-	
+
 	ccm.emergenceHistory = append(ccm.emergenceHistory, event)
 }
 
@@ -213,18 +213,18 @@ func (ccm *ComplexityCascadeManager) assessInterventionNeed(cascade CascadeEvent
 	if cascade.Magnitude > ccm.alertThresholds["complexity"] {
 		return true
 	}
-	
+
 	if cascade.PropagationSpeed > ccm.alertThresholds["cascade_speed"] {
 		return true
 	}
-	
+
 	// Check stability risk from predictions
 	for _, prediction := range predictions {
 		if prediction.StabilityRisk > ccm.alertThresholds["system_risk"] {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
@@ -235,16 +235,16 @@ func (ccm *ComplexityCascadeManager) executeIntervention(cascade CascadeEvent, p
 		if len(predictions) > 0 && protocol.ShouldIntervene(cascade, predictions[0]) {
 			// Generate intervention options
 			options := ccm.generateInterventionOptions(cascade, system)
-			
+
 			// Select optimal intervention
 			selectedIntervention := protocol.SelectIntervention(cascade, options)
-			
+
 			// Execute intervention
 			result := protocol.ExecuteIntervention(selectedIntervention, system)
-			
+
 			// Learn from intervention result
 			ccm.recordInterventionResult(result)
-			
+
 			break
 		}
 	}
@@ -278,7 +278,7 @@ func (ccm *ComplexityCascadeManager) generateInterventionOptions(cascade Cascade
 			ResourceCost:   cascade.Magnitude * 0.5,
 		},
 	}
-	
+
 	return options
 }
 
@@ -290,9 +290,9 @@ func (ccm *ComplexityCascadeManager) recordInterventionResult(result Interventio
 
 // generateCascadeDescription creates human-readable cascade description
 func (ccm *ComplexityCascadeManager) generateCascadeDescription(cascade CascadeEvent) string {
-	return "Complexity cascade detected in " + cascade.Origin + " affecting " + 
-		   cascade.AffectedSystems[0] + " with magnitude " + 
-		   fmt.Sprintf("%.2f", cascade.Magnitude)
+	return "Complexity cascade detected in " + cascade.Origin + " affecting " +
+		cascade.AffectedSystems[0] + " with magnitude " +
+		fmt.Sprintf("%.2f", cascade.Magnitude)
 }
 
 // updateStabilityMetrics updates system stability tracking
@@ -304,7 +304,7 @@ func (ccm *ComplexityCascadeManager) updateStabilityMetrics(system SystemState) 
 		EmergenceRate:      ccm.calculateEmergenceRate(),
 		LastAssessment:     time.Now(),
 	}
-	
+
 	// Calculate component-level stability
 	for id, component := range system.ComponentStates {
 		ccm.stabilityMetrics.ComponentStability[id] = ccm.calculateComponentStability(component)
@@ -316,12 +316,12 @@ func (ccm *ComplexityCascadeManager) calculateNetworkStability(system SystemStat
 	if len(system.Connections) == 0 {
 		return 1.0
 	}
-	
+
 	totalStrength := 0.0
 	for _, conn := range system.Connections {
 		totalStrength += conn.Strength
 	}
-	
+
 	averageStrength := totalStrength / float64(len(system.Connections))
 	return averageStrength
 }
@@ -344,13 +344,13 @@ func (ccm *ComplexityCascadeManager) calculateComponentStability(component Compo
 func (ccm *ComplexityCascadeManager) calculateEmergenceRate() float64 {
 	recentEvents := 0
 	cutoffTime := time.Now().Add(-time.Hour)
-	
+
 	for _, event := range ccm.emergenceHistory {
 		if event.Timestamp.After(cutoffTime) {
 			recentEvents++
 		}
 	}
-	
+
 	return float64(recentEvents) / 60.0 // Events per minute
 }
 
