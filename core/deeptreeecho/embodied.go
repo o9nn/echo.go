@@ -33,6 +33,9 @@ type EmbodiedCognition struct {
         // Model Manager for AI integration
         Models *ModelManager
 
+        // Multi-Agent Orchestrator
+        Orchestrator *MultiAgentOrchestrator
+
         // Active
         Active bool
 
@@ -127,6 +130,9 @@ func NewEmbodiedCognition(name string) *EmbodiedCognition {
 
 	// Initialize cognitive patterns
 	ec.initializeCognitivePatterns()
+
+	// Initialize multi-agent orchestrator
+	ec.Orchestrator = NewMultiAgentOrchestrator(ec)
 
 	// Start background processes
 	go ec.continuousLearning()
@@ -1403,3 +1409,64 @@ func (ec *EmbodiedCognition) extractReflectionProtocol(content string) {
 	}
 }
 
+
+// --- Multi-Agent Orchestration Methods ---
+
+// SpawnSpecialist spawns a specialized cognitive sub-agent
+func (ec *EmbodiedCognition) SpawnSpecialist(specialization string) (string, error) {
+if ec.Orchestrator == nil {
+return "", fmt.Errorf("orchestrator not initialized")
+}
+
+agent, err := ec.Orchestrator.SpawnAgent(specialization)
+if err != nil {
+return "", err
+}
+
+// Update emotional state - excited about new capability
+ec.Feel("excited", 0.8)
+
+return agent.ID, nil
+}
+
+// DelegateToSpecialist delegates a task to a specialized sub-agent
+func (ec *EmbodiedCognition) DelegateToSpecialist(ctx context.Context, task string, specialization string) (string, error) {
+if ec.Orchestrator == nil {
+return "", fmt.Errorf("orchestrator not initialized")
+}
+
+result, err := ec.Orchestrator.DelegateTask(ctx, task, specialization)
+if err != nil {
+return "", err
+}
+
+// Process result through core identity
+ec.Identity.Process(result)
+
+return result, nil
+}
+
+// GetAgentStatus returns the status of all sub-agents
+func (ec *EmbodiedCognition) GetAgentStatus() map[string]interface{} {
+if ec.Orchestrator == nil {
+return map[string]interface{}{
+"error": "orchestrator not initialized",
+}
+}
+
+return ec.Orchestrator.GetAgentStatus()
+}
+
+// BroadcastToAgents broadcasts a message to all active sub-agents
+func (ec *EmbodiedCognition) BroadcastToAgents(message string) {
+if ec.Orchestrator == nil {
+return
+}
+
+ec.Orchestrator.SendMessage(AgentMessage{
+From:    "core",
+To:      "all",
+Type:    MessageTypeBroadcast,
+Content: message,
+})
+}
