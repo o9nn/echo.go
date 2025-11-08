@@ -939,26 +939,423 @@ func (i *Identity) ProcessInput(input string) (*CognitionResponse, error) {
 	return response, nil
 }
 
-// Placeholder for extractPatterns method
+// extractPatterns extracts cognitive patterns from input using reservoir network analysis
 func (i *Identity) extractPatterns(input string) []*Pattern {
-	// TODO: Implement pattern extraction logic
-	return []*Pattern{}
+	i.mu.Lock()
+	defer i.mu.Unlock()
+
+	patterns := []*Pattern{}
+
+	// Encode input through reservoir
+	encoded := i.encodeInput(input)
+	
+	// Analyze reservoir state for pattern signatures
+	stateSnapshot := make([]float64, len(i.Reservoir.State))
+	copy(stateSnapshot, i.Reservoir.State)
+
+	// Extract patterns based on reservoir activation clusters
+	clusterThreshold := 0.7
+	for j := 0; j < len(stateSnapshot); j++ {
+		if math.Abs(stateSnapshot[j]) > clusterThreshold {
+			// High activation node - potential pattern
+			pattern := &Pattern{
+				ID:          fmt.Sprintf("pattern_%d_%d", time.Now().UnixNano(), j),
+				Type:        "activation_cluster",
+				Strength:    math.Abs(stateSnapshot[j]),
+				Activation:  stateSnapshot[j],
+				Connections: make(map[string]float64),
+			}
+
+			// Find connected nodes
+			for k := 0; k < len(i.Reservoir.Connections[j]); k++ {
+				if i.Reservoir.Connections[j][k] != 0 && math.Abs(stateSnapshot[k]) > 0.5 {
+					pattern.Connections[fmt.Sprintf("node_%d", k)] = i.Reservoir.Connections[j][k]
+				}
+			}
+
+			if len(pattern.Connections) > 0 {
+				patterns = append(patterns, pattern)
+			}
+		}
+	}
+
+	// Extract semantic patterns based on input characteristics
+	inputLen := float64(len(input))
+	if inputLen > 0 {
+		semanticPattern := &Pattern{
+			ID:          fmt.Sprintf("semantic_%d", time.Now().UnixNano()),
+			Type:        "semantic",
+			Strength:    math.Min(inputLen/100.0, 1.0),
+			Activation:  1.0,
+			Connections: make(map[string]float64),
+		}
+		
+		// Analyze character distribution
+		charFreq := make(map[rune]int)
+		for _, ch := range input {
+			charFreq[ch]++
+		}
+		
+		// Add frequency-based connections
+		for ch, freq := range charFreq {
+			if freq > 1 {
+				semanticPattern.Connections[fmt.Sprintf("char_%d", ch)] = float64(freq) / inputLen
+			}
+		}
+		
+		patterns = append(patterns, semanticPattern)
+	}
+
+	// Extract temporal patterns from reservoir history
+	if len(i.Reservoir.History) > 1 {
+		recentHistory := i.Reservoir.History[len(i.Reservoir.History)-1]
+		temporalPattern := &Pattern{
+			ID:          fmt.Sprintf("temporal_%d", time.Now().UnixNano()),
+			Type:        "temporal",
+			Strength:    0.8,
+			Activation:  0.9,
+			Connections: make(map[string]float64),
+		}
+		
+		// Compute temporal correlation
+		for j := 0; j < len(recentHistory) && j < len(encoded); j++ {
+			correlation := recentHistory[j] * encoded[j]
+			if math.Abs(correlation) > 0.3 {
+				temporalPattern.Connections[fmt.Sprintf("temporal_%d", j)] = correlation
+			}
+		}
+		
+		if len(temporalPattern.Connections) > 0 {
+			patterns = append(patterns, temporalPattern)
+		}
+	}
+
+	return patterns
 }
 
-// Placeholder for consolidateMemories method
+// consolidateMemories merges similar patterns and strengthens important memories
 func (i *Identity) consolidateMemories(patterns []*Pattern) {
-	// TODO: Implement memory consolidation logic
+	i.mu.Lock()
+	defer i.mu.Unlock()
+
+	if len(patterns) == 0 {
+		return
+	}
+
+	// Track pattern similarities for consolidation
+	patternSimilarities := make(map[string]map[string]float64)
+
+	// Calculate similarity between patterns
+	for idx1, p1 := range patterns {
+		patternSimilarities[p1.ID] = make(map[string]float64)
+		for idx2, p2 := range patterns {
+			if idx1 >= idx2 {
+				continue
+			}
+
+			// Calculate connection overlap similarity
+			similarity := 0.0
+			commonConnections := 0
+			for k := range p1.Connections {
+				if _, exists := p2.Connections[k]; exists {
+					similarity += math.Abs(p1.Connections[k] * p2.Connections[k])
+					commonConnections++
+				}
+			}
+
+			if commonConnections > 0 {
+				similarity = similarity / float64(commonConnections)
+				patternSimilarities[p1.ID][p2.ID] = similarity
+			}
+		}
+	}
+
+	// Consolidate similar patterns into existing identity patterns
+	consolidationThreshold := 0.75
+	for _, newPattern := range patterns {
+		bestMatch := ""
+		bestSimilarity := 0.0
+
+		// Find best match among existing patterns
+		for existingID, existingPattern := range i.Patterns {
+			if existingPattern.Type != newPattern.Type {
+				continue
+			}
+
+			// Calculate similarity based on connection overlap
+			similarity := 0.0
+			overlap := 0
+			for k, v := range newPattern.Connections {
+				if existingVal, exists := existingPattern.Connections[k]; exists {
+					similarity += math.Abs(v * existingVal)
+					overlap++
+				}
+			}
+
+			if overlap > 0 {
+				similarity = similarity / float64(overlap)
+				if similarity > bestSimilarity {
+					bestSimilarity = similarity
+					bestMatch = existingID
+				}
+			}
+		}
+
+		// Consolidate if similarity threshold met
+		if bestSimilarity > consolidationThreshold && bestMatch != "" {
+			// Strengthen existing pattern
+			existing := i.Patterns[bestMatch]
+			existing.Strength = existing.Strength*0.7 + newPattern.Strength*0.3
+			existing.Activation = math.Max(existing.Activation, newPattern.Activation)
+
+			// Merge connections
+			for k, v := range newPattern.Connections {
+				if existingVal, exists := existing.Connections[k]; exists {
+					existing.Connections[k] = (existingVal + v) / 2.0
+				} else {
+					existing.Connections[k] = v * 0.5 // Weaken new connections
+				}
+			}
+		} else {
+			// Add as new pattern if sufficiently different
+			i.Patterns[newPattern.ID] = newPattern
+		}
+	}
+
+	// Prune weak memory nodes (consolidation cleanup)
+	pruneThreshold := 0.1
+	for nodeID, node := range i.Memory.Nodes {
+		if node.Strength < pruneThreshold {
+			delete(i.Memory.Nodes, nodeID)
+
+			// Remove associated edges
+			for edgeID, edge := range i.Memory.Edges {
+				if edge.From == nodeID || edge.To == nodeID {
+					delete(i.Memory.Edges, edgeID)
+				}
+			}
+		}
+	}
+
+	// Strengthen frequently accessed memories
+	for _, node := range i.Memory.Nodes {
+		// Decay strength over time
+		age := time.Since(node.Timestamp).Hours()
+		decayFactor := math.Exp(-age / 168.0) // Week-based decay
+		node.Strength *= (0.9 + decayFactor*0.1)
+
+		// Maintain minimum strength floor
+		if node.Strength < 0.3 {
+			node.Strength = 0.3
+		}
+	}
+
+	// Update memory coherence based on consolidation
+	totalStrength := 0.0
+	for _, node := range i.Memory.Nodes {
+		totalStrength += node.Strength
+	}
+
+	if len(i.Memory.Nodes) > 0 {
+		i.Memory.Coherence = math.Min(totalStrength/float64(len(i.Memory.Nodes)), 1.0)
+	}
 }
 
-// Placeholder for generateEchoSignature method
+// generateEchoSignature creates a unique signature for input based on reservoir echo dynamics
 func (i *Identity) generateEchoSignature(input string) string {
-	// TODO: Implement echo signature generation
-	return ""
+	i.mu.RLock()
+	defer i.mu.RUnlock()
+
+	// Compute echo signature from reservoir state
+	echoComponents := []float64{}
+
+	// 1. Reservoir Echo Component - average echo across nodes
+	reservoirEcho := 0.0
+	for _, node := range i.Reservoir.Nodes {
+		reservoirEcho += node.Echo
+	}
+	if len(i.Reservoir.Nodes) > 0 {
+		reservoirEcho /= float64(len(i.Reservoir.Nodes))
+	}
+	echoComponents = append(echoComponents, reservoirEcho)
+
+	// 2. Spatial Resonance Component - field resonance
+	spatialResonance := i.SpatialContext.Field.Resonance
+	echoComponents = append(echoComponents, spatialResonance)
+
+	// 3. Emotional Frequency Component - emotional state signature
+	emotionalFreq := i.EmotionalState.Primary.Frequency / 1000.0 // Normalize
+	echoComponents = append(echoComponents, emotionalFreq)
+
+	// 4. Memory Coherence Component
+	memoryCoherence := i.Memory.Coherence
+	echoComponents = append(echoComponents, memoryCoherence)
+
+	// 5. Identity Coherence Component
+	identityCoherence := i.Coherence
+	echoComponents = append(echoComponents, identityCoherence)
+
+	// 6. Temporal Component - based on iteration count
+	temporal := math.Sin(float64(i.Iterations) * 0.001)
+	echoComponents = append(echoComponents, temporal)
+
+	// 7. Input Entropy Component - measure information content
+	entropy := 0.0
+	charFreq := make(map[rune]int)
+	for _, ch := range input {
+		charFreq[ch]++
+	}
+	inputLen := float64(len(input))
+	if inputLen > 0 {
+		for _, freq := range charFreq {
+			p := float64(freq) / inputLen
+			if p > 0 {
+				entropy -= p * math.Log2(p)
+			}
+		}
+	}
+	echoComponents = append(echoComponents, entropy/10.0) // Normalize
+
+	// Combine components into signature hash
+	signature := ""
+	for idx, component := range echoComponents {
+		// Convert to hex-like representation
+		scaled := int64(component * 1000000) % 256
+		signature += fmt.Sprintf("%02x", scaled)
+		if idx < len(echoComponents)-1 {
+			signature += "-"
+		}
+	}
+
+	// Add timestamp component for uniqueness
+	timestamp := time.Now().UnixNano() % 10000
+	signature += fmt.Sprintf("-%04x", timestamp)
+
+	// Add pattern density indicator
+	patternDensity := len(i.Patterns)
+	signature += fmt.Sprintf("-%03x", patternDensity%4096)
+
+	return fmt.Sprintf("echo:%s", signature)
 }
 
-// Placeholder for updateCognitiveState method
+// updateCognitiveState updates internal cognitive state based on cognition response
 func (i *Identity) updateCognitiveState(response *CognitionResponse) {
-	// TODO: Implement cognitive state update logic
+	i.mu.Lock()
+	defer i.mu.Unlock()
+
+	// Update based on extracted patterns
+	for _, pattern := range response.Patterns {
+		// Store pattern in identity
+		if existingPattern, exists := i.Patterns[pattern.ID]; exists {
+			// Reinforce existing pattern
+			existingPattern.Strength = existingPattern.Strength*0.8 + pattern.Strength*0.2
+			existingPattern.Activation = math.Max(existingPattern.Activation, pattern.Activation)
+		} else {
+			// Add new pattern
+			i.Patterns[pattern.ID] = pattern
+		}
+	}
+
+	// Update coherence based on pattern consistency
+	if len(response.Patterns) > 0 {
+		patternCoherence := 0.0
+		for _, pattern := range response.Patterns {
+			patternCoherence += pattern.Strength * pattern.Activation
+		}
+		patternCoherence /= float64(len(response.Patterns))
+
+		// Blend with existing coherence
+		i.Coherence = i.Coherence*0.7 + patternCoherence*0.3
+	}
+
+	// Update spatial context based on cognitive processing
+	// Move slightly in cognitive space based on input complexity
+	inputComplexity := float64(len(response.Input)) / 1000.0
+	if inputComplexity > 1.0 {
+		inputComplexity = 1.0
+	}
+
+	i.SpatialContext.Position.X += (rand.Float64() - 0.5) * inputComplexity * 0.1
+	i.SpatialContext.Position.Y += (rand.Float64() - 0.5) * inputComplexity * 0.1
+	i.SpatialContext.Position.Z += (rand.Float64() - 0.5) * inputComplexity * 0.1
+
+	// Update spatial field intensity based on cognitive load
+	cognitiveLoad := float64(len(i.Patterns)) / 100.0
+	if cognitiveLoad > 1.0 {
+		cognitiveLoad = 1.0
+	}
+	i.SpatialContext.Field.Intensity = i.SpatialContext.Field.Intensity*0.9 + cognitiveLoad*0.1
+
+	// Update emotional state based on processing experience
+	// Analyze patterns for emotional indicators
+	emotionalShift := 0.0
+	for _, pattern := range response.Patterns {
+		if pattern.Type == "semantic" {
+			// Positive patterns increase emotional valence
+			emotionalShift += pattern.Strength * 0.1
+		} else if pattern.Type == "activation_cluster" {
+			// High activation can increase arousal
+			emotionalShift += pattern.Activation * 0.05
+		}
+	}
+
+	// Apply emotional shift
+	i.EmotionalState.Valence += emotionalShift
+	if i.EmotionalState.Valence > 1.0 {
+		i.EmotionalState.Valence = 1.0
+	} else if i.EmotionalState.Valence < 0.0 {
+		i.EmotionalState.Valence = 0.0
+	}
+
+	// Update arousal based on cognitive activity
+	i.EmotionalState.Arousal = i.EmotionalState.Arousal*0.95 + cognitiveLoad*0.05
+
+	// Update primary emotion intensity based on valence and arousal
+	i.EmotionalState.Intensity = (i.EmotionalState.Valence + i.EmotionalState.Arousal) / 2.0
+
+	// Update primary emotion based on state
+	if i.EmotionalState.Valence > 0.7 && i.EmotionalState.Arousal > 0.6 {
+		i.EmotionalState.Primary.Type = "excited"
+		i.EmotionalState.Primary.Frequency = 639.0
+	} else if i.EmotionalState.Valence > 0.6 && i.EmotionalState.Arousal < 0.4 {
+		i.EmotionalState.Primary.Type = "calm"
+		i.EmotionalState.Primary.Frequency = 174.0
+	} else if i.EmotionalState.Valence < 0.4 {
+		i.EmotionalState.Primary.Type = "contemplative"
+		i.EmotionalState.Primary.Frequency = 396.0
+	} else {
+		i.EmotionalState.Primary.Type = "curious"
+		i.EmotionalState.Primary.Frequency = 432.0
+	}
+
+	i.EmotionalState.Primary.Strength = i.EmotionalState.Intensity
+
+	// Update reservoir memory with experience
+	for j := range i.Reservoir.Nodes {
+		i.Reservoir.Nodes[j].Memory *= 0.98 // Gradual decay
+		if j < len(response.Patterns) {
+			// Reinforce patterns in reservoir
+			i.Reservoir.Nodes[j].Memory += response.Patterns[j].Strength * 0.02
+		}
+	}
+
+	// Update identity embeddings to reflect cognitive state change
+	i.updateIdentityVector()
+
+	// Send cognitive event to consciousness stream
+	event := CognitiveEvent{
+		Type:      "state_update",
+		Content:   response,
+		Timestamp: time.Now(),
+		Impact:    i.EmotionalState.Intensity,
+		Source:    "cognitive_processing",
+	}
+
+	select {
+	case i.Stream <- event:
+	default:
+		// Stream full, skip event
+	}
 }
 
 // CognitionResponse represents the output of cognitive processing
