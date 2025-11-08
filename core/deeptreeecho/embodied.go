@@ -43,7 +43,7 @@ type EmbodiedCognition struct {
 	ActiveProviders map[string]ModelProvider // Added for AI integration
 	LongTerm        *LongTermMemory       // Added for persistent memory
 	ShortTerm       *ShortTermMemory      // Added for short-term working memory
-	WorkingMemory   *WorkingMemory        // Added for dynamic working memory
+	WorkingMemory   *WorkingMemoryBuffer  // Added for dynamic working memory
 	Patterns        map[string]*CognitivePattern
 	AdaptationLevel float64
 }
@@ -116,7 +116,7 @@ func NewEmbodiedCognition(name string) *EmbodiedCognition {
 		ActiveProviders: make(map[string]ModelProvider),
 		LongTerm:        NewLongTermMemory(),
 		ShortTerm:       NewShortTermMemory(),
-		WorkingMemory:   NewWorkingMemory(),
+		WorkingMemory:   NewWorkingMemoryBuffer(),
 		Patterns:        make(map[string]*CognitivePattern),
 		AdaptationLevel: 0.5,
 	}
@@ -931,7 +931,7 @@ type ShortTermMemory struct {
 	Capacity int
 }
 
-type WorkingMemory struct {
+type WorkingMemoryBuffer struct {
 	Buffer []interface{}
 	Active map[string]interface{}
 }
@@ -958,8 +958,8 @@ func NewShortTermMemory() *ShortTermMemory {
 	}
 }
 
-func NewWorkingMemory() *WorkingMemory {
-	return &WorkingMemory{
+func NewWorkingMemoryBuffer() *WorkingMemoryBuffer {
+	return &WorkingMemoryBuffer{
 		Buffer: make([]interface{}, 0),
 		Active: make(map[string]interface{}),
 	}
