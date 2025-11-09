@@ -24,6 +24,9 @@ type EchoDream struct {
 	// Memory consolidation
 	consolidator    *MemoryConsolidator
 	
+	// Advanced consolidation algorithms
+	consolidationAlgos *ConsolidationAlgorithms
+	
 	// Pattern synthesis
 	synthesizer     *PatternSynthesizer
 	
@@ -175,6 +178,9 @@ func NewEchoDream() *EchoDream {
 		journal: make([]*DreamRecord, 0),
 		metrics: &DreamMetrics{},
 	}
+	
+	// Initialize advanced consolidation algorithms
+	ed.consolidationAlgos = NewConsolidationAlgorithms()
 	
 	return ed
 }

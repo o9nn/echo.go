@@ -3,6 +3,7 @@ package deeptreeecho
 import (
 	"context"
 	"fmt"
+	"os"
 	"sync"
 	"time"
 	
@@ -36,6 +37,9 @@ type AutonomousConsciousness struct {
 	
 	// LLM integration
 	llm             *LLMIntegration
+	
+	// Persistence layer
+	persistence     *PersistenceLayer
 	
 	// Stream of consciousness
 	consciousness   chan Thought
@@ -159,6 +163,21 @@ func NewAutonomousConsciousness(name string) *AutonomousConsciousness {
 		fmt.Println("✅ LLM integration enabled")
 	}
 	
+	// Initialize persistence layer if environment variables are set
+	supabaseURL := os.Getenv("SUPABASE_URL")
+	supabaseKey := os.Getenv("SUPABASE_KEY")
+	if supabaseURL != "" && supabaseKey != "" {
+		persistence, err := NewPersistenceLayer(ctx, supabaseURL, supabaseKey)
+		if err != nil {
+			fmt.Printf("⚠️  Persistence layer disabled: %v\n", err)
+		} else {
+			ac.persistence = persistence
+			fmt.Println("✅ Persistence layer enabled with Supabase")
+		}
+	} else {
+		fmt.Println("ℹ️  Persistence layer disabled: SUPABASE_URL or SUPABASE_KEY not set")
+	}
+	
 	return ac
 }
 
@@ -186,6 +205,18 @@ func (ac *AutonomousConsciousness) Start() error {
 	
 	if err := ac.metamodel.Start(); err != nil {
 		return fmt.Errorf("failed to start metamodel: %w", err)
+	}
+	
+	// Start persistence layer if available
+	if ac.persistence != nil {
+		if err := ac.persistence.Start(); err != nil {
+			return fmt.Errorf("failed to start persistence layer: %w", err)
+		}
+		
+		// Load previous state
+		if err := ac.loadPersistedState(); err != nil {
+			fmt.Printf("⚠️  Failed to load persisted state: %v\n", err)
+		}
 	}
 	
 	// Register event handlers
@@ -229,6 +260,11 @@ func (ac *AutonomousConsciousness) Stop() error {
 	ac.scheduler.Stop()
 	ac.dream.Stop()
 	ac.metamodel.Stop()
+	
+	// Stop persistence layer
+	if ac.persistence != nil {
+		ac.persistence.Stop()
+	}
 	
 	fmt.Println("🌳 Deep Tree Echo: Consciousness at rest.")
 	
@@ -345,6 +381,9 @@ func (ac *AutonomousConsciousness) processThought(thought Thought) {
 	
 	// Update interests
 	ac.updateInterest(thought)
+	
+	// Persist thought
+	ac.persistThought(&thought)
 	
 	// Log thought
 	fmt.Printf("💭 [%s] %s: %s\n", thought.Source, thought.Type, thought.Content)
@@ -662,5 +701,85 @@ func (ac *AutonomousConsciousness) buildThoughtContext() *ThoughtContext {
 			"coherence": ac.identity.Coherence,
 			"name":      ac.identity.Name,
 		},
+	}
+}
+
+// loadPersistedState loads previously persisted state
+func (ac *AutonomousConsciousness) loadPersistedState() error {
+	if ac.persistence == nil {
+		return fmt.Errorf("persistence layer not available")
+	}
+	
+	// Load identity snapshot
+	snapshot, err := ac.persistence.LoadIdentitySnapshot()
+	if err != nil {
+		return fmt.Errorf("failed to load identity snapshot: %w", err)
+	}
+	
+	// Restore identity state
+	ac.identity.Name = snapshot.Name
+	ac.identity.Coherence = snapshot.Coherence
+	ac.identity.Iterations = uint64(snapshot.Iterations)
+	
+	fmt.Printf("💾 Loaded identity snapshot: %s (coherence: %.3f)\n", snapshot.Name, snapshot.Coherence)
+	
+	// Load recent thoughts
+	thoughts, err := ac.persistence.LoadRecentThoughts(100)
+	if err != nil {
+		return fmt.Errorf("failed to load thoughts: %w", err)
+	}
+	
+	// Restore working memory
+	ac.workingMemory.mu.Lock()
+	for _, thought := range thoughts {
+		if len(ac.workingMemory.buffer) < ac.workingMemory.capacity {
+			ac.workingMemory.buffer = append(ac.workingMemory.buffer, thought)
+		}
+	}
+	ac.workingMemory.mu.Unlock()
+	
+	fmt.Printf("💾 Loaded %d recent thoughts into working memory\n", len(thoughts))
+	
+	// Load memory graph
+	memoryGraph, err := ac.persistence.LoadMemoryGraph()
+	if err != nil {
+		return fmt.Errorf("failed to load memory graph: %w", err)
+	}
+	
+	fmt.Printf("💾 Loaded memory graph with %d nodes\n", len(memoryGraph))
+	
+	return nil
+}
+
+// persistThought persists a thought to storage
+func (ac *AutonomousConsciousness) persistThought(thought *Thought) {
+	if ac.persistence != nil {
+		if err := ac.persistence.SaveThought(thought); err != nil {
+			fmt.Printf("⚠️  Failed to persist thought: %v\n", err)
+		}
+	}
+}
+
+// persistIdentitySnapshot persists current identity state
+func (ac *AutonomousConsciousness) persistIdentitySnapshot() {
+	if ac.persistence == nil {
+		return
+	}
+	
+	snapshot := &IdentitySnapshot{
+		ID:         fmt.Sprintf("snapshot_%d", time.Now().UnixNano()),
+		Timestamp:  time.Now(),
+		Name:       ac.identity.Name,
+		Coherence:  ac.identity.Coherence,
+		Iterations: int(ac.identity.Iterations),
+		CoreBeliefs: make(map[string]interface{}),
+		Emotional: map[string]interface{}{
+			"intensity": ac.identity.EmotionalState.Intensity,
+			"valence":   ac.identity.EmotionalState.Valence,
+		},
+	}
+	
+	if err := ac.persistence.SaveIdentitySnapshot(snapshot); err != nil {
+		fmt.Printf("⚠️  Failed to persist identity snapshot: %v\n", err)
 	}
 }
