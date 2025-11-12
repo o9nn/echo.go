@@ -471,7 +471,7 @@ func (eac *EnhancedAutonomousConsciousness) practiceSkill(skill *Skill) {
 // Helper methods
 
 // buildThoughtContext builds context for LLM thought generation
-func (eac *EnhancedAutonomousConsciousness) buildThoughtContext() *ThoughtContext {
+func (eac *EnhancedAutonomousConsciousness) buildThoughtContext() *LLMThoughtContext {
 	// Get working memory contents
 	eac.workingMemory.mu.RLock()
 	workingMem := make([]string, len(eac.workingMemory.buffer))
@@ -488,7 +488,7 @@ func (eac *EnhancedAutonomousConsciousness) buildThoughtContext() *ThoughtContex
 	}
 	eac.interests.mu.RUnlock()
 
-	return &ThoughtContext{
+	return &LLMThoughtContext{
 		WorkingMemory:    workingMem,
 		RecentThoughts:   eac.getRecentThoughts(5),
 		CurrentInterests: interests,

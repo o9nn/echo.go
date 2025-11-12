@@ -188,8 +188,8 @@ func (llm *EnhancedLLMIntegration) getThoughtTypeGuidance(thoughtType ThoughtTyp
 	return ""
 }
 
-// generateWithPrompt generates text using the LLM
-func (llm *EnhancedLLMIntegration) generateWithPrompt(prompt string) (string, error) {
+// generateWithPromptLegacy generates text using the LLM (legacy method)
+func (llm *EnhancedLLMIntegration) generateWithPromptLegacy(prompt string) (string, error) {
 	requestBody := map[string]interface{}{
 		"model": llm.model,
 		"messages": []map[string]string{

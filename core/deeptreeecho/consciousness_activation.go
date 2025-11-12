@@ -125,7 +125,7 @@ func (iac *IntegratedAutonomousConsciousness) buildComprehensiveContext() Though
 	iac.workingMemory.mu.RLock()
 	context.WorkingMemory = make([]*Thought, len(iac.workingMemory.buffer))
 	copy(context.WorkingMemory, iac.workingMemory.buffer)
-	context.FocusItem = iac.workingMemory.focusItem
+	context.FocusItem = iac.workingMemory.focus
 	iac.workingMemory.mu.RUnlock()
 	
 	// Recent episodic memories from hypergraph
@@ -146,7 +146,9 @@ func (iac *IntegratedAutonomousConsciousness) buildComprehensiveContext() Though
 	
 	// Identity state
 	context.IdentityCoherence = iac.identity.Coherence
-	context.EmotionalState = iac.identity.EmotionalState
+	if iac.identity.EmotionalState != nil {
+		context.EmotionalState = *iac.identity.EmotionalState
+	}
 	
 	// Interest patterns
 	iac.interests.mu.RLock()
@@ -197,13 +199,10 @@ func (iac *IntegratedAutonomousConsciousness) generateIntegratedThought(
 		ID:               generateThoughtID(),
 		Content:          content,
 		Type:             thoughtType,
-		Mode:             mode,
 		Timestamp:        time.Now(),
-		Emotional:        context.EmotionalState.Intensity,
 		EmotionalValence: valence,
 		Importance:       importance,
 		Source:           SourceInternal,
-		Context:          context,
 	}
 	
 	return thought

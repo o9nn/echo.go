@@ -31,7 +31,7 @@ func (aar *AARCore) UpdateFromThought(thought Thought) {
 	}
 	
 	// Update need intensity based on emotional intensity
-	needModifier := getNeedModifier(thought.Emotional)
+	needModifier := getNeedModifier(thought.EmotionalValence)
 	aar.arena.needIntensity = 0.8*aar.arena.needIntensity + 0.2*needModifier
 	
 	// Update narrative based on significant thoughts

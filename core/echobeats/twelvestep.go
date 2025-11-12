@@ -493,3 +493,33 @@ func (tseb *TwelveStepEchoBeats) GetStatus() map[string]interface{} {
 		"phase":        tseb.getPhase(tseb.currentStep + 1),
 	}
 }
+
+// GetCurrentStep returns the current step number (1-indexed)
+func (tseb *TwelveStepEchoBeats) GetCurrentStep() int {
+	tseb.mu.RLock()
+	defer tseb.mu.RUnlock()
+	return tseb.currentStep + 1
+}
+
+// AdvanceStep manually advances to the next step
+func (tseb *TwelveStepEchoBeats) AdvanceStep() {
+	tseb.mu.Lock()
+	defer tseb.mu.Unlock()
+	
+	tseb.currentStep = (tseb.currentStep + 1) % 12
+	if tseb.currentStep == 0 {
+		tseb.cycleCount++
+		tseb.metrics.mu.Lock()
+		tseb.metrics.TotalCycles++
+		tseb.metrics.mu.Unlock()
+	}
+	
+	// Update mode if transitioning
+	newMode := tseb.getMode(tseb.currentStep + 1)
+	if newMode != tseb.currentMode {
+		tseb.currentMode = newMode
+		tseb.metrics.mu.Lock()
+		tseb.metrics.ModeTransitions++
+		tseb.metrics.mu.Unlock()
+	}
+}

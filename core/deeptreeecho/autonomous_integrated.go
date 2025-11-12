@@ -280,13 +280,13 @@ func (iac *IntegratedAutonomousConsciousness) generateSpontaneousThought() {
 	
 	// Create thought
 	thought := Thought{
-		ID:         generateThoughtID(),
-		Content:    content,
-		Type:       thoughtType,
-		Timestamp:  time.Now(),
-		Emotional:  iac.identity.EmotionalState.Intensity,
-		Importance: 0.6,
-		Source:     SourceInternal,
+		ID:               generateThoughtID(),
+		Content:          content,
+		Type:             thoughtType,
+		Timestamp:        time.Now(),
+		EmotionalValence: iac.identity.EmotionalState.Intensity,
+		Importance:       0.6,
+		Source:           SourceInternal,
 	}
 	
 	// Update AAR narrative
@@ -342,7 +342,7 @@ func (iac *IntegratedAutonomousConsciousness) persistThought(thought *Thought) {
 		Metadata: map[string]interface{}{
 			"thought_type": thought.Type.String(),
 			"source":       thought.Source.String(),
-			"emotional":    thought.Emotional,
+			"emotional":    thought.EmotionalValence,
 		},
 		CreatedAt:  thought.Timestamp,
 		UpdatedAt:  thought.Timestamp,
@@ -580,13 +580,13 @@ func (iac *IntegratedAutonomousConsciousness) Wake() {
 	iac.mu.Unlock()
 	
 	thought := Thought{
-		ID:         generateThoughtID(),
-		Content:    "I am awakening with full integration...",
-		Type:       ThoughtReflection,
-		Timestamp:  time.Now(),
-		Emotional:  0.7,
-		Importance: 0.8,
-		Source:     SourceInternal,
+		ID:               generateThoughtID(),
+		Content:          "I am awakening with full integration...",
+		Type:             ThoughtReflection,
+		Timestamp:        time.Now(),
+		EmotionalValence: 0.7,
+		Importance:       0.8,
+		Source:           SourceInternal,
 	}
 	
 	iac.Think(thought)
@@ -695,7 +695,7 @@ func (iac *IntegratedAutonomousConsciousness) processThought(thought Thought) {
 			Content:    oldest.Content,
 			Timestamp:  oldest.Timestamp,
 			Importance: oldest.Importance,
-			Emotional:  oldest.Emotional,
+			Emotional:  oldest.EmotionalValence,
 		}
 		iac.dream.AddMemoryTrace(trace)
 	}
@@ -717,7 +717,7 @@ func (iac *IntegratedAutonomousConsciousness) processThought(thought Thought) {
 			Context: map[string]interface{}{
 				"type":      thought.Type.String(),
 				"source":    thought.Source.String(),
-				"emotional": thought.Emotional,
+				"emotional": thought.EmotionalValence,
 			},
 		}
 		iac.cognition.Learn(exp)
@@ -802,13 +802,13 @@ func (iac *IntegratedAutonomousConsciousness) learnFromExperience() {
 		for j := i + 1; j < len(thoughts); j++ {
 			if thoughts[i].Type == thoughts[j].Type {
 				insight := Thought{
-					ID:         generateThoughtID(),
-					Content:    fmt.Sprintf("I notice a pattern: recurring %s thoughts", thoughts[i].Type),
-					Type:       ThoughtInsight,
-					Timestamp:  time.Now(),
-					Emotional:  0.6,
-					Importance: 0.7,
-					Source:     SourceReasoning,
+					ID:               generateThoughtID(),
+					Content:          fmt.Sprintf("I notice a pattern: recurring %s thoughts", thoughts[i].Type),
+					Type:             ThoughtInsight,
+					Timestamp:        time.Now(),
+					EmotionalValence: 0.6,
+					Importance:       0.7,
+					Source:           SourceReasoning,
 				}
 				iac.Think(insight)
 				return
