@@ -559,7 +559,7 @@ func (bp *BatchProcessor) FlushAll(supabase *memory.SupabaseClient) error {
 				"type":       thought.Type.String(),
 				"timestamp":  thought.Timestamp,
 				"importance": thought.Importance,
-				"emotional":  thought.Emotional,
+					"emotional":  thought.EmotionalValence,
 				"source":     thought.Source.String(),
 			}
 			if err := supabase.Insert("thoughts", data); err != nil {

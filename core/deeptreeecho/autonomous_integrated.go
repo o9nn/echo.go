@@ -63,6 +63,15 @@ type IntegratedAutonomousConsciousness struct {
 	// Skill practice system
 	skills          *SkillSystem
 	
+	// Autonomous state management
+	stateManager    *AutonomousStateManager
+	
+	// Discussion management
+	discussionManager *DiscussionManager
+	
+	// Knowledge learning
+	knowledgeLearning *KnowledgeLearningSystem
+	
 	// Running state
 	running         bool
 	startTime       time.Time
@@ -240,8 +249,9 @@ func (iac *IntegratedAutonomousConsciousness) Start() error {
 	return nil
 }
 
-// generateSpontaneousThought generates a spontaneous thought with full integration
-func (iac *IntegratedAutonomousConsciousness) generateSpontaneousThought() {
+// generateSpontaneousThoughtOld generates a spontaneous thought with full integration (OLD VERSION)
+// Replaced by version in autonomous_consciousness_complete.go
+func (iac *IntegratedAutonomousConsciousness) generateSpontaneousThoughtOld() {
 	iac.mu.Lock()
 	iac.thinking = true
 	iac.mu.Unlock()

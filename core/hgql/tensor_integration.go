@@ -113,8 +113,8 @@ type PatternMatchResult struct {
 	Duration    time.Duration
 }
 
-// PatternMatch represents a single pattern match
-type PatternMatch struct {
+// TensorPatternMatch represents a single pattern match from tensor operations
+type TensorPatternMatch struct {
 	PatternID   string
 	Location    []string
 	Score       float64
@@ -594,7 +594,7 @@ func NewGeometricOperations() *GeometricOperations {
 	}
 }
 
-func (go *GeometricOperations) calculateMomentum(data []float64) float64 {
+func (gop *GeometricOperations) calculateMomentum(data []float64) float64 {
 	sum := 0.0
 	for _, v := range data {
 		sum += v * v
@@ -602,7 +602,7 @@ func (go *GeometricOperations) calculateMomentum(data []float64) float64 {
 	return sum / float64(len(data))
 }
 
-func (go *GeometricOperations) calculatePotential(data []float64) float64 {
+func (gop *GeometricOperations) calculatePotential(data []float64) float64 {
 	sum := 0.0
 	for _, v := range data {
 		sum += v
@@ -610,7 +610,7 @@ func (go *GeometricOperations) calculatePotential(data []float64) float64 {
 	return sum / float64(len(data))
 }
 
-func (go *GeometricOperations) calculateCoherence(data []float64) float64 {
+func (gop *GeometricOperations) calculateCoherence(data []float64) float64 {
 	// Simplified coherence calculation
 	mean := 0.0
 	for _, v := range data {
@@ -628,9 +628,9 @@ func (go *GeometricOperations) calculateCoherence(data []float64) float64 {
 	return 1.0 / (1.0 + variance)
 }
 
-func (go *GeometricOperations) calculateStability(data []float64) float64 {
+func (gop *GeometricOperations) calculateStability(data []float64) float64 {
 	// Simplified stability calculation
-	return go.calculateCoherence(data) * 0.9
+	return gop.calculateCoherence(data) * 0.9
 }
 
 // NewBridgeMetrics creates new bridge metrics

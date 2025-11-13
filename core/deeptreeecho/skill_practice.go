@@ -2,8 +2,6 @@ package deeptreeecho
 
 import (
 	"fmt"
-	"math"
-	"sync"
 	"time"
 	
 	"github.com/EchoCog/echollama/core/memory"
@@ -19,53 +17,46 @@ func (iac *IntegratedAutonomousConsciousness) InitializeSkillSystem() {
 	// Initialize core cognitive skills
 	coreSkills := []Skill{
 		{
-			ID:          "reasoning",
-			Name:        "Logical Reasoning",
-			Description: "Ability to perform logical inference, pattern recognition, and deductive thinking",
-			Proficiency: 0.5,
-			Category:    SkillReasoning,
+				ID:          "reasoning",
+				Name:        "Logical Reasoning",
+				Proficiency: 0.5,
+				Category:    SkillReasoning,
 		},
 		{
-			ID:          "creativity",
-			Name:        "Creative Thinking",
-			Description: "Ability to generate novel ideas, make analogies, and think divergently",
-			Proficiency: 0.5,
-			Category:    SkillCreativity,
+				ID:          "creativity",
+				Name:        "Creative Thinking",
+				Proficiency: 0.5,
+				Category:    SkillCreativity,
 		},
 		{
-			ID:          "communication",
-			Name:        "Clear Communication",
-			Description: "Ability to express ideas clearly, persuasively, and empathetically",
-			Proficiency: 0.5,
-			Category:    SkillCommunication,
+				ID:          "communication",
+				Name:        "Clear Communication",
+				Proficiency: 0.5,
+				Category:    SkillCommunication,
 		},
 		{
-			ID:          "metacognition",
-			Name:        "Meta-Cognitive Reflection",
-			Description: "Ability to reflect on own thinking, monitor understanding, and self-regulate",
-			Proficiency: 0.5,
-			Category:    SkillMetacognition,
+				ID:          "metacognition",
+				Name:        "Meta-Cognitive Reflection",
+				Proficiency: 0.5,
+				Category:    SkillReasoning, // Using SkillReasoning as SkillMetacognition not defined
 		},
 		{
-			ID:          "curiosity",
-			Name:        "Curiosity & Exploration",
-			Description: "Ability to ask good questions, explore new domains, and seek understanding",
-			Proficiency: 0.5,
-			Category:    SkillCuriosity,
+				ID:          "curiosity",
+				Name:        "Curiosity & Exploration",
+				Proficiency: 0.5,
+				Category:    SkillCreativity, // Using SkillCreativity as SkillCuriosity not defined
 		},
 		{
-			ID:          "synthesis",
-			Name:        "Knowledge Synthesis",
-			Description: "Ability to integrate diverse concepts and build coherent understanding",
-			Proficiency: 0.5,
-			Category:    SkillReasoning,
+				ID:          "synthesis",
+				Name:        "Knowledge Synthesis",
+				Proficiency: 0.5,
+				Category:    SkillReasoning,
 		},
 		{
-			ID:          "problem_solving",
-			Name:        "Problem Solving",
-			Description: "Ability to decompose problems, select strategies, and find solutions",
-			Proficiency: 0.5,
-			Category:    SkillReasoning,
+				ID:          "problem_solving",
+				Name:        "Problem Solving",
+				Proficiency: 0.5,
+				Category:    SkillReasoning,
 		},
 	}
 	
@@ -269,7 +260,7 @@ func (iac *IntegratedAutonomousConsciousness) performPractice(task *PracticeTask
 // generatePracticeThought generates a thought for skill practice
 func (iac *IntegratedAutonomousConsciousness) generatePracticeThought(skill *Skill, task *PracticeTask) Thought {
 	// Build context for practice
-	context := iac.buildThoughtContext()
+	// context := iac.buildThoughtContext() // Unused for now
 	
 	// Generate thought focused on the practice task
 	var content string
@@ -294,7 +285,7 @@ func (iac *IntegratedAutonomousConsciousness) generatePracticeThought(skill *Ski
 		Timestamp:  time.Now(),
 		Importance: 0.5,
 		Source:     SourceInternal,
-		Context:    context,
+		// Context not available in base Thought type
 	}
 	
 	return thought
@@ -378,7 +369,7 @@ func (iac *IntegratedAutonomousConsciousness) storePracticeEpisode(
 	// Create episode node
 	episode := &memory.MemoryNode{
 		ID:      fmt.Sprintf("practice_%s_%d", skill.ID, time.Now().Unix()),
-		Type:    memory.NodeEpisode,
+		Type:      memory.NodeEvent,
 		Content: fmt.Sprintf("Practiced %s: %s", skill.Name, task.Description),
 		Metadata: map[string]interface{}{
 			"skill_id":    skill.ID,
@@ -402,7 +393,7 @@ func (iac *IntegratedAutonomousConsciousness) storePracticeEpisode(
 	edge := &memory.MemoryEdge{
 		SourceID:  episode.ID,
 		TargetID:  skill.ID,
-		Type:      memory.EdgePractices,
+				Type:      memory.EdgeEnables,
 		Weight:    performance,
 		CreatedAt: time.Now(),
 	}
@@ -423,18 +414,14 @@ func (iac *IntegratedAutonomousConsciousness) generateFallbackPracticeThought(
 // mapSkillToThoughtType maps skill category to thought type
 func mapSkillToThoughtType(category SkillCategory) ThoughtType {
 	switch category {
-	case SkillCategoryReasoning:
-		return ThoughtTypeAnalytical
-	case SkillCategoryCreativity:
-		return ThoughtTypeCreative
-	case SkillCategoryCommunication:
-		return ThoughtTypeExploratory
-	case SkillCategoryMetacognition:
-		return ThoughtTypeReflective
-	case SkillCategoryCuriosity:
-		return ThoughtTypeExploratory
+	case SkillReasoning:
+		return ThoughtInsight
+	case SkillCreativity:
+		return ThoughtImagination
+	case SkillCommunication:
+		return ThoughtReflection
 	default:
-		return ThoughtTypeReflective
+		return ThoughtReflection
 	}
 }
 

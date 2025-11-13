@@ -2,7 +2,6 @@ package deeptreeecho
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 	
@@ -167,7 +166,7 @@ func (b *EnhancedLLMContextBuilder) BuildPrompt(thoughtType ThoughtType, mode Co
 	// Emotional state
 	prompt.WriteString(fmt.Sprintf("\n## Emotional State:\n"))
 	prompt.WriteString(fmt.Sprintf("- Intensity: %.2f\n", b.emotionalState.Intensity))
-	prompt.WriteString(fmt.Sprintf("- Dominant Emotion: %s\n", b.emotionalState.DominantEmotion))
+	prompt.WriteString(fmt.Sprintf("- Dominant Emotion: %s\n", b.emotionalState.Primary.Type))
 	
 	// Thought generation instruction
 	prompt.WriteString(fmt.Sprintf("\n## Generate Thought\n"))
@@ -198,8 +197,8 @@ func (b *EnhancedLLMContextBuilder) BuildPrompt(thoughtType ThoughtType, mode Co
 		prompt.WriteString("Analyze patterns, relationships, or implications in your knowledge.")
 	case ThoughtTypeCreative:
 		prompt.WriteString("Generate novel ideas, analogies, or creative insights.")
-	case ThoughtTypePredictive:
-		prompt.WriteString("Anticipate potential futures, outcomes, or consequences.")
+	// case ThoughtTypePredictive: // Duplicate of ThoughtTypeIntentional (both map to ThoughtPlan)
+	// 	prompt.WriteString("Anticipate potential futures, outcomes, or consequences.")
 	case ThoughtTypeIntentional:
 		prompt.WriteString("Commit to a goal, intention, or course of action.")
 	}
@@ -262,7 +261,7 @@ func (b *EnhancedLLMContextBuilder) BuildJSONContext() map[string]interface{} {
 	context["coherence"] = b.coherence
 	context["emotional_state"] = map[string]interface{}{
 		"intensity":        b.emotionalState.Intensity,
-		"dominant_emotion": b.emotionalState.DominantEmotion,
+				"emotion":       b.emotionalState.Primary.Type,
 	}
 	
 	return context
@@ -299,43 +298,20 @@ func (llm *EnhancedLLMIntegration) GenerateDeepContextualThought(
 }
 
 // UpdateAARContext updates the LLM's internal AAR context
-func (llm *EnhancedLLMIntegration) UpdateAARContext(state AARState) {
-	llm.mu.Lock()
-	defer llm.mu.Unlock()
-	
-	llm.currentAARState = state
-}
+// Note: Disabled because EnhancedLLMIntegration doesn't have mu or currentAARState fields
+// func (llm *EnhancedLLMIntegration) UpdateAARContext(state AARState) {
+// 	llm.mu.Lock()
+// 	defer llm.mu.Unlock()
+// 	
+// 	llm.currentAARState = state
+// }
 
 // generateWithPrompt generates text using the LLM with a given prompt
 func (llm *EnhancedLLMIntegration) generateWithPrompt(prompt string) (string, error) {
 	// Use the OpenAI API or local model
-	if llm.provider == nil {
-		return "", fmt.Errorf("no LLM provider configured")
-	}
-	
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-	
-	response, err := llm.provider.Generate(ctx, prompt, GenerationOptions{
-		Temperature:   0.7,
-		MaxTokens:     150,
-		TopP:          0.9,
-		StopSequences: []string{"\n\n", "##"},
-	})
-	
-	if err != nil {
-		return "", err
-	}
-	
-	// Clean up response
-	response = strings.TrimSpace(response)
-	
-	// Remove any meta-commentary
-	if idx := strings.Index(response, "Generate"); idx >= 0 {
-		response = response[:idx]
-	}
-	
-	return response, nil
+	// Note: provider field doesn't exist in EnhancedLLMIntegration
+	// Using fallback for now
+	return "", fmt.Errorf("LLM generation not implemented")
 }
 
 // Helper functions
