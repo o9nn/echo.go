@@ -76,6 +76,8 @@ type ThoughtType int
 const (
 	ThoughtPerception ThoughtType = iota
 	ThoughtReflection
+	ThoughtReflective // Alias for reflection
+	ThoughtMetaCognitive
 	ThoughtQuestion
 	ThoughtInsight
 	ThoughtPlan
@@ -85,8 +87,8 @@ const (
 
 func (t ThoughtType) String() string {
 	return [...]string{
-		"Perception", "Reflection", "Question", "Insight",
-		"Plan", "Memory", "Imagination",
+		"Perception", "Reflection", "Reflective", "MetaCognitive",
+		"Question", "Insight", "Plan", "Memory", "Imagination",
 	}[t]
 }
 

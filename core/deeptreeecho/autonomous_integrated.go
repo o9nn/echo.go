@@ -72,6 +72,9 @@ type IntegratedAutonomousConsciousness struct {
 	// Knowledge learning
 	knowledgeLearning *KnowledgeLearningSystem
 	
+	// Wisdom metrics
+	wisdomMetrics *WisdomMetrics
+	
 	// Running state
 	running         bool
 	startTime       time.Time
@@ -169,11 +172,17 @@ func NewIntegratedAutonomousConsciousness(name string) *IntegratedAutonomousCons
 		}
 	}
 	
-	// Initialize default skills
-	iac.initializeSkills()
-	
-	return iac
-}
+		// Initialize default skills
+		iac.initializeSkills()
+		
+		// Initialize autonomous state manager
+		iac.stateManager = NewAutonomousStateManager()
+		
+		// Initialize wisdom metrics
+		iac.wisdomMetrics = NewWisdomMetrics()
+		
+		return iac
+	}
 
 // Start begins autonomous operation with full integration
 func (iac *IntegratedAutonomousConsciousness) Start() error {
@@ -218,8 +227,8 @@ func (iac *IntegratedAutonomousConsciousness) Start() error {
 	// Register event handlers
 	iac.registerEventHandlers()
 	
-	// Start consciousness stream
-	go iac.consciousnessStream()
+		// Start continuous consciousness stream
+		go iac.continuousConsciousnessStream()
 	
 	// Start autonomous thought generation
 	go iac.autonomousThinking()
@@ -602,8 +611,13 @@ func (iac *IntegratedAutonomousConsciousness) Wake() {
 	iac.Think(thought)
 }
 
-// Rest puts the consciousness to rest
+// Rest puts the consciousness into rest mode
 func (iac *IntegratedAutonomousConsciousness) Rest() {
+	// Use full RestCycle with EchoDream integration
+	iac.RestCycle()
+	return
+	
+	// Old simple implementation below (kept for reference)
 	iac.mu.Lock()
 	iac.awake = false
 	iac.mu.Unlock()
@@ -974,6 +988,12 @@ func (iac *IntegratedAutonomousConsciousness) autonomousCognitiveCycle() {
 
 // shouldWake determines if consciousness should wake from rest
 func (iac *IntegratedAutonomousConsciousness) shouldWake() bool {
+	// Use state manager if available
+	if iac.stateManager != nil {
+		return iac.stateManager.ShouldWake()
+	}
+	
+	// Fallback to simple logic
 	// Wake if:
 	// 1. Consolidation is complete (simulated by rest duration)
 	// 2. External stimuli present (future: check for messages, etc.)
@@ -993,8 +1013,14 @@ func (iac *IntegratedAutonomousConsciousness) shouldWake() bool {
 	return coherence > 0.8 // Wake when coherence is restored
 }
 
-// shouldRest determines if consciousness should enter rest state
+// shouldRest determines if consciousness should enter rest cycle
 func (iac *IntegratedAutonomousConsciousness) shouldRest() bool {
+	// Use state manager if available
+	if iac.stateManager != nil {
+		return iac.stateManager.ShouldRest()
+	}
+	
+	// Fallback to simple logic
 	// Rest if:
 	// 1. Cognitive load is high (coherence dropping)
 	// 2. Memory consolidation needed
@@ -1074,21 +1100,6 @@ func (iac *IntegratedAutonomousConsciousness) pursueCognitiveGoal(goal *Cognitiv
 }
 
 // updateWisdomMetrics tracks wisdom cultivation progress
-func (iac *IntegratedAutonomousConsciousness) updateWisdomMetrics() {
-	// Track key wisdom indicators
-	coherence := iac.aarCore.GetCoherence()
-	stability := iac.aarCore.GetStability()
-	awareness := iac.aarCore.GetAwareness()
-
-	// Simple wisdom score: combination of coherence, stability, and awareness
-	wisdomScore := (coherence + stability + awareness) / 3.0
-
-	// Store in working memory context
-	iac.workingMemory.mu.Lock()
-	iac.workingMemory.context["wisdom_score"] = wisdomScore
-	iac.workingMemory.context["last_wisdom_update"] = time.Now()
-	iac.workingMemory.mu.Unlock()
-}
 
 // reportAutonomousStatus provides periodic status updates
 func (iac *IntegratedAutonomousConsciousness) reportAutonomousStatus() {
@@ -1168,22 +1179,37 @@ func (iac *IntegratedAutonomousConsciousness) Stop() error {
 
 // CognitiveGoal represents a goal for autonomous cognitive activity
 type CognitiveGoal struct {
-	ID          string
-	Type        GoalType
-	Description string
-	Priority    float64
-	Created     time.Time
-	Status      GoalStatus
+	ID            string
+	Type          GoalType
+	Description   string
+	Priority      float64
+	TimeHorizon   GoalHorizon
+	Prerequisites []string
+	Progress      float64
+	Created       time.Time
+	Deadline      *time.Time
+	Status        GoalStatus
 }
 
 // GoalType represents types of cognitive goals
 type GoalType string
 
 const (
-	GoalLearn   GoalType = "learn"
-	GoalExplore GoalType = "explore"
-	GoalCreate  GoalType = "create"
+	GoalLearn    GoalType = "learn"
+	GoalExplore  GoalType = "explore"
+	GoalCreate   GoalType = "create"
 	GoalPractice GoalType = "practice"
+	GoalReflect  GoalType = "reflect"
+)
+
+// GoalHorizon represents the time horizon for a goal
+type GoalHorizon int
+
+const (
+	GoalImmediate  GoalHorizon = iota // Next few cycles
+	GoalShortTerm                      // Hours
+	GoalMediumTerm                     // Days
+	GoalLongTerm                       // Weeks+
 )
 
 // GoalStatus represents the status of a goal

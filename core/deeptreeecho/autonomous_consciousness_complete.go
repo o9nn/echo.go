@@ -92,8 +92,8 @@ func (iac *IntegratedAutonomousConsciousness) PersistentConsciousnessStream() {
 			
 			// Update cognitive load
 			if iac.stateManager != nil {
-				iac.stateManager.UpdateCognitiveLoad(0.01)
-				iac.stateManager.UpdateConsolidationNeed(0.02)
+				iac.stateManager.UpdateCognitiveLoad(&basicThought)
+				iac.stateManager.RecordLearningEvent()
 			}
 			
 			// Small delay to prevent overwhelming the system
@@ -269,42 +269,13 @@ func (iac *IntegratedAutonomousConsciousness) WakeUp() {
 	iac.mu.Unlock()
 	
 	if iac.stateManager != nil {
-		iac.stateManager.EnterWake()
+		iac.stateManager.ExitRest()
 	}
 	
 	fmt.Println("✨ Awake and ready for conscious experience")
 }
 
 // RestCycle performs memory consolidation during rest
-func (iac *IntegratedAutonomousConsciousness) RestCycle() {
-	fmt.Println("💤 Rest Cycle: Beginning memory consolidation...")
-	
-	// Restore energy gradually
-	for i := 0; i < 10; i++ {
-		if iac.awake {
-			// Woke up early
-			return
-		}
-		
-		if iac.stateManager != nil {
-			iac.stateManager.RestoreEnergy(0.1)
-		}
-		
-		time.Sleep(1 * time.Second)
-	}
-	
-	// Run EchoDream consolidation
-	if iac.dream != nil {
-		iac.ConsolidateMemories()
-	}
-	
-	// Reduce consolidation need
-	if iac.stateManager != nil {
-		iac.stateManager.UpdateConsolidationNeed(-0.8)
-	}
-	
-	fmt.Println("💤 Rest Cycle: Consolidation complete")
-}
 
 // ConsolidateMemories runs EchoDream memory consolidation
 func (iac *IntegratedAutonomousConsciousness) ConsolidateMemories() {
