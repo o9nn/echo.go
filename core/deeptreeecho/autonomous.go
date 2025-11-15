@@ -39,7 +39,13 @@ type AutonomousConsciousness struct {
 	llm             *LLMIntegration
 	
 	// Persistence layer
-	// persistence     *PersistenceLayer // Temporarily disabled
+	persistence     *PersistenceLayer
+	
+	// Enhanced thought generation
+	thoughtGenerator *LLMThoughtGenerator
+	
+	// 12-step cognitive processor
+	twelveStep      *echobeats.TwelveStepEchoBeats
 	
 	// Stream of consciousness
 	consciousness   chan Thought
@@ -169,16 +175,24 @@ func NewAutonomousConsciousness(name string) *AutonomousConsciousness {
 	supabaseURL := os.Getenv("SUPABASE_URL")
 	supabaseKey := os.Getenv("SUPABASE_KEY")
 	if supabaseURL != "" && supabaseKey != "" {
-	// 		persistence, err := NewPersistenceLayer(ctx, supabaseURL, supabaseKey)
+		persistence, err := NewPersistenceLayer(ctx)
 		if err != nil {
 			fmt.Printf("⚠️  Persistence layer disabled: %v\n", err)
 		} else {
-			// ac.persistence = persistence
+			ac.persistence = persistence
 			fmt.Println("✅ Persistence layer enabled with Supabase")
 		}
 	} else {
 		fmt.Println("ℹ️  Persistence layer disabled: SUPABASE_URL or SUPABASE_KEY not set")
 	}
+	
+	// Initialize enhanced thought generator
+	ac.thoughtGenerator = NewLLMThoughtGenerator(ctx)
+	fmt.Println("✅ Enhanced thought generator initialized")
+	
+	// Initialize 12-step cognitive processor
+	ac.twelveStep = echobeats.NewTwelveStepEchoBeats(ctx)
+	fmt.Println("✅ 12-step cognitive processor initialized")
 	
 	return ac
 }
@@ -209,17 +223,20 @@ func (ac *AutonomousConsciousness) Start() error {
 		return fmt.Errorf("failed to start metamodel: %w", err)
 	}
 	
-	// Start persistence layer if available
-		// 	// if ac.persistence != nil {
-		// if err := ac.persistence.Start(); err != nil {
-		// return fmt.Errorf("failed to start persistence layer: %w", err)
-		// }
-		// 	
-		// 	// Load previous state
-		// if err := ac.loadPersistedState(); err != nil {
-		// fmt.Printf("⚠️  Failed to load persisted state: %v\n", err)
-		// }
-		// }
+	// Start persistence layer
+	if ac.persistence != nil {
+		// Load previous state
+		if err := ac.loadPersistedState(); err != nil {
+			fmt.Printf("⚠️  Failed to load persisted state: %v\n", err)
+		}
+	}
+	
+	// Start 12-step cognitive processor
+	if ac.twelveStep != nil {
+		if err := ac.twelveStep.Start(); err != nil {
+			return fmt.Errorf("failed to start 12-step processor: %w", err)
+		}
+	}
 	
 	// Register event handlers
 	ac.registerEventHandlers()
@@ -263,13 +280,20 @@ func (ac *AutonomousConsciousness) Stop() error {
 	ac.dream.Stop()
 	ac.metamodel.Stop()
 	
-	// Stop persistence layer
-	// 	// if ac.persistence != nil {
-	// 	// ac.persistence.Stop()
-	// }
-	// 	
-	// fmt.Println("🌳 Deep Tree Echo: Consciousness at rest.")
-	// 	
+	// Save state and stop persistence layer
+	if ac.persistence != nil {
+		if err := ac.savePersistedState(); err != nil {
+			fmt.Printf("⚠️  Failed to save persisted state: %v\n", err)
+		}
+		ac.persistence.Close()
+	}
+	
+	// Stop 12-step processor
+	if ac.twelveStep != nil {
+		ac.twelveStep.Stop()
+	}
+	
+	fmt.Println("🌳 Deep Tree Echo: Consciousness at rest.")
 	return nil
 }
 
@@ -385,7 +409,11 @@ func (ac *AutonomousConsciousness) processThought(thought Thought) {
 	ac.updateInterest(thought)
 	
 	// Persist thought
-		// 	ac.persistThought(&thought)
+	if ac.persistence != nil {
+		if err := ac.persistence.SaveThought(&thought, ac.identity.ID); err != nil {
+			fmt.Printf("⚠️  Failed to persist thought: %v\n", err)
+		}
+	}
 	
 	// Log thought
 	fmt.Printf("💭 [%s] %s: %s\n", thought.Source, thought.Type, thought.Content)
@@ -442,16 +470,30 @@ func (ac *AutonomousConsciousness) generateSpontaneousThought() {
 
 // generateThoughtContent generates content for a thought
 func (ac *AutonomousConsciousness) generateThoughtContent() string {
-	// If LLM is available, use it for richer thought generation
-	if ac.llm != nil {
+	// Use enhanced thought generator if available
+	if ac.thoughtGenerator != nil {
 		thoughtType := ac.selectThoughtType()
-		context := ac.buildThoughtContext()
 		
-		content, err := ac.llm.GenerateThought(thoughtType, context)
-		if err == nil && content != "" {
-			return content
+		// Get working memory for context
+		ac.workingMemory.mu.RLock()
+		workingMem := make([]*Thought, len(ac.workingMemory.buffer))
+		copy(workingMem, ac.workingMemory.buffer)
+		ac.workingMemory.mu.RUnlock()
+		
+		// Get interests for context
+		ac.interests.mu.RLock()
+		interests := make(map[string]float64)
+		for k, v := range ac.interests.topics {
+			interests[k] = v
 		}
-		fmt.Printf("⚠️  LLM thought generation failed: %v, using fallback\n", err)
+		ac.interests.mu.RUnlock()
+		
+		// Generate thought
+		thought, err := ac.thoughtGenerator.GenerateThought(thoughtType, workingMem, interests)
+		if err == nil && thought != nil {
+			return thought.Content
+		}
+		fmt.Printf("⚠️  Enhanced thought generation failed: %v, using fallback\n", err)
 	}
 	
 	// Fallback to template-based generation
@@ -650,7 +692,7 @@ func (ac *AutonomousConsciousness) GetStatus() map[string]interface{} {
 	workingMemSize := len(ac.workingMemory.buffer)
 	ac.workingMemory.mu.RUnlock()
 	
-	return map[string]interface{}{
+	status := map[string]interface{}{
 		"running":            ac.running,
 		"awake":              ac.awake,
 		"thinking":           ac.thinking,
@@ -663,6 +705,23 @@ func (ac *AutonomousConsciousness) GetStatus() map[string]interface{} {
 		"identity_coherence": ac.identity.Coherence,
 		"iterations":         ac.identity.Iterations,
 	}
+	
+	// Add 12-step processor status
+	if ac.twelveStep != nil {
+		status["twelve_step"] = ac.twelveStep.GetStatus()
+	}
+	
+	// Add persistence metrics
+	if ac.persistence != nil {
+		status["persistence"] = ac.persistence.GetMetrics()
+	}
+	
+	// Add thought generator metrics
+	if ac.thoughtGenerator != nil {
+		status["thought_generator"] = ac.thoughtGenerator.GetMetrics()
+	}
+	
+	return status
 }
 
 // generateThoughtID generates a unique thought ID
@@ -708,9 +767,58 @@ func (ac *AutonomousConsciousness) buildThoughtContext() *LLMThoughtContext {
 
 // loadPersistedState loads previously persisted state
 func (ac *AutonomousConsciousness) loadPersistedState() error {
-	// if ac.persistence == nil {
+	if ac.persistence == nil {
 		return fmt.Errorf("persistence layer not available")
 	}
+	
+	// Load identity
+	persistedIdentity, err := ac.persistence.LoadIdentity(ac.identity.ID)
+	if err != nil {
+		return fmt.Errorf("failed to load identity: %w", err)
+	}
+	
+	// Restore identity state
+	if persistedIdentity != nil {
+		ac.identity.Coherence = persistedIdentity.Coherence
+		
+		// Restore interests
+		ac.interests.mu.Lock()
+		for topic, score := range persistedIdentity.Interests {
+			ac.interests.topics[topic] = score
+		}
+		ac.interests.mu.Unlock()
+		
+		fmt.Printf("💾 Loaded identity: %s (coherence: %.2f)\n",
+			persistedIdentity.Name,
+			persistedIdentity.Coherence)
+	}
+	
+	// Load recent thoughts into working memory
+	thoughts, err := ac.persistence.QueryThoughts(ac.identity.ID, 7)
+	if err != nil {
+		return fmt.Errorf("failed to load thoughts: %w", err)
+	}
+	
+	ac.workingMemory.mu.Lock()
+	for _, pt := range thoughts {
+		thought := &Thought{
+			ID:               pt.ID,
+			Content:          pt.Content,
+			Type:             parseThoughtType(pt.Type),
+			Timestamp:        pt.Timestamp,
+			Associations:     pt.Associations,
+			EmotionalValence: pt.EmotionalValence,
+			Importance:       pt.Importance,
+			Source:           parseThoughtSource(pt.Source),
+		}
+		ac.workingMemory.buffer = append(ac.workingMemory.buffer, thought)
+	}
+	ac.workingMemory.mu.Unlock()
+	
+	fmt.Printf("💾 Loaded %d thoughts into working memory\n", len(thoughts))
+	
+	return nil
+}
 	
 	// Load identity snapshot
 	// snapshot, err := ac.persistence.LoadIdentitySnapshot()
