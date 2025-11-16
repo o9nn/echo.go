@@ -298,3 +298,47 @@ func generateMessageID() string {
 }
 
 // contains function is defined in aar_integration.go
+
+// HasActiveDiscussions returns whether there are any active discussions
+func (dm *DiscussionManager) HasActiveDiscussions() bool {
+	dm.mu.RLock()
+	defer dm.mu.RUnlock()
+	
+	for _, discussion := range dm.activeDiscussions {
+		if discussion.Active {
+			return true
+		}
+	}
+	
+	return false
+}
+
+// GetActiveDiscussionCount returns the number of active discussions
+func (dm *DiscussionManager) GetActiveDiscussionCount() int {
+	dm.mu.RLock()
+	defer dm.mu.RUnlock()
+	
+	count := 0
+	for _, discussion := range dm.activeDiscussions {
+		if discussion.Active {
+			count++
+		}
+	}
+	
+	return count
+}
+
+// GetAllActiveDiscussions returns all active discussions
+func (dm *DiscussionManager) GetAllActiveDiscussions() []*Discussion {
+	dm.mu.RLock()
+	defer dm.mu.RUnlock()
+	
+	discussions := make([]*Discussion, 0)
+	for _, discussion := range dm.activeDiscussions {
+		if discussion.Active {
+			discussions = append(discussions, discussion)
+		}
+	}
+	
+	return discussions
+}

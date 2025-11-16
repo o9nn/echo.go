@@ -664,3 +664,96 @@ func generateContextualThought(thoughtType ThoughtType, focus interface{}, inter
 	
 	return options[rand.Intn(len(options))]
 }
+
+// IntegrateInferenceState integrates state from concurrent inference engines
+func (ccs *ContinuousConsciousnessStream) IntegrateInferenceState(state interface{}) {
+	ccs.mu.Lock()
+	defer ccs.mu.Unlock()
+	
+	// Extract relevant state information
+	// This is called by the concurrent inference system to feed results into consciousness
+	
+	// Increase activity when inference produces results
+	ccs.currentActivity += 0.1
+	if ccs.currentActivity > 1.0 {
+		ccs.currentActivity = 1.0
+	}
+	
+	// Update cognitive state based on inference
+	ccs.cognitiveState.mu.Lock()
+	ccs.cognitiveState.load += 0.05 // Inference adds to cognitive load
+	if ccs.cognitiveState.load > 1.0 {
+		ccs.cognitiveState.load = 1.0
+	}
+	ccs.cognitiveState.mu.Unlock()
+}
+
+// GetCurrentActivity returns the current consciousness activity level
+func (ccs *ContinuousConsciousnessStream) GetCurrentActivity() float64 {
+	ccs.mu.RLock()
+	defer ccs.mu.RUnlock()
+	return ccs.currentActivity
+}
+
+// GetFlowQuality returns the current flow quality
+func (ccs *ContinuousConsciousnessStream) GetFlowQuality() float64 {
+	ccs.flowState.mu.RLock()
+	defer ccs.flowState.mu.RUnlock()
+	return ccs.flowState.quality
+}
+
+// IsInOptimalFlow returns whether consciousness is in optimal flow state
+func (ccs *ContinuousConsciousnessStream) IsInOptimalFlow() bool {
+	ccs.flowState.mu.RLock()
+	defer ccs.flowState.mu.RUnlock()
+	return ccs.flowState.optimalZone
+}
+
+// GetCognitiveLoad returns the current cognitive load
+func (ccs *ContinuousConsciousnessStream) GetCognitiveLoad() float64 {
+	ccs.cognitiveState.mu.RLock()
+	defer ccs.cognitiveState.mu.RUnlock()
+	return ccs.cognitiveState.load
+}
+
+// GetThoughtsEmerged returns the total number of thoughts emerged
+func (ccs *ContinuousConsciousnessStream) GetThoughtsEmerged() uint64 {
+	ccs.mu.RLock()
+	defer ccs.mu.RUnlock()
+	return ccs.thoughtsEmerged
+}
+
+// GetStimuliProcessed returns the total number of stimuli processed
+func (ccs *ContinuousConsciousnessStream) GetStimuliProcessed() uint64 {
+	ccs.mu.RLock()
+	defer ccs.mu.RUnlock()
+	return ccs.stimuliProcessed
+}
+
+// SendStimulus sends an external stimulus to the consciousness stream
+func (ccs *ContinuousConsciousnessStream) SendStimulus(stimulus Stimulus) error {
+	select {
+	case ccs.stimulusChannel <- stimulus:
+		return nil
+	case <-time.After(time.Second):
+		return fmt.Errorf("stimulus channel full or blocked")
+	}
+}
+
+// GetAttentionTarget returns what consciousness is currently focused on
+func (ccs *ContinuousConsciousnessStream) GetAttentionTarget() interface{} {
+	ccs.attentionFocus.mu.RLock()
+	defer ccs.attentionFocus.mu.RUnlock()
+	return ccs.attentionFocus.target
+}
+
+// SetAttentionTarget sets what consciousness should focus on
+func (ccs *ContinuousConsciousnessStream) SetAttentionTarget(target interface{}, intensity float64) {
+	ccs.attentionFocus.mu.Lock()
+	defer ccs.attentionFocus.mu.Unlock()
+	
+	ccs.attentionFocus.target = target
+	ccs.attentionFocus.intensity = intensity
+	ccs.attentionFocus.lastShift = time.Now()
+	ccs.attentionFocus.duration = 0
+}

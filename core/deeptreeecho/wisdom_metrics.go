@@ -296,3 +296,103 @@ func (wm *WisdomMetrics) GetDimensionGrowth(dimension string) float64 {
 	
 	return current - first
 }
+
+// RecordThought records a thought for wisdom tracking
+func (wm *WisdomMetrics) RecordThought(thought *Thought) {
+	wm.mu.Lock()
+	defer wm.mu.Unlock()
+	
+	wm.totalThoughts++
+	
+	// Check if thought is reflective (meta-cognitive)
+	if thought.Type == ThoughtReflection || thought.Type == ThoughtMetaCognitive {
+		wm.reflectiveThoughts++
+	}
+	
+	// Update reflective insight based on ratio of reflective thoughts
+	if wm.totalThoughts > 0 {
+		wm.ReflectiveInsight = float64(wm.reflectiveThoughts) / float64(wm.totalThoughts)
+	}
+	
+	// Recalculate wisdom score
+	wm.recalculateWisdomScore()
+}
+
+// recalculateWisdomScore computes the composite wisdom score
+func (wm *WisdomMetrics) recalculateWisdomScore() {
+	// Weighted average of all dimensions
+	wm.WisdomScore = (
+		wm.KnowledgeDepth*0.15 +
+		wm.KnowledgeBreadth*0.15 +
+		wm.IntegrationLevel*0.20 +
+		wm.PracticalApplication*0.15 +
+		wm.ReflectiveInsight*0.15 +
+		wm.EthicalConsideration*0.10 +
+		wm.TemporalPerspective*0.10)
+	
+	// Record snapshot
+	snapshot := WisdomSnapshot{
+		Timestamp:   time.Now(),
+		WisdomScore: wm.WisdomScore,
+		Dimensions: map[string]float64{
+			"knowledge_depth":       wm.KnowledgeDepth,
+			"knowledge_breadth":     wm.KnowledgeBreadth,
+			"integration_level":     wm.IntegrationLevel,
+			"practical_application": wm.PracticalApplication,
+			"reflective_insight":    wm.ReflectiveInsight,
+			"ethical_consideration": wm.EthicalConsideration,
+			"temporal_perspective":  wm.TemporalPerspective,
+		},
+	}
+	
+	wm.history = append(wm.history, snapshot)
+	
+	// Keep only recent history (last 1000 snapshots)
+	if len(wm.history) > 1000 {
+		wm.history = wm.history[len(wm.history)-1000:]
+	}
+	
+	wm.lastUpdate = time.Now()
+}
+
+// GetWisdomScore returns the current wisdom score
+func (wm *WisdomMetrics) GetWisdomScore() float64 {
+	wm.mu.RLock()
+	defer wm.mu.RUnlock()
+	return wm.WisdomScore
+}
+
+// GetKnowledgeDepth returns the knowledge depth metric
+func (wm *WisdomMetrics) GetKnowledgeDepth() float64 {
+	wm.mu.RLock()
+	defer wm.mu.RUnlock()
+	return wm.KnowledgeDepth
+}
+
+// GetKnowledgeBreadth returns the knowledge breadth metric
+func (wm *WisdomMetrics) GetKnowledgeBreadth() float64 {
+	wm.mu.RLock()
+	defer wm.mu.RUnlock()
+	return wm.KnowledgeBreadth
+}
+
+// GetReflectiveInsight returns the reflective insight metric
+func (wm *WisdomMetrics) GetReflectiveInsight() float64 {
+	wm.mu.RLock()
+	defer wm.mu.RUnlock()
+	return wm.ReflectiveInsight
+}
+
+// GetIntegrationLevel returns the integration level metric
+func (wm *WisdomMetrics) GetIntegrationLevel() float64 {
+	wm.mu.RLock()
+	defer wm.mu.RUnlock()
+	return wm.IntegrationLevel
+}
+
+// GetPracticalApplication returns the practical application metric
+func (wm *WisdomMetrics) GetPracticalApplication() float64 {
+	wm.mu.RLock()
+	defer wm.mu.RUnlock()
+	return wm.PracticalApplication
+}

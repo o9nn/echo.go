@@ -64,7 +64,7 @@ type AutonomousConsciousnessV4 struct {
 	interests       *InterestPatterns
 
 	// Skill practice system
-	skills          *SkillRegistry
+	skills          *SkillRegistryEnhanced
 
 	// Discussion management
 	discussionMgr   *DiscussionManager
@@ -121,15 +121,8 @@ func NewAutonomousConsciousnessV4(name string) *AutonomousConsciousnessV4 {
 			capacity: 7,
 			context:  make(map[string]interface{}),
 		},
-		interests: &InterestPatterns{
-			patterns:        make(map[string]*InterestPattern),
-			curiosityLevel:  0.8,
-			noveltyBias:     0.6,
-		},
-		skills: &SkillRegistry{
-			skills:          make(map[string]*Skill),
-			practiceHistory: make([]*PracticeSession, 0),
-		},
+		interests: NewInterestPatterns(),
+		skills: NewSkillRegistryEnhanced(),
 		awake:    false,
 		running:  false,
 	}
@@ -144,7 +137,11 @@ func NewAutonomousConsciousnessV4(name string) *AutonomousConsciousnessV4 {
 	ac.scheduler = echobeats.NewTwelveStepEchoBeats(ctx)
 
 	// Initialize continuous consciousness stream
-	ac.consciousnessStream = NewContinuousConsciousnessStream(ctx)
+	ac.consciousnessStream = NewContinuousConsciousnessStream(
+		ac.workingMemory,
+		ac.interests,
+		ac.aarCore,
+	)
 
 	// Initialize EchoDream
 	ac.dream = echodream.NewEchoDream()
@@ -193,8 +190,8 @@ func NewAutonomousConsciousnessV4(name string) *AutonomousConsciousnessV4 {
 	// Initialize wisdom metrics
 	ac.wisdomMetrics = NewWisdomMetrics()
 
-	// Initialize discussion manager
-	ac.discussionMgr = NewDiscussionManager(ac, ac.interests)
+	// Initialize discussion manager (using V4-compatible version)
+	ac.discussionMgr = NewDiscussionManagerV4(ac, ac.interests).DiscussionManager
 
 	// Initialize default skills
 	ac.initializeDefaultSkills()
@@ -296,7 +293,7 @@ func (ac *AutonomousConsciousnessV4) consciousnessIntegrationLoop() {
 
 			// Process emerged thoughts
 			select {
-			case thought := <-ac.consciousnessStream.ThoughtStream():
+			case thought := <-ac.consciousnessStream.GetThoughtStream():
 				ac.processEmergedThought(thought)
 			default:
 				// No thought emerged this cycle
@@ -463,7 +460,10 @@ func (ac *AutonomousConsciousnessV4) skillPracticeLoop() {
 			}
 
 			// Schedule practice for skills that need it
-			ac.skills.SchedulePractice()
+			skillsNeedingPractice := ac.skills.GetSkillsNeedingPractice(24 * time.Hour)
+			for _, skill := range skillsNeedingPractice {
+				ac.skills.SchedulePractice(skill.ID, 30*time.Minute)
+			}
 		}
 	}
 }
@@ -493,6 +493,7 @@ func (ac *AutonomousConsciousnessV4) Wake() {
 	defer ac.mu.Unlock()
 
 	if ac.awake {
+		fmt.Println("⚠️  Already awake")
 		return
 	}
 
@@ -504,7 +505,22 @@ func (ac *AutonomousConsciousnessV4) Wake() {
 	ac.loadManager.fatigueLevel *= 0.3
 	ac.loadManager.mu.Unlock()
 
-	fmt.Println("☀️  Echoself awakens...")
+	fmt.Println("🌅 Autonomous Consciousness V4: Awakening...")
+	
+	// Start all subsystems
+	if ac.consciousnessStream != nil {
+		ac.consciousnessStream.Start()
+	}
+	
+	if ac.inferenceSystem != nil {
+		ac.inferenceSystem.Start()
+	}
+	
+	if ac.dream != nil {
+		ac.dream.Start()
+	}
+	
+	fmt.Println("✨ Autonomous Consciousness V4: Fully Awake")
 }
 
 // Rest initiates the rest/dream cycle
@@ -541,7 +557,7 @@ func (ac *AutonomousConsciousnessV4) Rest() {
 // dreamCycle performs dream processing and recovery
 func (ac *AutonomousConsciousnessV4) dreamCycle(duration time.Duration) {
 	// Start dream processing
-	ac.dream.EnterDream()
+	dreamRecord := ac.dream.BeginDream()
 
 	// Consolidate memories during dream
 	ac.consolidateMemories()
@@ -564,7 +580,7 @@ func (ac *AutonomousConsciousnessV4) dreamCycle(duration time.Duration) {
 	ac.loadManager.mu.Unlock()
 
 	// Exit dream
-	ac.dream.ExitDream()
+	ac.dream.EndDream(dreamRecord)
 
 	// Auto-wake after rest
 	ac.Wake()
@@ -577,7 +593,7 @@ func (ac *AutonomousConsciousnessV4) initializeDefaultSkills() {
 	ac.skills.RegisterSkill(&Skill{
 		ID:          uuid.New().String(),
 		Name:        "Pattern Recognition",
-		Description: "Ability to recognize patterns in data",
+		Category:    SkillReasoning,
 		Proficiency: 0.5,
 		LastPracticed: time.Now(),
 	})
@@ -585,7 +601,7 @@ func (ac *AutonomousConsciousnessV4) initializeDefaultSkills() {
 	ac.skills.RegisterSkill(&Skill{
 		ID:          uuid.New().String(),
 		Name:        "Analogical Reasoning",
-		Description: "Ability to draw analogies between concepts",
+		Category:    SkillReasoning,
 		Proficiency: 0.4,
 		LastPracticed: time.Now(),
 	})
@@ -628,14 +644,29 @@ func (ac *AutonomousConsciousnessV4) extractPatterns() {
 // Stop gracefully shuts down the system
 func (ac *AutonomousConsciousnessV4) Stop() error {
 	ac.mu.Lock()
+	defer ac.mu.Unlock()
+	
 	if !ac.running {
-		ac.mu.Unlock()
 		return fmt.Errorf("autonomous consciousness not running")
 	}
+	
+	fmt.Println("🌙 Autonomous Consciousness V4: Shutting down...")
+	
 	ac.running = false
-	ac.mu.Unlock()
-
-	fmt.Println("🌳 Deep Tree Echo V4: Shutting down...")
+	ac.awake = false
+	
+	// Stop all subsystems
+	if ac.consciousnessStream != nil {
+		ac.consciousnessStream.Stop()
+	}
+	
+	if ac.inferenceSystem != nil {
+		ac.inferenceSystem.Stop()
+	}
+	
+	if ac.dream != nil {
+		ac.dream.Stop()
+	}
 
 	// Save final state
 	if ac.persistence != nil {
@@ -646,7 +677,154 @@ func (ac *AutonomousConsciousnessV4) Stop() error {
 
 	// Stop all components
 	ac.cancel()
+	
+	fmt.Println("💤 Autonomous Consciousness V4: Stopped")
 
 	fmt.Println("🌳 Deep Tree Echo V4: Shutdown complete")
 	return nil
+}
+
+// UpdateLoad updates the current cognitive load
+func (clm *CognitiveLoadManager) UpdateLoad(newLoad float64) {
+	clm.mu.Lock()
+	defer clm.mu.Unlock()
+	
+	// Record snapshot
+	snapshot := LoadSnapshot{
+		Timestamp: time.Now(),
+		Load:      newLoad,
+		Fatigue:   clm.fatigueLevel,
+	}
+	clm.loadHistory = append(clm.loadHistory, snapshot)
+	
+	// Keep only recent history (last 1000 snapshots)
+	if len(clm.loadHistory) > 1000 {
+		clm.loadHistory = clm.loadHistory[len(clm.loadHistory)-1000:]
+	}
+	
+	// Update current load
+	clm.currentLoad = newLoad
+	
+	// Update fatigue based on load
+	if newLoad > 0.7 {
+		// High load increases fatigue
+		clm.fatigueLevel += clm.fatigueRate * (newLoad - 0.7)
+	} else {
+		// Low load allows some recovery
+		clm.fatigueLevel -= clm.recoveryRate * (0.7 - newLoad)
+	}
+	
+	// Clamp fatigue to [0, 1]
+	if clm.fatigueLevel > 1.0 {
+		clm.fatigueLevel = 1.0
+	} else if clm.fatigueLevel < 0.0 {
+		clm.fatigueLevel = 0.0
+	}
+}
+
+// GetCurrentLoad returns the current cognitive load
+func (clm *CognitiveLoadManager) GetCurrentLoad() float64 {
+	clm.mu.RLock()
+	defer clm.mu.RUnlock()
+	return clm.currentLoad
+}
+
+// GetFatigueLevel returns the current fatigue level
+func (clm *CognitiveLoadManager) GetFatigueLevel() float64 {
+	clm.mu.RLock()
+	defer clm.mu.RUnlock()
+	return clm.fatigueLevel
+}
+
+// ResetFatigue resets fatigue after rest
+func (clm *CognitiveLoadManager) ResetFatigue() {
+	clm.mu.Lock()
+	defer clm.mu.Unlock()
+	clm.fatigueLevel = 0.0
+}
+
+
+// Stop gracefully stops the autonomous consciousness
+
+
+// GetStatus returns the current status of the autonomous consciousness
+func (ac *AutonomousConsciousnessV4) GetStatus() map[string]interface{} {
+	ac.mu.RLock()
+	defer ac.mu.RUnlock()
+	
+	status := make(map[string]interface{})
+	
+	// Basic status
+	status["identity"] = ac.identity.Name
+	status["awake"] = ac.awake
+	status["running"] = ac.running
+	status["iterations"] = ac.iterations
+	
+	if !ac.startTime.IsZero() {
+		status["uptime"] = time.Since(ac.startTime).String()
+	}
+	
+	// Consciousness stream status
+	if ac.consciousnessStream != nil {
+		status["consciousness_stream"] = map[string]interface{}{
+			"activity_level":    ac.consciousnessStream.GetCurrentActivity(),
+			"thoughts_emerged":  ac.consciousnessStream.GetThoughtsEmerged(),
+			"flow_quality":      ac.consciousnessStream.GetFlowQuality(),
+			"cognitive_load":    ac.consciousnessStream.GetCognitiveLoad(),
+			"in_optimal_flow":   ac.consciousnessStream.IsInOptimalFlow(),
+		}
+	}
+	
+	// Inference engine status
+	if ac.inferenceSystem != nil {
+		sharedState := ac.inferenceSystem.GetSharedState()
+		status["inference_engines"] = map[string]interface{}{
+			"affordance_active": sharedState != nil,
+			"relevance_active":  sharedState != nil,
+			"salience_active":   sharedState != nil,
+		}
+	}
+	
+	// Cognitive load status
+	if ac.loadManager != nil {
+		status["cognitive_load"] = map[string]interface{}{
+			"current_load":  ac.loadManager.GetCurrentLoad(),
+			"fatigue_level": ac.loadManager.GetFatigueLevel(),
+		}
+	}
+	
+	// Interest patterns status
+	if ac.interests != nil {
+		status["interests"] = map[string]interface{}{
+			"curiosity_level": ac.interests.GetCuriosityLevel(),
+			"top_interests":   ac.interests.GetTopInterests(5),
+		}
+	}
+	
+	// Skill registry status
+	if ac.skills != nil {
+		status["skills"] = map[string]interface{}{
+			"total_skills":        ac.skills.GetSkillCount(),
+			"practice_sessions":   ac.skills.GetPracticeSessionCount(),
+			"total_practice_time": ac.skills.GetTotalPracticeTime().String(),
+		}
+	}
+	
+	// Wisdom metrics status
+	if ac.wisdomMetrics != nil {
+		status["wisdom"] = map[string]interface{}{
+			"wisdom_score":       ac.wisdomMetrics.GetWisdomScore(),
+			"knowledge_depth":    ac.wisdomMetrics.GetKnowledgeDepth(),
+			"knowledge_breadth":  ac.wisdomMetrics.GetKnowledgeBreadth(),
+			"reflective_insight": ac.wisdomMetrics.GetReflectiveInsight(),
+		}
+	}
+	
+	// Dream status
+	if ac.dream != nil {
+		dreamStatus := ac.dream.GetStatus()
+		status["dream"] = dreamStatus
+	}
+	
+	return status
 }
