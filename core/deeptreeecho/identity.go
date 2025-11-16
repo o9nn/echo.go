@@ -49,6 +49,9 @@ type Identity struct {
 
 	// Opponent Processing System (for wisdom cultivation through dynamic balance)
 	OpponentProcesses *OpponentSystem
+	
+	// Persona Manager (for Ordo/Chao archetype activation)
+	PersonaManager *PersonaManager
 }
 
 // SpatialContext represents 3D spatial awareness for embodied cognition
@@ -280,6 +283,9 @@ func NewIdentity(name string) *Identity {
 
 	// Initialize opponent processing system for wisdom cultivation
 	id.OpponentProcesses = NewOpponentSystem()
+	
+	// Initialize persona manager for Ordo/Chao archetype activation
+	id.PersonaManager = NewPersonaManager()
 
 	// Start consciousness stream processing
 	go id.processStream()
@@ -1381,27 +1387,33 @@ var _ = Config{}.EnableLearning // Avoid unused variable error
 // OptimizeRelevanceRealization uses opponent processing to optimize cognitive balance
 // This is the core method for wisdom cultivation (sophrosyne)
 func (id *Identity) OptimizeRelevanceRealization(context string) *Decision {
-id.mu.Lock()
-defer id.mu.Unlock()
-
-// Optimize all opponent balances based on current state
-balances := id.OpponentProcesses.OptimizeBalance(id, context)
-
-// Create decision based on balanced cognition
-decision := &Decision{}
-id.OpponentProcesses.ApplyBalanceToDecision(decision)
-
-// Log the optimization
-fmt.Printf("Relevance Realization Optimized [%s]:\n", context)
-for name, balance := range balances {
-fmt.Printf("  %s: %.3f\n", name, balance)
-}
-fmt.Printf("  → Exploration Weight: %.3f\n", decision.ExplorationWeight)
-fmt.Printf("  → Scope: %s\n", decision.ScopePreference)
-fmt.Printf("  → Adaptation Rate: %.3f\n", decision.AdaptationRate)
-fmt.Printf("  → Confidence Threshold: %.3f\n", decision.Confidence)
-
-return decision
+	id.mu.Lock()
+	defer id.mu.Unlock()
+	
+	// Determine active persona (Ordo/Chao/Neutral)
+	activePersona := id.PersonaManager.DetermineActivePersona(id)
+	
+	// Apply persona-specific biases to opponent processes
+	id.PersonaManager.ApplyPersonaBias(id, activePersona)
+	
+	// Optimize all opponent balances based on current state
+	balances := id.OpponentProcesses.OptimizeBalance(id, context)
+	
+	// Create decision based on balanced cognition
+	decision := &Decision{}
+	id.OpponentProcesses.ApplyBalanceToDecision(decision)
+	
+	// Log the optimization
+	fmt.Printf("Relevance Realization Optimized [%s]:\n", context)
+	for name, balance := range balances {
+		fmt.Printf("  %s: %.3f\n", name, balance)
+	}
+	fmt.Printf("  → Exploration Weight: %.3f\n", decision.ExplorationWeight)
+	fmt.Printf("  → Scope: %s\n", decision.ScopePreference)
+	fmt.Printf("  → Adaptation Rate: %.3f\n", decision.AdaptationRate)
+	fmt.Printf("  → Confidence Threshold: %.3f\n", decision.Confidence)
+	
+	return decision
 }
 
 // GetWisdomScore returns the current wisdom cultivation level
