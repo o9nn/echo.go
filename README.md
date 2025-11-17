@@ -95,6 +95,37 @@ EchOllama integrates Deep Tree Echo, an advanced cognitive architecture that bri
 
 Visit the [Deep Tree Echo documentation](dte.md) for detailed architecture information.
 
+### 🔍 Self-Assessment and Introspection
+
+Deep Tree Echo includes comprehensive self-assessment capabilities to ensure continuous alignment with its core identity:
+
+```shell
+# Perform self-assessment and coherence check
+ollama echo assess
+
+# Output as JSON
+ollama echo assess --json
+
+# Continuous monitoring
+ollama echo assess --continuous --interval 10m
+
+# Check Deep Tree Echo status
+ollama echo status
+
+# Deep cognitive processing
+ollama echo think "What patterns have emerged?"
+```
+
+The self-assessment system validates:
+- **Identity Alignment**: Coherence with replit.md identity kernel
+- **Repository Structure**: Proper cognitive architecture organization
+- **Pattern Health**: Cognitive pattern strength and distribution
+- **Memory Integrity**: Memory system coherence and connectivity
+- **Operational Schema**: Implementation of core modules
+- **Reflection Protocol**: Adherence to self-reflection practices
+
+See [SELF_ASSESSMENT_README.md](SELF_ASSESSMENT_README.md) for complete documentation.
+
 ### 🚧 Development Status
 
 **Current Status**: Active Development

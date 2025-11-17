@@ -1700,6 +1700,9 @@ func NewCLI() *cobra.Command {
 		runnerCmd,
 	)
 
+	// Add Deep Tree Echo commands
+	AddEchoCommands(rootCmd)
+
 	return rootCmd
 }
 
