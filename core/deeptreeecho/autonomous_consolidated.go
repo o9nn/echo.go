@@ -306,7 +306,15 @@ func (cac *ConsolidatedAutonomousConsciousness) processThought(thought *Thought)
 		cac.learning = true
 		cac.mu.Unlock()
 		
-		cac.cognition.Learn(thought.Content)
+		// Create Experience from thought
+		exp := Experience{
+			Input:     thought.Content,
+			Output:    "", // Will be filled by response/action
+			Feedback:  thought.Importance,
+			Timestamp: time.Now(),
+			Context:   map[string]interface{}{"source": "consciousness_stream"},
+		}
+		cac.cognition.Learn(exp)
 		
 		cac.mu.Lock()
 		cac.learning = false
@@ -343,7 +351,10 @@ func (cac *ConsolidatedAutonomousConsciousness) wireStepHandlers() {
 // 12-step handler implementations (simplified for this iteration)
 func (cac *ConsolidatedAutonomousConsciousness) assessRelevance() {
 	// Determine what's most important right now
-	cac.workingMemory.UpdateFocus()
+	// Update focus to the most recent thought if available
+	if focus := cac.workingMemory.GetFocus(); focus != nil {
+		cac.workingMemory.UpdateFocus(focus)
+	}
 }
 
 func (cac *ConsolidatedAutonomousConsciousness) detectAffordances() {
@@ -458,9 +469,13 @@ func (cac *ConsolidatedAutonomousConsciousness) synthesizeInsight(patterns []str
 	return nil // TODO: implement
 }
 
-func (cac *ConsolidatedAutonomousConsciousness) persistConsolidatedKnowledge(insights *echodream.DreamRecord) {
-	// Persist to Supabase
-	// TODO: implement full persistence
+func (cac *ConsolidatedAutonomousConsciousness) persistConsolidatedKnowledge(insights []string) {
+	// Persist insights from dream session to Supabase
+	// TODO: implement full persistence of insights
+	// For now, log the insights
+	if len(insights) > 0 {
+		fmt.Printf("💡 Dream insights: %v\n", insights)
+	}
 }
 
 func (cac *ConsolidatedAutonomousConsciousness) loadIdentityState() error {

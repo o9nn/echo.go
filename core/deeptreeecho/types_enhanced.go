@@ -77,12 +77,7 @@ func (wm *WorkingMemory) focusItem(thought *Thought) {
 	wm.focus = thought
 }
 
-// GetFocus returns the current focus thought
-func (wm *WorkingMemory) GetFocus() *Thought {
-	wm.mu.RLock()
-	defer wm.mu.RUnlock()
-	return wm.focus
-}
+// GetFocus is now defined in autonomous.go to avoid duplication
 
 // GetRecent returns the n most recent thoughts
 func (wm *WorkingMemory) GetRecent(n int) []*Thought {

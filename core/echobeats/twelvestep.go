@@ -500,3 +500,33 @@ func (tseb *TwelveStepEchoBeats) AdvanceStep() {
 		tseb.metrics.mu.Unlock()
 	}
 }
+
+// GetFatigueLevel returns the current cognitive fatigue level (0.0 to 1.0)
+// This is used by the autonomous consciousness system to determine when rest is needed
+func (tseb *TwelveStepEchoBeats) GetFatigueLevel() float64 {
+	tseb.mu.RLock()
+	defer tseb.mu.RUnlock()
+	
+	// Calculate fatigue based on cycle count and continuous operation time
+	// Fatigue increases with cycle count and resets after rest
+	// This is a simple linear model; can be enhanced with more sophisticated fatigue modeling
+	
+	baseFatigue := float64(tseb.cycleCount) / 100.0 // Increase fatigue every 100 cycles
+	
+	// Cap fatigue at 1.0 (maximum)
+	if baseFatigue > 1.0 {
+		return 1.0
+	}
+	
+	return baseFatigue
+}
+
+// ResetFatigue resets the fatigue level (called after rest/dream cycle)
+func (tseb *TwelveStepEchoBeats) ResetFatigue() {
+	tseb.mu.Lock()
+	defer tseb.mu.Unlock()
+	
+	// Reset cycle count to reduce fatigue
+	// Keep some residual fatigue to model long-term cognitive load
+	tseb.cycleCount = tseb.cycleCount / 4
+}

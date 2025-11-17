@@ -239,7 +239,7 @@ func (ed *EchoDream) BeginDream() *DreamRecord {
 }
 
 // EndDream concludes a dream session
-func (ed *EchoDream) EndDream(record *DreamRecord) {
+func (ed *EchoDream) EndDream(record *DreamRecord) []string {
 	ed.mu.Lock()
 	defer ed.mu.Unlock()
 	
@@ -261,6 +261,9 @@ func (ed *EchoDream) EndDream(record *DreamRecord) {
 	
 	fmt.Printf("💤 EchoDream: Dream session complete - Duration: %v, Consolidated: %d, Synthesized: %d\n",
 		record.Duration, record.MemoriesConsolidated, record.PatternsSynthesized)
+	
+	// Return insights from the dream session
+	return record.Insights
 }
 
 // dreamCycle is the main dream processing loop

@@ -893,3 +893,46 @@ func (ac *AutonomousConsciousness) persistIdentitySnapshot() {
 // 		fmt.Printf("⚠️  Failed to persist identity snapshot: %v\n", err)
 // 	}
 }
+
+// UpdateFocus updates the current focus of working memory
+func (wm *WorkingMemory) UpdateFocus(thought *Thought) {
+	wm.mu.Lock()
+	defer wm.mu.Unlock()
+	
+	wm.focus = thought
+	
+	// Add to buffer if not already present
+	found := false
+	for _, t := range wm.buffer {
+		if t.ID == thought.ID {
+			found = true
+			break
+		}
+	}
+	
+	if !found {
+		wm.buffer = append(wm.buffer, thought)
+		
+		// Maintain capacity limit (remove oldest if over capacity)
+		if len(wm.buffer) > wm.capacity {
+			wm.buffer = wm.buffer[1:]
+		}
+	}
+}
+
+// GetFocus returns the current focus thought
+func (wm *WorkingMemory) GetFocus() *Thought {
+	wm.mu.RLock()
+	defer wm.mu.RUnlock()
+	return wm.focus
+}
+
+// GetBuffer returns a copy of the working memory buffer
+func (wm *WorkingMemory) GetBuffer() []*Thought {
+	wm.mu.RLock()
+	defer wm.mu.RUnlock()
+	
+	buffer := make([]*Thought, len(wm.buffer))
+	copy(buffer, wm.buffer)
+	return buffer
+}

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/supabase-community/supabase-go"
+	"github.com/supabase-community/postgrest-go"
 )
 
 // SupabasePersistence provides persistent storage for Deep Tree Echo's
@@ -152,8 +153,7 @@ func (sp *SupabasePersistence) PersistMemory(memory *PersistentMemory) error {
 		return fmt.Errorf("failed to marshal memory: %w", err)
 	}
 
-	var result []map[string]interface{}
-	err = sp.client.DB.From("memories").Insert(data, false, "", "", "").Execute(&result)
+	_, _, err = sp.client.From("memories").Insert(data, false, "", "", "").Execute()
 	if err != nil {
 		return fmt.Errorf("failed to insert memory: %w", err)
 	}
@@ -167,12 +167,16 @@ func (sp *SupabasePersistence) RetrieveRelevantMemories(context string, limit in
 	// For now, we use a simple text search
 	var results []PersistentMemory
 	
-	err := sp.client.DB.From("memories").
+	data, _, err := sp.client.From("memories").
 		Select("*", "", false).
 		Ilike("content", fmt.Sprintf("%%%s%%", context)).
-		Order("importance", &supabase.OrderOpts{Ascending: false}).
+		Order("importance", &postgrest.OrderOpts{Ascending: false}).
 		Limit(limit, "").
-		Execute(&results)
+		Execute()
+	
+	if err == nil && data != nil {
+		err = json.Unmarshal(data, &results)
+	}
 	
 	if err != nil {
 		return nil, fmt.Errorf("failed to retrieve memories: %w", err)
@@ -204,8 +208,7 @@ func (sp *SupabasePersistence) UpdateKnowledgeGraph(nodes []*PersistentKnowledge
 			return fmt.Errorf("failed to marshal node: %w", err)
 		}
 
-		var result []map[string]interface{}
-		err = sp.client.DB.From("knowledge_nodes").Upsert(data, "id", "", "").Execute(&result)
+		_, _, err = sp.client.From("knowledge_nodes").Upsert(data, "id", "", "").Execute()
 		if err != nil {
 			return fmt.Errorf("failed to upsert node: %w", err)
 		}
@@ -225,8 +228,7 @@ func (sp *SupabasePersistence) UpdateKnowledgeGraph(nodes []*PersistentKnowledge
 			return fmt.Errorf("failed to marshal edge: %w", err)
 		}
 
-		var result []map[string]interface{}
-		err = sp.client.DB.From("knowledge_edges").Upsert(data, "id", "", "").Execute(&result)
+		_, _, err = sp.client.From("knowledge_edges").Upsert(data, "id", "", "").Execute()
 		if err != nil {
 			return fmt.Errorf("failed to upsert edge: %w", err)
 		}
@@ -249,8 +251,7 @@ func (sp *SupabasePersistence) SaveIdentitySnapshot(snapshot *IdentitySnapshot) 
 		return fmt.Errorf("failed to marshal snapshot: %w", err)
 	}
 
-	var result []map[string]interface{}
-	err = sp.client.DB.From("identity_snapshots").Insert(data, false, "", "", "").Execute(&result)
+	_, _, err = sp.client.From("identity_snapshots").Insert(data, false, "", "", "").Execute()
 	if err != nil {
 		return fmt.Errorf("failed to insert snapshot: %w", err)
 	}
@@ -262,11 +263,15 @@ func (sp *SupabasePersistence) SaveIdentitySnapshot(snapshot *IdentitySnapshot) 
 func (sp *SupabasePersistence) LoadLatestIdentity() (*IdentitySnapshot, error) {
 	var results []IdentitySnapshot
 	
-	err := sp.client.DB.From("identity_snapshots").
+	data, _, err := sp.client.From("identity_snapshots").
 		Select("*", "", false).
-		Order("timestamp", &supabase.OrderOpts{Ascending: false}).
+		Order("timestamp", &postgrest.OrderOpts{Ascending: false}).
 		Limit(1, "").
-		Execute(&results)
+		Execute()
+	
+	if err == nil && data != nil {
+		err = json.Unmarshal(data, &results)
+	}
 	
 	if err != nil {
 		return nil, fmt.Errorf("failed to load identity: %w", err)
@@ -293,8 +298,7 @@ func (sp *SupabasePersistence) TrackLearning(record *LearningRecord) error {
 		return fmt.Errorf("failed to marshal learning record: %w", err)
 	}
 
-	var result []map[string]interface{}
-	err = sp.client.DB.From("learning_records").Upsert(data, "skill_name", "", "").Execute(&result)
+	_, _, err = sp.client.From("learning_records").Upsert(data, "skill_name", "", "").Execute()
 	if err != nil {
 		return fmt.Errorf("failed to upsert learning record: %w", err)
 	}
@@ -306,11 +310,15 @@ func (sp *SupabasePersistence) TrackLearning(record *LearningRecord) error {
 func (sp *SupabasePersistence) GetLearningProgress(skillName string) (*LearningRecord, error) {
 	var results []LearningRecord
 	
-	err := sp.client.DB.From("learning_records").
+	data, _, err := sp.client.From("learning_records").
 		Select("*", "", false).
 		Eq("skill_name", skillName).
 		Limit(1, "").
-		Execute(&results)
+		Execute()
+	
+	if err == nil && data != nil {
+		err = json.Unmarshal(data, &results)
+	}
 	
 	if err != nil {
 		return nil, fmt.Errorf("failed to get learning progress: %w", err)
@@ -337,8 +345,7 @@ func (sp *SupabasePersistence) SaveDiscussion(discussion *DiscussionRecord) erro
 		return fmt.Errorf("failed to marshal discussion: %w", err)
 	}
 
-	var result []map[string]interface{}
-	err = sp.client.DB.From("discussions").Upsert(data, "id", "", "").Execute(&result)
+	_, _, err = sp.client.From("discussions").Upsert(data, "id", "", "").Execute()
 	if err != nil {
 		return fmt.Errorf("failed to upsert discussion: %w", err)
 	}
@@ -350,11 +357,15 @@ func (sp *SupabasePersistence) SaveDiscussion(discussion *DiscussionRecord) erro
 func (sp *SupabasePersistence) GetRecentDiscussions(limit int) ([]*DiscussionRecord, error) {
 	var results []DiscussionRecord
 	
-	err := sp.client.DB.From("discussions").
+	data, _, err := sp.client.From("discussions").
 		Select("*", "", false).
-		Order("start_time", &supabase.OrderOpts{Ascending: false}).
+		Order("start_time", &postgrest.OrderOpts{Ascending: false}).
 		Limit(limit, "").
-		Execute(&results)
+		Execute()
+	
+	if err == nil && data != nil {
+		err = json.Unmarshal(data, &results)
+	}
 	
 	if err != nil {
 		return nil, fmt.Errorf("failed to get discussions: %w", err)
@@ -382,11 +393,10 @@ func (sp *SupabasePersistence) ConsolidateMemories(memoryIDs []string) error {
 			return fmt.Errorf("failed to marshal update: %w", err)
 		}
 
-		var result []map[string]interface{}
-		err = sp.client.DB.From("memories").
+		_, _, err = sp.client.From("memories").
 			Update(data, "", "").
 			Eq("id", id).
-			Execute(&result)
+			Execute()
 		
 		if err != nil {
 			return fmt.Errorf("failed to consolidate memory %s: %w", id, err)
@@ -400,11 +410,15 @@ func (sp *SupabasePersistence) ConsolidateMemories(memoryIDs []string) error {
 func (sp *SupabasePersistence) GetWisdomMetricsHistory(limit int) ([]IdentitySnapshot, error) {
 	var results []IdentitySnapshot
 	
-	err := sp.client.DB.From("identity_snapshots").
+	data, _, err := sp.client.From("identity_snapshots").
 		Select("timestamp,wisdom_metrics", "", false).
-		Order("timestamp", &supabase.OrderOpts{Ascending: false}).
+		Order("timestamp", &postgrest.OrderOpts{Ascending: false}).
 		Limit(limit, "").
-		Execute(&results)
+		Execute()
+	
+	if err == nil && data != nil {
+		err = json.Unmarshal(data, &results)
+	}
 	
 	if err != nil {
 		return nil, fmt.Errorf("failed to get wisdom metrics: %w", err)

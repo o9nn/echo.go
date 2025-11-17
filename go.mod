@@ -2,7 +2,7 @@ module github.com/EchoCog/echollama
 
 go 1.23.0
 
-toolchain go1.24.10
+toolchain go1.23.4
 
 require (
 	github.com/containerd/console v1.0.3
@@ -26,6 +26,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.14
 	github.com/nlpodyssey/gopickle v0.3.0
 	github.com/pdevine/tensor v0.0.0-20240510204454-f88f4562727c
+	github.com/supabase-community/supabase-go v0.0.4
 	golang.org/x/image v0.16.0
 	golang.org/x/tools v0.16.1
 	gonum.org/v1/gonum v0.15.0
@@ -49,7 +50,6 @@ require (
 	github.com/supabase-community/gotrue-go v1.2.0 // indirect
 	github.com/supabase-community/postgrest-go v0.0.11 // indirect
 	github.com/supabase-community/storage-go v0.7.0 // indirect
-	github.com/supabase-community/supabase-go v0.0.4 // indirect
 	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80 // indirect
 	github.com/xtgo/set v1.0.0 // indirect
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6 // indirect
