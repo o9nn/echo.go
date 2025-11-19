@@ -43,8 +43,8 @@ func TestClientFromEnvironment(t *testing.T) {
 				t.Fatalf("expected %s, got %s", v.err, err)
 			}
 
-			if client.base.String() != v.expect {
-				t.Fatalf("expected %s, got %s", v.expect, client.base.String())
+			if client.Base.String() != v.expect {
+				t.Fatalf("expected %s, got %s", v.expect, client.Base.String())
 			}
 		})
 	}
