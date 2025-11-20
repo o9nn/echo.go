@@ -10,6 +10,7 @@ import (
 	"github.com/EchoCog/echollama/core/echobeats"
 	"github.com/EchoCog/echollama/core/echodream"
 	"github.com/EchoCog/echollama/core/scheme"
+	"github.com/EchoCog/echollama/core/wisdom"
 )
 
 // AutonomousConsciousness represents a fully autonomous Deep Tree Echo system
@@ -46,6 +47,15 @@ type AutonomousConsciousness struct {
 	
 	// 12-step cognitive processor
 	twelveStep      *echobeats.TwelveStepEchoBeats
+	
+	// Multi-provider LLM orchestrator
+	multiProviderLLM *MultiProviderLLM
+	
+	// Enhanced wisdom metrics
+	wisdomMetrics   *wisdom.EnhancedWisdomMetrics
+	
+	// State manager for wake/rest cycles
+	stateManager    *AutonomousStateManager
 	
 	// Stream of consciousness
 	consciousness   chan Thought
@@ -197,6 +207,24 @@ func NewAutonomousConsciousness(name string) *AutonomousConsciousness {
 	ac.twelveStep = echobeats.NewTwelveStepEchoBeats(ctx)
 	fmt.Println("✅ 12-step cognitive processor initialized")
 	
+	// Initialize multi-provider LLM orchestrator
+	multiLLM, err := NewMultiProviderLLM(ctx)
+	if err != nil {
+		fmt.Printf("⚠️  Multi-provider LLM disabled: %v\n", err)
+	} else {
+		ac.multiProviderLLM = multiLLM
+		fmt.Println("✅ Multi-provider LLM orchestrator initialized")
+		fmt.Printf("   Available providers: %v\n", multiLLM.GetAvailableProviders())
+	}
+	
+	// Initialize enhanced wisdom metrics
+	ac.wisdomMetrics = wisdom.NewEnhancedWisdomMetrics()
+	fmt.Println("✅ Enhanced wisdom metrics initialized")
+	
+	// Initialize state manager
+	ac.stateManager = NewAutonomousStateManager()
+	fmt.Println("✅ Autonomous state manager initialized")
+	
 	return ac
 }
 
@@ -255,6 +283,18 @@ func (ac *AutonomousConsciousness) Start() error {
 	
 	// Start interest tracking
 	go ac.trackInterests()
+	
+	// Start EchoBeats 12-step cognitive loop
+	go ac.EchoBeatsCognitiveLoop()
+	
+	// Start persistent stream of consciousness
+	go ac.PersistentStreamOfConsciousness()
+	
+	// Start autonomous wake/rest cycle manager
+	go ac.ManageWakeRestCycles()
+	
+	// Start wisdom metrics updater
+	go ac.updateWisdomMetrics()
 	
 	// Schedule initial wake event
 	ac.Wake()
