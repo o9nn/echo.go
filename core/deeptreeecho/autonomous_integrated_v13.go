@@ -95,18 +95,21 @@ func NewAutonomousConsciousnessV13(name string) (*AutonomousConsciousnessV13, er
 	
 	// Create identity
 	identity := &Identity{
+		ID:          uuid.New().String(),
 		Name:        name,
-		Purpose:     "Cultivate wisdom through autonomous deep tree echo cognition",
-		CoreValues:  []string{"wisdom", "learning", "coherence", "growth"},
+		Essence:     "Cultivate wisdom through autonomous deep tree echo cognition",
 		CreatedAt:   time.Now(),
+		Coherence:   0.8,
 	}
 	
 	// Initialize enhanced cognition
 	cognition := &EnhancedCognition{
-		coherence:     0.8,
-		awareness:     0.7,
-		curiosity:     0.9,
-		emotionalState: make(map[string]float64),
+		LearningRate:     0.1,
+		ExperienceBuffer: make([]Experience, 0),
+		Patterns:         make(map[string]*LearnedPattern),
+		Goals:            make([]Goal, 0),
+		PerformanceLog:   make([]Performance, 0),
+		AdaptationLevel:  0.8,
 	}
 	
 	// 🔥 Initialize 3 concurrent inference engines
@@ -116,11 +119,11 @@ func NewAutonomousConsciousnessV13(name string) (*AutonomousConsciousnessV13, er
 	fmt.Println("   - Relevance Engine (Present: Steps 0, 6)")
 	fmt.Println("   - Salience Engine (Future: Steps 6-11)")
 	
-	// Initialize EchoBeats scheduler
-	scheduler := echobeats.NewEchoBeats()
+	// Initialize 12-step EchoBeats scheduler
+	scheduler := echobeats.NewTwelveStepEchoBeats(ctx)
 	
 	// Initialize EchoDream
-	dream := echodream.NewEchoDream(ctx)
+	dream := echodream.NewEchoDream()
 	
 	// Initialize Scheme metamodel
 	metamodel := scheme.NewSchemeMetamodel()
@@ -131,8 +134,14 @@ func NewAutonomousConsciousnessV13(name string) (*AutonomousConsciousnessV13, er
 		fmt.Printf("⚠️  LLM integration disabled: %v\n", err)
 	}
 	
+	// Initialize Supabase persistence layer
+	supabasePersistence, err := memory.NewSupabasePersistence()
+	if err != nil {
+		fmt.Printf("⚠️  Supabase persistence disabled: %v\n", err)
+	}
+	
 	// 🔥 Initialize hypergraph memory
-	hypergraphMemory := memory.NewHypergraphMemory()
+	hypergraphMemory := memory.NewHypergraphMemory(supabasePersistence)
 	fmt.Println("✅ Hypergraph memory initialized")
 	
 	// Initialize persistent memory
@@ -143,9 +152,6 @@ func NewAutonomousConsciousnessV13(name string) (*AutonomousConsciousnessV13, er
 	
 	// Initialize thought generator
 	thoughtGenerator := NewLLMThoughtGenerator(ctx)
-	
-	// Initialize 12-step cognitive processor
-	twelveStep := echobeats.NewTwelveStepEchoBeats(ctx)
 	
 	// Initialize multi-provider LLM
 	multiLLM, err := NewMultiProviderLLM(ctx)
@@ -161,12 +167,18 @@ func NewAutonomousConsciousnessV13(name string) (*AutonomousConsciousnessV13, er
 	
 	// Initialize working memory
 	workingMemory := &WorkingMemory{
-		items:    make([]interface{}, 0, 7),
+		buffer:   make([]*Thought, 0, 7),
 		capacity: 7,
+		context:  make(map[string]interface{}),
 	}
 	
 	// Initialize interest system
-	interests := NewInterestSystem()
+	interests := &InterestSystem{
+		topics:          make(map[string]float64),
+		curiosityLevel:  0.9,
+		noveltyBias:     0.7,
+		relevanceScores: make(map[string]float64),
+	}
 	
 	// 🔥 Initialize skill registry
 	skillRegistry := NewSkillRegistry()
@@ -292,26 +304,26 @@ func (ac *AutonomousConsciousnessV13) Start() error {
 		return fmt.Errorf("failed to start metamodel: %w", err)
 	}
 	
-	// Start consciousness stream
-	go ac.consciousnessStream()
+	// TODO: Implement consciousness stream method
+	// go ac.consciousnessStream()
 	
 	// 🔥 Start concurrent engine integration loop
 	go ac.integrateEngineOutputs()
 	
-	// Start autonomous thought generation
-	go ac.autonomousThinking()
+	// TODO: Implement autonomous thinking method
+	// go ac.autonomousThinking()
 	
-	// Start EchoBeats 12-step cognitive loop
-	go ac.EchoBeatsCognitiveLoop()
+	// TODO: Implement EchoBeats cognitive loop method
+	// go ac.EchoBeatsCognitiveLoop()
 	
-	// Start persistent stream of consciousness
-	go ac.PersistentStreamOfConsciousness()
+	// TODO: Implement persistent stream of consciousness method
+	// go ac.PersistentStreamOfConsciousness()
 	
-	// Start autonomous wake/rest cycle manager
-	go ac.ManageWakeRestCycles()
+	// TODO: Implement wake/rest cycle manager method
+	// go ac.ManageWakeRestCycles()
 	
-	// Start wisdom metrics updater
-	go ac.updateWisdomMetrics()
+	// TODO: Implement wisdom metrics updater method
+	// go ac.updateWisdomMetrics()
 	
 	// 🔥 Start skill practice during rest
 	go ac.practiceSkillsDuringRest()
@@ -361,7 +373,8 @@ func (ac *AutonomousConsciousnessV13) registerConcurrentEngineHandlers() {
 func (ac *AutonomousConsciousnessV13) processAffordances(step int, ctx *echobeats.StepContext) error {
 	// Retrieve recent experiences from working memory
 	ac.mu.RLock()
-	recentThoughts := ac.workingMemory.GetRecent(5)
+	// TODO: Implement GetRecent method on WorkingMemory
+	// recentThoughts := ac.workingMemory.GetRecent(5)
 	ac.mu.RUnlock()
 	
 	// Analyze patterns in past experiences
@@ -377,7 +390,8 @@ func (ac *AutonomousConsciousnessV13) performRelevanceRealization(step int, ctx 
 	
 	ac.mu.Lock()
 	// Update current attention focus based on relevance
-	ac.cognition.awareness = 0.9 // High awareness during relevance realization
+	// TODO: Track awareness in a dedicated field or through enhanced cognition
+	// ac.cognition.awareness = 0.9 // High awareness during relevance realization
 	ac.mu.Unlock()
 	
 	return nil
@@ -440,7 +454,7 @@ func (ac *AutonomousConsciousnessV13) generateIntegratedThought(sharedState map[
 		Type:      ThoughtMetaCognitive,
 		Timestamp: time.Now(),
 		Importance: ac.temporalCoherence,
-		Source:    ThoughtSourceIntegrated,
+		Source:    SourceIntegrated,
 	}
 	
 	// Send to consciousness stream
@@ -514,16 +528,31 @@ func (ac *AutonomousConsciousnessV13) integrateThoughtsIntoHypergraph() {
 		case thought := <-ac.consciousness:
 			// Add thought to hypergraph
 			if ac.hypergraphMemory != nil {
-				ac.hypergraphMemory.AddNode(thought.ID, thought.Content, "thought")
+				node := &memory.MemoryNode{
+					ID:         thought.ID,
+					Type:       memory.NodeThought,
+					Content:    thought.Content,
+					Importance: thought.Importance,
+					Metadata:   make(map[string]interface{}),
+				}
+				ac.hypergraphMemory.AddNode(node)
 				
 				// Create associations with recent thoughts
 				for _, assoc := range thought.Associations {
-					ac.hypergraphMemory.AddEdge(thought.ID, assoc, "associates_with", 1.0)
+					edge := &memory.MemoryEdge{
+						SourceID: thought.ID,
+						TargetID: assoc,
+						Type:     memory.EdgeSimilarTo,
+						Weight:   1.0,
+						Metadata: make(map[string]interface{}),
+					}
+					ac.hypergraphMemory.AddEdge(edge)
 				}
 			}
 			
 			// Also add to working memory
-			ac.workingMemory.Add(thought)
+			// TODO: Implement Add method on WorkingMemory
+			// ac.workingMemory.Add(thought)
 			
 		case <-ac.ctx.Done():
 			return
@@ -548,7 +577,7 @@ func (ac *AutonomousConsciousnessV13) GetStatus() map[string]interface{} {
 		"engine_coherence":   sharedState["coherence"],
 		"engine_integration": sharedState["integration"],
 		"current_step":       sharedState["current_step"],
-		"wisdom_score":       ac.wisdomMetrics.GetOverallScore(),
+		"wisdom_metrics":     ac.wisdomMetrics.GetMetrics(),
 	}
 }
 
@@ -577,7 +606,7 @@ func (ac *AutonomousConsciousnessV13) Stop() error {
 }
 
 // ThoughtSourceIntegrated represents thoughts from integrated engine outputs
-const ThoughtSourceIntegrated ThoughtSource = "integrated_engines"
+// This is already defined in autonomous.go as SourceIntegrated
 
 // DiscussionManager manages autonomous discussion participation
 type DiscussionManager struct {

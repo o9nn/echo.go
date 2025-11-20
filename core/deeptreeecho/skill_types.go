@@ -6,19 +6,8 @@ import (
 	"time"
 )
 
-// PracticeSession represents a single practice session for a skill
-type PracticeSession struct {
-	ID            string
-	SkillID       string
-	StartTime     time.Time
-	EndTime       time.Time
-	Duration      time.Duration
-	Quality       float64 // 0-1, how well the practice went
-	Focus         float64 // 0-1, level of focus during practice
-	Difficulty    float64 // 0-1, difficulty of the practice
-	Notes         string
-	Improvements  []string // What was learned/improved
-}
+// PracticeSession is defined in skill_practice_enhanced.go
+// Using that definition for consistency across the skill practice system
 
 // SkillRegistryEnhanced manages skills with practice history tracking
 type SkillRegistryEnhanced struct {
@@ -62,12 +51,13 @@ func (sr *SkillRegistryEnhanced) RecordPracticeSession(session *PracticeSession)
 	}
 	
 	sr.practiceHistory = append(sr.practiceHistory, session)
-	sr.totalPracticeTime += session.Duration
+	sessionDuration := session.EndTime.Sub(session.StartTime)
+	sr.totalPracticeTime += sessionDuration
 	
 	// Update skill proficiency based on practice
 	if skill, exists := sr.skills[session.SkillID]; exists {
-		// Improve proficiency based on practice quality and difficulty
-		improvement := session.Quality * session.Difficulty * 0.01
+		// Improve proficiency based on practice performance
+		improvement := session.Performance * 0.01
 		skill.Proficiency += improvement
 		if skill.Proficiency > 1.0 {
 			skill.Proficiency = 1.0
@@ -178,22 +168,20 @@ func (sr *SkillRegistryEnhanced) SchedulePractice(skillID string, duration time.
 	sr.mu.Lock()
 	defer sr.mu.Unlock()
 	
-	skill, exists := sr.skills[skillID]
+	_, exists := sr.skills[skillID]
 	if !exists {
 		return fmt.Errorf("skill not found: %s", skillID)
 	}
 	
 	// Create a new practice session
 	session := &PracticeSession{
-		ID:         generateID(),
-		SkillID:    skillID,
-		StartTime:  time.Now(),
-		EndTime:    time.Time{}, // Will be set when practice ends
-		Duration:   duration,
-		Quality:    0.0, // Will be assessed after practice
-		Focus:      0.0,
-		Difficulty: skill.Proficiency, // Practice at current proficiency level
-		Notes:      "Scheduled practice session",
+		ID:          generateID(),
+		SkillID:     skillID,
+		StartTime:   time.Now(),
+		EndTime:     time.Now().Add(duration),
+		Success:     false, // Will be assessed after practice
+		Performance: 0.0,
+		Improvement: 0.0,
 	}
 	
 	sr.practiceHistory = append(sr.practiceHistory, session)

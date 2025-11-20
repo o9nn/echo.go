@@ -4,7 +4,6 @@ import (
 	"math"
 	"math/rand"
 	"sync"
-	"time"
 )
 
 // PersonaType represents different cognitive styles

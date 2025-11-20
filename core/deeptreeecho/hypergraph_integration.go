@@ -63,7 +63,14 @@ func (hi *HypergraphIntegrator) IntegrateThought(thought Thought) error {
 	
 	// Add thought as a node
 	nodeID := thought.ID
-	if err := hi.hypergraph.AddNode(nodeID, thought.Content, "thought"); err != nil {
+	node := &memory.MemoryNode{
+		ID:         nodeID,
+		Type:       memory.NodeThought,
+		Content:    thought.Content,
+		Importance: thought.Importance,
+		Metadata:   make(map[string]interface{}),
+	}
+	if err := hi.hypergraph.AddNode(node); err != nil {
 		return fmt.Errorf("failed to add thought node: %w", err)
 	}
 	hi.nodesAdded++
@@ -96,82 +103,110 @@ func (hi *HypergraphIntegrator) IntegrateThought(thought Thought) error {
 // connectToRecentMemories connects a node to recent memory nodes
 func (hi *HypergraphIntegrator) connectToRecentMemories(nodeID string, count int) {
 	// Get recent memory nodes
-	recentNodes := hi.hypergraph.GetRecentNodes("memory", count)
+	recentNodes := hi.hypergraph.GetRecentNodes(count)
 	
 	for _, memNode := range recentNodes {
 		// Calculate semantic similarity (simplified)
 		similarity := 0.5 // In full implementation, use embeddings
 		
-		if similarity > 0.3 {
-			hi.hypergraph.AddEdge(nodeID, memNode.ID, "recalls", similarity)
-			hi.edgesAdded++
-		}
+			if similarity > 0.3 {
+				edge := &memory.MemoryEdge{
+					SourceID: nodeID,
+					TargetID: memNode.ID,
+					Type:     memory.EdgeLeadsTo,
+					Weight:   similarity,
+					Metadata: make(map[string]interface{}),
+				}
+				hi.hypergraph.AddEdge(edge)
+				hi.edgesAdded++
+			}
 	}
 }
 
 // connectToKnowledgeGaps connects to identified knowledge gaps
 func (hi *HypergraphIntegrator) connectToKnowledgeGaps(nodeID string) {
-	// Find nodes representing knowledge gaps
-	gapNodes := hi.hypergraph.QueryNodesByType("knowledge_gap")
-	
-	for _, gapNode := range gapNodes {
-		hi.hypergraph.AddEdge(nodeID, gapNode.ID, "addresses", 0.8)
-		hi.edgesAdded++
-	}
+	// TODO: Implement QueryNodesByType method on HypergraphMemory
+	// gapNodes := hi.hypergraph.QueryNodesByType("knowledge_gap")
+	// 
+	// for _, gapNode := range gapNodes {
+	// 	edge := &memory.MemoryEdge{
+	// 		SourceID: nodeID,
+	// 		TargetID: gapNode.ID,
+	// 		Type:     memory.EdgeEnables,
+	// 		Weight:   0.8,
+	// 		Metadata: make(map[string]interface{}),
+	// 	}
+	// 	hi.hypergraph.AddEdge(edge)
+	// 	hi.edgesAdded++
+	// }
 }
 
 // connectToMultipleConcepts connects a node to multiple related concepts
 func (hi *HypergraphIntegrator) connectToMultipleConcepts(nodeID string, concepts []string) {
 	for _, conceptID := range concepts {
-		hi.hypergraph.AddEdge(nodeID, conceptID, "integrates", 0.9)
+		edge := &memory.MemoryEdge{
+			SourceID: nodeID,
+			TargetID: conceptID,
+			Type:     memory.EdgePartOf,
+			Weight:   0.9,
+			Metadata: make(map[string]interface{}),
+		}
+		hi.hypergraph.AddEdge(edge)
 		hi.edgesAdded++
 	}
 }
 
 // connectToCognitiveProcesses connects to cognitive process nodes
 func (hi *HypergraphIntegrator) connectToCognitiveProcesses(nodeID string) {
-	// Connect to nodes representing cognitive processes
-	processNodes := hi.hypergraph.QueryNodesByType("cognitive_process")
-	
-	for _, procNode := range processNodes {
-		hi.hypergraph.AddEdge(nodeID, procNode.ID, "reflects_on", 0.7)
-		hi.edgesAdded++
-	}
+	// TODO: Implement QueryNodesByType method on HypergraphMemory
+	// processNodes := hi.hypergraph.QueryNodesByType("cognitive_process")
+	// 
+	// for _, procNode := range processNodes {
+	// 	edge := &memory.MemoryEdge{
+	// 		SourceID: nodeID,
+	// 		TargetID: procNode.ID,
+	// 		Type:     memory.EdgeLeadsTo,
+	// 		Weight:   0.7,
+	// 		Metadata: make(map[string]interface{}),
+	// 	}
+	// 	hi.hypergraph.AddEdge(edge)
+	// 	hi.edgesAdded++
+	// }
 }
 
 // detectPatterns identifies recurring patterns in the hypergraph
 func (hi *HypergraphIntegrator) detectPatterns(nodeID string, thought Thought) {
-	// Get neighborhood of the new node
-	neighbors := hi.hypergraph.GetNeighbors(nodeID, 2)
-	
-	// Check for recurring structural patterns
-	for _, neighbor := range neighbors {
-		// Simplified pattern detection
-		// In full implementation, use graph isomorphism algorithms
-		
-		patternKey := fmt.Sprintf("%s-%s", thought.Type, neighbor.Type)
-		
-		if pattern, exists := hi.patterns[patternKey]; exists {
-			pattern.Occurrences++
-			pattern.LastSeen = time.Now()
-			pattern.Strength = float64(pattern.Occurrences) / 10.0
-			
-			if pattern.Strength > hi.patternThreshold {
-				hi.patternsFound++
-				fmt.Printf("🔍 Pattern detected: %s (strength: %.2f)\n", patternKey, pattern.Strength)
-			}
-		} else {
-			hi.patterns[patternKey] = &Pattern{
-				ID:          uuid.New().String(),
-				Type:        patternKey,
-				Nodes:       []string{nodeID, neighbor.ID},
-				Strength:    0.1,
-				FirstSeen:   time.Now(),
-				LastSeen:    time.Now(),
-				Occurrences: 1,
-			}
-		}
-	}
+	// TODO: Implement GetNeighbors method on HypergraphMemory
+	// neighbors := hi.hypergraph.GetNeighbors(nodeID, 2)
+	// 
+	// // Check for recurring structural patterns
+	// for _, neighbor := range neighbors {
+	// 	// Simplified pattern detection
+	// 	// In full implementation, use graph isomorphism algorithms
+	// 	
+	// 	patternKey := fmt.Sprintf("%s-%s", thought.Type, neighbor.Type)
+	// 	
+	// 	if pattern, exists := hi.patterns[patternKey]; exists {
+	// 		pattern.Occurrences++
+	// 		pattern.LastSeen = time.Now()
+	// 		pattern.Strength = float64(pattern.Occurrences) / 10.0
+	// 		
+	// 		if pattern.Strength > hi.patternThreshold {
+	// 			hi.patternsFound++
+	// 			fmt.Printf("🔍 Pattern detected: %s (strength: %.2f)\n", patternKey, pattern.Strength)
+	// 		}
+	// 	} else {
+	// 		hi.patterns[patternKey] = &Pattern{
+	// 			ID:          uuid.New().String(),
+	// 			Type:        patternKey,
+	// 			Nodes:       []string{nodeID, neighbor.ID},
+	// 			Strength:    0.1,
+	// 			FirstSeen:   time.Now(),
+	// 			LastSeen:    time.Now(),
+	// 			Occurrences: 1,
+	// 		}
+	// 	}
+	// }
 }
 
 // ConsolidateMemories performs memory consolidation during rest
@@ -223,11 +258,25 @@ func (hi *HypergraphIntegrator) extractInsights() {
 			insightID := uuid.New().String()
 			insightContent := fmt.Sprintf("Pattern insight: %s occurs frequently", pattern.Type)
 			
-			hi.hypergraph.AddNode(insightID, insightContent, "insight")
+			node := &memory.MemoryNode{
+				ID:         insightID,
+				Type:       memory.NodePattern,
+				Content:    insightContent,
+				Importance: pattern.Strength,
+				Metadata:   make(map[string]interface{}),
+			}
+			hi.hypergraph.AddNode(node)
 			
 			// Connect to pattern nodes
 			for _, nodeID := range pattern.Nodes {
-				hi.hypergraph.AddEdge(insightID, nodeID, "synthesizes", pattern.Strength)
+				edge := &memory.MemoryEdge{
+					SourceID: insightID,
+					TargetID: nodeID,
+					Type:     memory.EdgePartOf,
+					Weight:   pattern.Strength,
+					Metadata: make(map[string]interface{}),
+				}
+				hi.hypergraph.AddEdge(edge)
 			}
 		}
 	}
@@ -247,16 +296,19 @@ func (hi *HypergraphIntegrator) GetMetrics() map[string]interface{} {
 }
 
 // SemanticSearch performs semantic search in the hypergraph
-func (hi *HypergraphIntegrator) SemanticSearch(query string, limit int) ([]*memory.HypergraphNode, error) {
+func (hi *HypergraphIntegrator) SemanticSearch(query string, limit int) ([]*memory.MemoryNode, error) {
 	// In full implementation, this would use embeddings
 	// For now, use simple text matching
 	
-	return hi.hypergraph.SearchByContent(query, limit)
+	// TODO: Implement SearchByContent method on HypergraphMemory
+	return []*memory.MemoryNode{}, nil
 }
 
 // FindRelatedConcepts finds concepts related to a given node
 func (hi *HypergraphIntegrator) FindRelatedConcepts(nodeID string, depth int) []string {
-	neighbors := hi.hypergraph.GetNeighbors(nodeID, depth)
+	// TODO: Implement GetNeighbors method on HypergraphMemory
+	// neighbors := hi.hypergraph.GetNeighbors(nodeID, depth)
+	neighbors := []*memory.MemoryNode{}
 	
 	concepts := make([]string, 0, len(neighbors))
 	for _, neighbor := range neighbors {

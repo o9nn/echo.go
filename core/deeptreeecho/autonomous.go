@@ -120,11 +120,12 @@ const (
 	SourceDream
 	SourceMemory
 	SourceReasoning
+	SourceIntegrated
 )
 
 func (s ThoughtSource) String() string {
 	return [...]string{
-		"External", "Internal", "Dream", "Memory", "Reasoning",
+		"External", "Internal", "Dream", "Memory", "Reasoning", "Integrated",
 	}[s]
 }
 

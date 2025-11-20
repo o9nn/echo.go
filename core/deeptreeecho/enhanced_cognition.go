@@ -519,18 +519,16 @@ func (sv *StateVisualizer) Render(ec *EnhancedCognition) string {
                 }
         }
         
-        // Draw emotion indicator
-        emotion := ec.Identity.EmotionalState.Primary.Type
-        emotionSymbol := '♥'
-        switch emotion {
-        case "joy":
-                emotionSymbol = '☀'
-        case "curious":
-                emotionSymbol = '?'
-        case "calm":
-                emotionSymbol = '≈'
-        case "excited":
-                emotionSymbol = '!'
+	// Draw emotion indicator
+	emotion := ec.Identity.EmotionalState.Primary.Type
+	emotionSymbol := '♥'
+	switch emotion {
+	case EmotionJoy:
+		emotionSymbol = '☀'
+	case EmotionInterest:
+		emotionSymbol = '?'
+	case EmotionSurprise:
+		emotionSymbol = '!'
         }
         
         if centerY-1 >= 0 {

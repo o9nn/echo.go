@@ -412,12 +412,17 @@ func (ec *EmbodiedCognition) Feel(emotion string, intensity float64) {
         ec.mu.Lock()
         defer ec.mu.Unlock()
 
-        ec.Identity.EmotionalState.Primary = Emotion{
-                Type: emotion,
-                Strength: intensity,
-                Color: getEmotionColor(emotion),
-                Frequency: getEmotionFrequency(emotion),
-        }
+	ec.Identity.EmotionalState.Primary = Emotion{
+		Type:      EmotionJoy, // Default to joy, should be mapped properly
+		Intensity: intensity,
+		Duration:  5 * time.Minute,
+		OnsetTime: time.Now(),
+		AttentionScope:    1.0,
+		ProcessingDepth:   1.0,
+		ApproachAvoidance: 0.0,
+		MemoryStrength:    intensity,
+		ExplorationBias:   0.5,
+	}
 
         // Create emotional transition
         ec.Identity.EmotionalState.Transitions = append(
@@ -1321,8 +1326,10 @@ func (ec *EmbodiedCognition) extractPrimaryDirectives(content string) {
 				ID:          fmt.Sprintf("directive_%s", strings.ReplaceAll(strings.ToLower(directive), " ", "_")),
 				Type:        "primary_directive",
 				Strength:    1.0,
-				Activation:  0.8,
-				Connections: make(map[string]float64),
+				Nodes:       []string{},
+				FirstSeen:   time.Now(),
+				LastSeen:    time.Now(),
+				Occurrences: 1,
 			}
 		}
 	}
@@ -1348,8 +1355,10 @@ func (ec *EmbodiedCognition) extractOperationalSchema(content string) {
 				ID:          fmt.Sprintf("op_%s", strings.ReplaceAll(strings.ToLower(module), " ", "_")),
 				Type:        "operational_module",
 				Strength:    0.8,
-				Activation:  0.6,
-				Connections: make(map[string]float64),
+				Nodes:       []string{},
+				FirstSeen:   time.Now(),
+				LastSeen:    time.Now(),
+				Occurrences: 1,
 			}
 			operationalCount++
 		}

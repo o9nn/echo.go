@@ -29,7 +29,7 @@ type AgentModel struct {
 	
 	// Mental state model
 	Beliefs      map[string]float64  // What they believe (confidence 0-1)
-	Goals        []Goal              // What they want to achieve
+	Goals        []AgentGoal         // What they want to achieve
 	Intentions   []Intention         // What they plan to do
 	Preferences  map[string]float64  // What they prefer
 	
@@ -50,8 +50,8 @@ type AgentModel struct {
 	LastInteraction    time.Time
 }
 
-// Goal represents an agent's objective
-type Goal struct {
+// AgentGoal represents an agent's objective (renamed to avoid conflict with enhanced_cognition.Goal)
+type AgentGoal struct {
 	Description string
 	Priority    float64
 	Deadline    time.Time
@@ -115,7 +115,7 @@ func (tom *TheoryOfMindModule) CreateAgentModel(agentID string, agentType string
 		AgentID:            agentID,
 		AgentType:          agentType,
 		Beliefs:            make(map[string]float64),
-		Goals:              make([]Goal, 0),
+		Goals:              make([]AgentGoal, 0),
 		Intentions:         make([]Intention, 0),
 		Preferences:        make(map[string]float64),
 		PastActions:        make([]ActionRecord, 0),
@@ -146,7 +146,7 @@ func (tom *TheoryOfMindModule) UpdateBelief(agentID string, belief string, confi
 }
 
 // InferGoal infers an agent's goal from their actions
-func (tom *TheoryOfMindModule) InferGoal(agentID string, observedActions []string) *Goal {
+func (tom *TheoryOfMindModule) InferGoal(agentID string, observedActions []string) *AgentGoal {
 	tom.mu.RLock()
 	defer tom.mu.RUnlock()
 	
@@ -155,9 +155,10 @@ func (tom *TheoryOfMindModule) InferGoal(agentID string, observedActions []strin
 	// Analyze action patterns to infer goal
 	// Simplified: look for common themes in actions
 	
-	goal := &Goal{
+	goal := &AgentGoal{
 		Description: "Inferred from actions",
 		Priority:    0.6,
+		Deadline:    time.Now().Add(24 * time.Hour),
 		Progress:    0.3,
 	}
 	
@@ -452,7 +453,7 @@ func (tom *TheoryOfMindModule) ensureAgentModel(agentID string) *AgentModel {
 		AgentID:          agentID,
 		AgentType:        "unknown",
 		Beliefs:          make(map[string]float64),
-		Goals:            make([]Goal, 0),
+		Goals:            make([]AgentGoal, 0),
 		Intentions:       make([]Intention, 0),
 		Preferences:      make(map[string]float64),
 		PastActions:      make([]ActionRecord, 0),

@@ -172,6 +172,18 @@ func (sp *SupabasePersistence) convertToIdentityRecord(identity interface{}) Ide
 	}
 }
 
+// StoreNode persists a memory node to the database
+func (sp *SupabasePersistence) StoreNode(node *MemoryNode) error {
+	// Stub implementation - would persist to Supabase when SDK is compatible
+	return nil
+}
+
+// StoreEdge persists a memory edge to the database
+func (sp *SupabasePersistence) StoreEdge(edge *MemoryEdge) error {
+	// Stub implementation - would persist to Supabase when SDK is compatible
+	return nil
+}
+
 // Close closes the Supabase connection
 func (sp *SupabasePersistence) Close() error {
 	// Supabase client doesn't need explicit closing

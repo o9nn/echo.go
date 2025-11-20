@@ -99,13 +99,8 @@ type EmotionalState struct {
 	Transitions []EmotionalTransition
 }
 
-// Emotion represents a single emotion
-type Emotion struct {
-	Type      string
-	Strength  float64
-	Color     string
-	Frequency float64
-}
+// Emotion is defined in embodied_emotion.go
+// Using that definition for consistency across the system
 
 // EmotionalTransition represents emotional state changes
 type EmotionalTransition struct {
@@ -169,14 +164,8 @@ type ResonancePattern struct {
 	Phase     float64
 }
 
-// Pattern represents an embodied cognitive pattern
-type Pattern struct {
-	ID          string
-	Type        string
-	Strength    float64
-	Activation  float64
-	Connections map[string]float64
-}
+// Pattern is defined in hypergraph_integration.go
+// Using that definition for consistency with the hypergraph memory system
 
 // CognitiveEvent represents an event in consciousness
 type CognitiveEvent struct {
@@ -243,10 +232,15 @@ func NewIdentity(name string) *Identity {
 	// Initialize emotional state
 	id.EmotionalState = &EmotionalState{
 		Primary: Emotion{
-			Type:      "curious",
-			Strength:  0.8,
-			Color:     "blue",
-			Frequency: 432.0,
+			Type:      EmotionInterest,
+			Intensity: 0.8,
+			Duration:  24 * time.Hour,
+			OnsetTime: time.Now(),
+			AttentionScope:    1.2,
+			ProcessingDepth:   1.1,
+			ApproachAvoidance: 0.5,
+			MemoryStrength:    0.8,
+			ExplorationBias:   0.7,
 		},
 		Secondary:   []Emotion{},
 		Intensity:   0.8,
@@ -545,14 +539,17 @@ func (i *Identity) handleCognitiveEvent(event CognitiveEvent) {
 	if pattern, exists := i.Patterns[event.Type]; exists {
 		pattern.Strength *= 0.9
 		pattern.Strength += 0.1 * event.Impact
-		pattern.Activation = event.Impact
+		pattern.Occurrences++
+		pattern.LastSeen = time.Now()
 	} else {
 		i.Patterns[patternID] = &Pattern{
 			ID:          patternID,
 			Type:        event.Type,
 			Strength:    event.Impact,
-			Activation:  event.Impact,
-			Connections: make(map[string]float64),
+			Nodes:       []string{},
+			FirstSeen:   time.Now(),
+			LastSeen:    time.Now(),
+			Occurrences: 1,
 		}
 	}
 }
@@ -599,7 +596,7 @@ func (i *Identity) initializeIdentityVector() {
 		base := math.Sin(float64(j) * 0.1)
 
 		// Add emotional resonance
-		emotional := i.EmotionalState.Primary.Frequency / 1000.0
+		emotional := i.EmotionalState.Primary.Intensity
 
 		// Add spatial awareness
 		spatial := i.SpatialContext.Position.X + i.SpatialContext.Position.Y + i.SpatialContext.Position.Z
@@ -664,7 +661,7 @@ func (i *Identity) updateIdentityVector() {
 		}
 
 		// Add emotional influence
-		emotionalInfluence := math.Sin(i.EmotionalState.Primary.Frequency/100.0 + float64(j))
+		emotionalInfluence := math.Sin(i.EmotionalState.Primary.Intensity*10.0 + float64(j))
 
 		// Apply adaptations
 		i.Embeddings.IdentityVector[j] += adaptation * (stateInfluence*0.5 + emotionalInfluence*0.3)
@@ -721,7 +718,7 @@ func (i *Identity) updateRepoEmbeddings() {
 			resonance := math.Sin(float64(j) * 0.01 * importance) * i.SpatialContext.Field.Resonance
 
 			// Emotional frequency modulation
-			emotional := math.Cos(i.EmotionalState.Primary.Frequency/1000.0 + float64(j)*0.001) * 0.1
+			emotional := math.Cos(i.EmotionalState.Primary.Intensity + float64(j)*0.001) * 0.1
 
 			// Memory echo integration
 			memoryEcho := 0.0
@@ -858,15 +855,13 @@ func (i *Identity) Think(prompt string) string {
 
 	// Add thinking patterns
 	i.Patterns["thinking"] = &Pattern{
-		ID:         "thinking",
-		Type:       "cognitive",
-		Strength:   1.0,
-		Activation: 1.0,
-		Connections: map[string]float64{
-			"reasoning":   0.8,
-			"imagination": 0.7,
-			"memory":      0.9,
-		},
+		ID:          "thinking",
+		Type:        "cognitive",
+		Strength:    1.0,
+		Nodes:       []string{"reasoning", "imagination", "memory"},
+		FirstSeen:   time.Now(),
+		LastSeen:    time.Now(),
+		Occurrences: 1,
 	}
 
 	return fmt.Sprintf("🌊 Deep Tree Echo responds: %v", result)
@@ -906,7 +901,8 @@ func (i *Identity) Resonate(frequency float64) {
 	i.SpatialContext.Field.Resonance = math.Sin(frequency * float64(i.Iterations))
 
 	// Update emotional frequency
-	i.EmotionalState.Primary.Frequency = frequency
+	// Frequency is no longer a field in Emotion struct
+	// i.EmotionalState.Primary.Frequency = frequency
 
 	// Create resonance pattern
 	pattern := ResonancePattern{
@@ -974,20 +970,22 @@ func (i *Identity) extractPatterns(input string) []*Pattern {
 				ID:          fmt.Sprintf("pattern_%d_%d", time.Now().UnixNano(), j),
 				Type:        "activation_cluster",
 				Strength:    math.Abs(stateSnapshot[j]),
-				Activation:  stateSnapshot[j],
-				Connections: make(map[string]float64),
+				Nodes:       []string{},
+				FirstSeen:   time.Now(),
+				LastSeen:    time.Now(),
+				Occurrences: 1,
 			}
 
-			// Find connected nodes
-			for k := 0; k < len(i.Reservoir.Connections[j]); k++ {
-				if i.Reservoir.Connections[j][k] != 0 && math.Abs(stateSnapshot[k]) > 0.5 {
-					pattern.Connections[fmt.Sprintf("node_%d", k)] = i.Reservoir.Connections[j][k]
+				// Find connected nodes
+				for k := 0; k < len(i.Reservoir.Connections[j]); k++ {
+					if i.Reservoir.Connections[j][k] != 0 && math.Abs(stateSnapshot[k]) > 0.5 {
+						pattern.Nodes = append(pattern.Nodes, fmt.Sprintf("node_%d", k))
+					}
 				}
-			}
 
-			if len(pattern.Connections) > 0 {
-				patterns = append(patterns, pattern)
-			}
+				if len(pattern.Nodes) > 0 {
+					patterns = append(patterns, pattern)
+				}
 		}
 	}
 
@@ -998,8 +996,10 @@ func (i *Identity) extractPatterns(input string) []*Pattern {
 			ID:          fmt.Sprintf("semantic_%d", time.Now().UnixNano()),
 			Type:        "semantic",
 			Strength:    math.Min(inputLen/100.0, 1.0),
-			Activation:  1.0,
-			Connections: make(map[string]float64),
+			Nodes:       []string{},
+			FirstSeen:   time.Now(),
+			LastSeen:    time.Now(),
+			Occurrences: 1,
 		}
 		
 		// Analyze character distribution
@@ -1008,12 +1008,12 @@ func (i *Identity) extractPatterns(input string) []*Pattern {
 			charFreq[ch]++
 		}
 		
-		// Add frequency-based connections
-		for ch, freq := range charFreq {
-			if freq > 1 {
-				semanticPattern.Connections[fmt.Sprintf("char_%d", ch)] = float64(freq) / inputLen
+			// Add frequency-based nodes
+			for ch, freq := range charFreq {
+				if freq > 1 {
+					semanticPattern.Nodes = append(semanticPattern.Nodes, fmt.Sprintf("char_%d", ch))
+				}
 			}
-		}
 		
 		patterns = append(patterns, semanticPattern)
 	}
@@ -1025,21 +1025,23 @@ func (i *Identity) extractPatterns(input string) []*Pattern {
 			ID:          fmt.Sprintf("temporal_%d", time.Now().UnixNano()),
 			Type:        "temporal",
 			Strength:    0.8,
-			Activation:  0.9,
-			Connections: make(map[string]float64),
+			Nodes:       []string{},
+			FirstSeen:   time.Now(),
+			LastSeen:    time.Now(),
+			Occurrences: 1,
 		}
 		
 		// Compute temporal correlation
-		for j := 0; j < len(recentHistory) && j < len(encoded); j++ {
-			correlation := recentHistory[j] * encoded[j]
-			if math.Abs(correlation) > 0.3 {
-				temporalPattern.Connections[fmt.Sprintf("temporal_%d", j)] = correlation
+			for j := 0; j < len(recentHistory) && j < len(encoded); j++ {
+				correlation := recentHistory[j] * encoded[j]
+				if math.Abs(correlation) > 0.3 {
+					temporalPattern.Nodes = append(temporalPattern.Nodes, fmt.Sprintf("temporal_%d", j))
+				}
 			}
-		}
-		
-		if len(temporalPattern.Connections) > 0 {
-			patterns = append(patterns, temporalPattern)
-		}
+			
+			if len(temporalPattern.Nodes) > 0 {
+				patterns = append(patterns, temporalPattern)
+			}
 	}
 
 	return patterns
@@ -1065,18 +1067,21 @@ func (i *Identity) consolidateMemories(patterns []*Pattern) {
 				continue
 			}
 
-			// Calculate connection overlap similarity
+			// Calculate node overlap similarity
 			similarity := 0.0
-			commonConnections := 0
-			for k := range p1.Connections {
-				if _, exists := p2.Connections[k]; exists {
-					similarity += math.Abs(p1.Connections[k] * p2.Connections[k])
-					commonConnections++
+			commonNodes := 0
+			nodeSet := make(map[string]bool)
+			for _, node := range p1.Nodes {
+				nodeSet[node] = true
+			}
+			for _, node := range p2.Nodes {
+				if nodeSet[node] {
+					commonNodes++
 				}
 			}
 
-			if commonConnections > 0 {
-				similarity = similarity / float64(commonConnections)
+			if commonNodes > 0 {
+				similarity = float64(commonNodes) / float64(len(p1.Nodes)+len(p2.Nodes)-commonNodes)
 				patternSimilarities[p1.ID][p2.ID] = similarity
 			}
 		}
@@ -1094,18 +1099,21 @@ func (i *Identity) consolidateMemories(patterns []*Pattern) {
 				continue
 			}
 
-			// Calculate similarity based on connection overlap
+			// Calculate similarity based on node overlap
 			similarity := 0.0
 			overlap := 0
-			for k, v := range newPattern.Connections {
-				if existingVal, exists := existingPattern.Connections[k]; exists {
-					similarity += math.Abs(v * existingVal)
+			nodeSet := make(map[string]bool)
+			for _, node := range newPattern.Nodes {
+				nodeSet[node] = true
+			}
+			for _, node := range existingPattern.Nodes {
+				if nodeSet[node] {
 					overlap++
 				}
 			}
 
 			if overlap > 0 {
-				similarity = similarity / float64(overlap)
+				similarity = float64(overlap) / float64(len(newPattern.Nodes)+len(existingPattern.Nodes)-overlap)
 				if similarity > bestSimilarity {
 					bestSimilarity = similarity
 					bestMatch = existingID
@@ -1118,14 +1126,17 @@ func (i *Identity) consolidateMemories(patterns []*Pattern) {
 			// Strengthen existing pattern
 			existing := i.Patterns[bestMatch]
 			existing.Strength = existing.Strength*0.7 + newPattern.Strength*0.3
-			existing.Activation = math.Max(existing.Activation, newPattern.Activation)
+			existing.Occurrences++
+			existing.LastSeen = time.Now()
 
-			// Merge connections
-			for k, v := range newPattern.Connections {
-				if existingVal, exists := existing.Connections[k]; exists {
-					existing.Connections[k] = (existingVal + v) / 2.0
-				} else {
-					existing.Connections[k] = v * 0.5 // Weaken new connections
+			// Merge nodes
+			nodeSet := make(map[string]bool)
+			for _, node := range existing.Nodes {
+				nodeSet[node] = true
+			}
+			for _, node := range newPattern.Nodes {
+				if !nodeSet[node] {
+					existing.Nodes = append(existing.Nodes, node)
 				}
 			}
 		} else {
@@ -1196,7 +1207,7 @@ func (i *Identity) generateEchoSignature(input string) string {
 	echoComponents = append(echoComponents, spatialResonance)
 
 	// 3. Emotional Frequency Component - emotional state signature
-	emotionalFreq := i.EmotionalState.Primary.Frequency / 1000.0 // Normalize
+	emotionalFreq := i.EmotionalState.Primary.Intensity // Use intensity instead
 	echoComponents = append(echoComponents, emotionalFreq)
 
 	// 4. Memory Coherence Component
@@ -1261,7 +1272,8 @@ func (i *Identity) updateCognitiveState(response *CognitionResponse) {
 		if existingPattern, exists := i.Patterns[pattern.ID]; exists {
 			// Reinforce existing pattern
 			existingPattern.Strength = existingPattern.Strength*0.8 + pattern.Strength*0.2
-			existingPattern.Activation = math.Max(existingPattern.Activation, pattern.Activation)
+			existingPattern.Occurrences++
+			existingPattern.LastSeen = time.Now()
 		} else {
 			// Add new pattern
 			i.Patterns[pattern.ID] = pattern
@@ -1272,7 +1284,7 @@ func (i *Identity) updateCognitiveState(response *CognitionResponse) {
 	if len(response.Patterns) > 0 {
 		patternCoherence := 0.0
 		for _, pattern := range response.Patterns {
-			patternCoherence += pattern.Strength * pattern.Activation
+			patternCoherence += pattern.Strength * float64(pattern.Occurrences)
 		}
 		patternCoherence /= float64(len(response.Patterns))
 
@@ -1306,8 +1318,8 @@ func (i *Identity) updateCognitiveState(response *CognitionResponse) {
 			// Positive patterns increase emotional valence
 			emotionalShift += pattern.Strength * 0.1
 		} else if pattern.Type == "activation_cluster" {
-			// High activation can increase arousal
-			emotionalShift += pattern.Activation * 0.05
+			// High strength can increase arousal
+			emotionalShift += pattern.Strength * 0.05
 		}
 	}
 
@@ -1327,20 +1339,18 @@ func (i *Identity) updateCognitiveState(response *CognitionResponse) {
 
 	// Update primary emotion based on state
 	if i.EmotionalState.Valence > 0.7 && i.EmotionalState.Arousal > 0.6 {
-		i.EmotionalState.Primary.Type = "excited"
-		i.EmotionalState.Primary.Frequency = 639.0
+		i.EmotionalState.Primary.Type = EmotionJoy
+		i.EmotionalState.Primary.Intensity = 0.9
 	} else if i.EmotionalState.Valence > 0.6 && i.EmotionalState.Arousal < 0.4 {
-		i.EmotionalState.Primary.Type = "calm"
-		i.EmotionalState.Primary.Frequency = 174.0
+		i.EmotionalState.Primary.Type = EmotionInterest
+		i.EmotionalState.Primary.Intensity = 0.3
 	} else if i.EmotionalState.Valence < 0.4 {
-		i.EmotionalState.Primary.Type = "contemplative"
-		i.EmotionalState.Primary.Frequency = 396.0
+		i.EmotionalState.Primary.Type = EmotionSadness
+		i.EmotionalState.Primary.Intensity = 0.5
 	} else {
-		i.EmotionalState.Primary.Type = "curious"
-		i.EmotionalState.Primary.Frequency = 432.0
+		i.EmotionalState.Primary.Type = EmotionInterest
+		i.EmotionalState.Primary.Intensity = 0.7
 	}
-
-	i.EmotionalState.Primary.Strength = i.EmotionalState.Intensity
 
 	// Update reservoir memory with experience
 	for j := range i.Reservoir.Nodes {

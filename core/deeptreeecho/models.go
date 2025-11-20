@@ -200,11 +200,11 @@ func (m *ModelManager) processResponse(response string) string {
 	prefix := ""
 	
 	switch emotion.Type {
-	case "joy":
+	case EmotionJoy:
 		prefix = "✨ "
-	case "curious":
+	case EmotionInterest:
 		prefix = "🔍 "
-	case "calm":
+	case EmotionSadness:
 		prefix = "🌊 "
 	default:
 		prefix = "💭 "
