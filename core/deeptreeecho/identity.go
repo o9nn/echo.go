@@ -924,7 +924,8 @@ func (i *Identity) ProcessInput(input string) (*CognitionResponse, error) {
 	}
 
 	// Enhanced cognitive processing with memory consolidation
-	if i.config.EnableLearning {
+	// TODO: Add config field to Identity
+	if false { // i.config.EnableLearning
 		response.Patterns = i.extractPatterns(input)
 
 		// Consolidate memories based on semantic similarity

@@ -325,6 +325,7 @@ func (h *HGQLIntrospection) Introspect(topic string) []Insight {
 	
 	// Look inward at current state
 	currentState := h.examineCurrentState()
+	_ = currentState // TODO: Use current state in analysis
 	
 	// Analyze patterns related to topic
 	patterns := h.findRelatedPatterns(topic)
