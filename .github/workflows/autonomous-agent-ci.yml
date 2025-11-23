@@ -18,7 +18,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.23.0'
           cache: true
       
       - name: Run gofmt
@@ -56,7 +56,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.23.0'
           cache: true
       
       - name: Run Gosec Security Scanner
@@ -85,7 +85,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: '1.23.0'
           cache: true
       
       - name: Check for vulnerabilities
@@ -107,7 +107,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        go-version: ['1.21']
+        go-version: ['1.23.0']
     
     steps:
       - name: Checkout code
