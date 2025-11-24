@@ -33,3 +33,4 @@ autonomous_server
 test_build
 test_v5
 *.tar.gz
+venv/
