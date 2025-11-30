@@ -343,3 +343,37 @@ func (ips *InterestPatternSystem) GetInterestProfile() string {
 	
 	return profile
 }
+
+// GetAllInterests returns all interest patterns as a map
+func (ips *InterestPatternSystem) GetAllInterests() map[string]float64 {
+	ips.mu.RLock()
+	defer ips.mu.RUnlock()
+	
+	interests := make(map[string]float64)
+	for topic, interest := range ips.interests {
+		interests[topic] = interest.Strength
+	}
+	
+	return interests
+}
+
+// RestoreInterests restores interest patterns from a map
+func (ips *InterestPatternSystem) RestoreInterests(interests map[string]float64) {
+	ips.mu.Lock()
+	defer ips.mu.Unlock()
+	
+	for topic, strength := range interests {
+		if existing, exists := ips.interests[topic]; exists {
+			existing.Strength = strength
+			existing.LastUpdated = time.Now()
+		} else {
+			ips.interests[topic] = &InterestVector{
+				Topic:       topic,
+				Strength:    strength,
+				LastUpdated: time.Now(),
+				Encounters:  0,
+				Engagements: 0,
+			}
+		}
+	}
+}
