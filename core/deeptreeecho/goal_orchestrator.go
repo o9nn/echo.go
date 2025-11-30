@@ -216,10 +216,10 @@ Generate the goals now:`, identity, values, domains)
 	opts := llm.GenerateOptions{
 		Temperature:  0.8,
 		MaxTokens:    500,
-		SystemPrompt: "You are a goal-setting assistant for an autonomous AI system.",
 	}
 	
-	response, err := go_orch.llmProvider.Generate(go_orch.ctx, prompt, opts)
+	fullPrompt := "[System: You are a goal-setting assistant for an autonomous AI system.]\n\n" + prompt
+	response, err := go_orch.llmProvider.Generate(context.Background(), fullPrompt, opts)
 	if err != nil {
 		return fmt.Errorf("LLM goal generation failed: %w", err)
 	}
@@ -322,10 +322,10 @@ List the sub-goals:`, goal.Description, goal.Type.String())
 	opts := llm.GenerateOptions{
 		Temperature:  0.7,
 		MaxTokens:    300,
-		SystemPrompt: "You are a goal decomposition assistant.",
 	}
 	
-	response, err := go_orch.llmProvider.Generate(go_orch.ctx, prompt, opts)
+	fullPrompt := "[System: You are a goal decomposition assistant.]\n\n" + prompt
+	response, err := go_orch.llmProvider.Generate(context.Background(), fullPrompt, opts)
 	if err != nil {
 		return fmt.Errorf("LLM goal decomposition failed: %w", err)
 	}

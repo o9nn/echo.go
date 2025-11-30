@@ -1,7 +1,9 @@
 module github.com/EchoCog/echollama
 
 // Deep Tree Echo - compatible with Go 1.18+
-go 1.18
+go 1.23.0
+
+toolchain go1.23.4
 
 require (
 	github.com/containerd/console v1.0.3
@@ -32,7 +34,10 @@ require (
 	gonum.org/v1/gonum v0.15.0
 )
 
-require github.com/pdevine/tensor v0.0.0-20250402003834-09d804610a08
+require (
+	github.com/mattn/go-sqlite3 v1.14.32
+	github.com/pdevine/tensor v0.0.0-20250402003834-09d804610a08
+)
 
 require (
 	github.com/apache/arrow/go/arrow v0.0.0-20211112161151-bc219186db40 // indirect
@@ -45,7 +50,6 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/flatbuffers v24.3.25+incompatible // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/mattn/go-sqlite3 v1.14.32 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
