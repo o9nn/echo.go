@@ -445,3 +445,12 @@ func (sched *EchobeatsScheduler) GetEngineStatus() []map[string]interface{} {
 	
 	return status
 }
+
+
+// Helper function to truncate strings
+func truncate(s string, maxLen int) string {
+	if len(s) <= maxLen {
+		return s
+	}
+	return s[:maxLen-3] + "..."
+}

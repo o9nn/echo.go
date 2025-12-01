@@ -82,27 +82,15 @@ func NewEchodreamKnowledgeIntegration(llmProvider llm.LLMProvider) *EchodreamKno
 }
 
 // ConsolidateKnowledge processes thoughts and experiences during dream state
-func (edi *EchodreamKnowledgeIntegration) ConsolidateKnowledge(thoughts []Thought) error {
+func (edi *EchodreamKnowledgeIntegration) ConsolidateKnowledge(ctx context.Context) error {
 	edi.mu.Lock()
 	defer edi.mu.Unlock()
 	
 	fmt.Println("🌙 Echodream: Beginning knowledge consolidation...")
 	
-	// Convert thoughts to episodic memories
-	for _, thought := range thoughts {
-		memory := EpisodicMemory{
-			ID:          fmt.Sprintf("mem_%s", thought.ID),
-			Content:     thought.Content,
-			Timestamp:   thought.Timestamp,
-			Emotional:   0.5,  // Could be computed from content
-			Importance:  0.5,  // Could be computed from type and connections
-			Tags:        []string{thought.Type.String()},
-			Consolidated: false,
-		}
-		
-		edi.episodicMemories = append(edi.episodicMemories, memory)
-		edi.totalMemoriesProcessed++
-	}
+	// Consolidate existing memories
+	thoughtCount := len(edi.episodicMemories)
+	edi.totalMemoriesProcessed += uint64(thoughtCount)
 	
 	// Extract patterns from recent memories
 	if err := edi.extractPatterns(); err != nil {
@@ -120,7 +108,7 @@ func (edi *EchodreamKnowledgeIntegration) ConsolidateKnowledge(thoughts []Though
 	edi.lastConsolidation = time.Now()
 	edi.consolidationCount++
 	
-	fmt.Printf("   ✓ Processed %d memories\n", len(thoughts))
+	fmt.Printf("   ✓ Processed %d memories\n", thoughtCount)
 	fmt.Printf("   ✓ Extracted %d patterns\n", len(edi.consolidatedPatterns))
 	fmt.Printf("   ✓ Generated %d wisdom insights\n", len(edi.wisdomInsights))
 	
@@ -337,3 +325,4 @@ func (edi *EchodreamKnowledgeIntegration) GetMetrics() map[string]interface{} {
 		"wisdom_generated":       edi.totalWisdomGenerated,
 	}
 }
+
