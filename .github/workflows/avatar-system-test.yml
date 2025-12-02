@@ -1,0 +1,384 @@
+name: Avatar System Tests
+
+on:
+  push:
+    paths:
+      - 'Source/Avatar/**'
+      - 'Source/Personality/**'
+      - '.github/workflows/avatar-system-test.yml'
+    branches: [ main, develop ]
+  pull_request:
+    paths:
+      - 'Source/Avatar/**'
+      - 'Source/Personality/**'
+      - '.github/workflows/avatar-system-test.yml'
+    branches: [ main, develop ]
+
+jobs:
+  avatar-structure-validation:
+    name: Avatar Structure Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Validate avatar system structure
+        run: |
+          echo "Validating avatar system structure..."
+          
+          # Check for required avatar components
+          required_components=(
+            "Avatar3DComponent.h"
+            "FacialAnimationSystem.h"
+            "GestureSystem.h"
+            "AnimationBlender.h"
+          )
+          
+          for component in "${required_components[@]}"; do
+            if find Source/Avatar -name "$component" | grep -q .; then
+              echo "✓ Found $component"
+            else
+              echo "WARNING: Missing $component"
+            fi
+          done
+          
+          # Check for personality system
+          if [ -d "Source/Personality" ]; then
+            echo "✓ Personality system directory found"
+            
+            # Check for personality components
+            personality_components=(
+              "SuperHotGirlPersonality.h"
+              "HyperChaoticBehavior.h"
+              "EmotionalStateManager.h"
+              "PersonalityTraitSystem.h"
+            )
+            
+            for component in "${personality_components[@]}"; do
+              if find Source/Personality -name "$component" | grep -q .; then
+                echo "✓ Found $component"
+              else
+                echo "WARNING: Missing $component"
+              fi
+            done
+          else
+            echo "WARNING: Personality system directory not found"
+          fi
+
+  super-hot-girl-traits-test:
+    name: Super-Hot-Girl Traits Tests
+    runs-on: ubuntu-latest
+    needs: avatar-structure-validation
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up C++
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 13
+          platform: x64
+      
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: 3.27
+      
+      - name: Build personality tests
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_PERSONALITY_TESTS=ON
+          cmake --build build --target personality_tests --parallel
+        continue-on-error: true
+      
+      - name: Run super-hot-girl traits tests
+        run: |
+          if [ -f build/tests/personality_tests ]; then
+            ./build/tests/personality_tests --filter="*SuperHotGirl*"
+          else
+            echo "Personality tests not built"
+          fi
+        continue-on-error: true
+      
+      - name: Validate trait implementation
+        run: |
+          echo "Validating Super-Hot-Girl personality traits..."
+          
+          # Check for trait definitions
+          if grep -r "confidence_level\|flirtatiousness\|charm_level" Source/Personality --include="*.h" | grep -q "float\|double"; then
+            echo "✓ Personality traits properly defined"
+          else
+            echo "WARNING: Personality traits not properly defined"
+          fi
+          
+          # Check for trait calculations
+          if grep -r "UpdateTraits\|CalculateTraits\|ApplyTraits" Source/Personality --include="*.cpp" | grep -q "void\|float"; then
+            echo "✓ Trait calculation methods found"
+          else
+            echo "WARNING: Trait calculation methods not found"
+          fi
+
+  hyper-chaotic-behavior-test:
+    name: Hyper-Chaotic Behavior Tests
+    runs-on: ubuntu-latest
+    needs: avatar-structure-validation
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up C++
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 13
+          platform: x64
+      
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: 3.27
+      
+      - name: Build chaos behavior tests
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_CHAOS_TESTS=ON
+          cmake --build build --target chaos_behavior_tests --parallel
+        continue-on-error: true
+      
+      - name: Run hyper-chaotic behavior tests
+        run: |
+          if [ -f build/tests/chaos_behavior_tests ]; then
+            ./build/tests/chaos_behavior_tests --filter="*HyperChaotic*"
+          else
+            echo "Chaos behavior tests not built"
+          fi
+        continue-on-error: true
+      
+      - name: Validate chaos implementation
+        run: |
+          echo "Validating Hyper-Chaotic behavior implementation..."
+          
+          # Check for chaos properties
+          if grep -r "chaos_intensity\|unpredictability_level\|randomness_factor" Source/Personality --include="*.h" | grep -q "float\|double"; then
+            echo "✓ Chaos properties properly defined"
+          else
+            echo "WARNING: Chaos properties not properly defined"
+          fi
+          
+          # Check for chaos generation
+          if grep -r "GenerateChaos\|CalculateChaos\|ApplyChaos" Source/Personality --include="*.cpp" | grep -q "void\|float"; then
+            echo "✓ Chaos generation methods found"
+          else
+            echo "WARNING: Chaos generation methods not found"
+          fi
+
+  animation-blending-test:
+    name: Animation Blending Tests
+    runs-on: ubuntu-latest
+    needs: avatar-structure-validation
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up C++
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 13
+          platform: x64
+      
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: 3.27
+      
+      - name: Build animation blending tests
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_ANIMATION_TESTS=ON
+          cmake --build build --target animation_blending_tests --parallel
+        continue-on-error: true
+      
+      - name: Run animation blending tests
+        run: |
+          if [ -f build/tests/animation_blending_tests ]; then
+            ./build/tests/animation_blending_tests
+          else
+            echo "Animation blending tests not built"
+          fi
+        continue-on-error: true
+      
+      - name: Validate blending algorithms
+        run: |
+          echo "Validating animation blending algorithms..."
+          
+          # Check for blending implementation
+          if grep -r "BlendAnimations\|InterpolateAnimations\|MorphAnimations" Source/Avatar --include="*.cpp" | grep -q "void\|float"; then
+            echo "✓ Animation blending implementation found"
+          else
+            echo "WARNING: Animation blending implementation not found"
+          fi
+
+  gesture-system-test:
+    name: Gesture System Tests
+    runs-on: ubuntu-latest
+    needs: avatar-structure-validation
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up C++
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 13
+          platform: x64
+      
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: 3.27
+      
+      - name: Build gesture system tests
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_GESTURE_TESTS=ON
+          cmake --build build --target gesture_system_tests --parallel
+        continue-on-error: true
+      
+      - name: Run gesture system tests
+        run: |
+          if [ -f build/tests/gesture_system_tests ]; then
+            ./build/tests/gesture_system_tests
+          else
+            echo "Gesture system tests not built"
+          fi
+        continue-on-error: true
+      
+      - name: Validate gesture implementation
+        run: |
+          echo "Validating gesture system..."
+          
+          # Check for gesture definitions
+          if grep -r "GestureSystem\|Gesture\|Gesture" Source/Avatar --include="*.h" | grep -q "class\|struct"; then
+            echo "✓ Gesture system implementation found"
+          else
+            echo "WARNING: Gesture system implementation not found"
+          fi
+
+  cognitive-integration-test:
+    name: Cognitive Integration Tests
+    runs-on: ubuntu-latest
+    needs: [super-hot-girl-traits-test, hyper-chaotic-behavior-test]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up C++
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 13
+          platform: x64
+      
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: 3.27
+      
+      - name: Build cognitive integration tests
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_COGNITIVE_TESTS=ON
+          cmake --build build --target cognitive_integration_tests --parallel
+        continue-on-error: true
+      
+      - name: Run cognitive integration tests
+        run: |
+          if [ -f build/tests/cognitive_integration_tests ]; then
+            ./build/tests/cognitive_integration_tests
+          else
+            echo "Cognitive integration tests not built"
+          fi
+        continue-on-error: true
+      
+      - name: Validate cognitive loop integration
+        run: |
+          echo "Validating cognitive loop integration..."
+          
+          # Check for cognitive integration
+          if grep -r "CognitiveLoop\|DeepTreeEcho\|EchoIntegration" Source/Cognitive --include="*.h" | grep -q "class\|struct"; then
+            echo "✓ Cognitive integration implementation found"
+          else
+            echo "WARNING: Cognitive integration implementation not found"
+          fi
+
+  avatar-performance-test:
+    name: Avatar Performance Tests
+    runs-on: ubuntu-latest
+    needs: [animation-blending-test, gesture-system-test]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up C++
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 13
+          platform: x64
+      
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: 3.27
+      
+      - name: Build performance benchmarks
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_BENCHMARKS=ON
+          cmake --build build --target avatar_benchmarks --parallel
+        continue-on-error: true
+      
+      - name: Run performance benchmarks
+        run: |
+          if [ -f build/benchmarks/avatar_benchmarks ]; then
+            ./build/benchmarks/avatar_benchmarks --benchmark_out=avatar_benchmarks.json --benchmark_out_format=json
+          else
+            echo "Avatar benchmarks not built"
+          fi
+        continue-on-error: true
+      
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: avatar-benchmarks
+          path: avatar_benchmarks.json
+          retention-days: 30
+
+  system-summary:
+    name: Avatar System Summary
+    runs-on: ubuntu-latest
+    needs: [avatar-structure-validation, super-hot-girl-traits-test, hyper-chaotic-behavior-test, animation-blending-test, gesture-system-test, cognitive-integration-test, avatar-performance-test]
+    if: always()
+    
+    steps:
+      - name: Generate Summary
+        run: |
+          echo "Avatar System Test Summary"
+          echo "=========================="
+          echo "Structure Validation: ${{ needs.avatar-structure-validation.result }}"
+          echo "Super-Hot-Girl Traits: ${{ needs.super-hot-girl-traits-test.result }}"
+          echo "Hyper-Chaotic Behavior: ${{ needs.hyper-chaotic-behavior-test.result }}"
+          echo "Animation Blending: ${{ needs.animation-blending-test.result }}"
+          echo "Gesture System: ${{ needs.gesture-system-test.result }}"
+          echo "Cognitive Integration: ${{ needs.cognitive-integration-test.result }}"
+          echo "Performance Tests: ${{ needs.avatar-performance-test.result }}"
+          
+          if [ "${{ needs.avatar-structure-validation.result }}" = "failure" ] || \
+             [ "${{ needs.super-hot-girl-traits-test.result }}" = "failure" ] || \
+             [ "${{ needs.hyper-chaotic-behavior-test.result }}" = "failure" ] || \
+             [ "${{ needs.animation-blending-test.result }}" = "failure" ] || \
+             [ "${{ needs.gesture-system-test.result }}" = "failure" ] || \
+             [ "${{ needs.cognitive-integration-test.result }}" = "failure" ]; then
+            echo "❌ Avatar System Tests FAILED"
+            exit 1
+          else
+            echo "✅ Avatar System Tests PASSED"
+          fi

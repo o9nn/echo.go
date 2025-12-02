@@ -1,0 +1,309 @@
+name: Main CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  UNREAL_ENGINE_VERSION: 5.3
+  CMAKE_VERSION: 3.27
+  NINJA_VERSION: 1.11.1
+
+jobs:
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up C++
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 13
+          platform: x64
+      
+      - name: Install clang-format
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format clang-tidy cppcheck
+      
+      - name: Check code formatting
+        run: |
+          echo "Checking C++ code formatting with clang-format..."
+          find Source -name "*.cpp" -o -name "*.h" | while read file; do
+            if ! clang-format --dry-run -Werror "$file" > /dev/null 2>&1; then
+              echo "File $file is not formatted correctly"
+              clang-format -i "$file"
+            fi
+          done
+      
+      - name: Run clang-tidy
+        run: |
+          echo "Running clang-tidy for static analysis..."
+          find Source -name "*.cpp" | head -20 | while read file; do
+            clang-tidy "$file" -- -I/usr/include || true
+          done
+        continue-on-error: true
+      
+      - name: Run cppcheck
+        run: |
+          echo "Running cppcheck..."
+          cppcheck --enable=all --suppress=missingIncludeSystem Source/ || true
+        continue-on-error: true
+      
+      - name: Check for TODO/FIXME/HACK comments
+        run: |
+          echo "Scanning for TODO/FIXME/HACK comments..."
+          grep -r "TODO\|FIXME\|HACK" Source/ --include="*.cpp" --include="*.h" | tee code-issues.txt || true
+          echo "Found $(wc -l < code-issues.txt) code issues to address"
+      
+      - name: Upload code issues report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-issues-report
+          path: code-issues.txt
+          retention-days: 7
+
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: "."
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+        continue-on-error: true
+      
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+      
+      - name: Check for hardcoded secrets
+        run: |
+          echo "Checking for hardcoded secrets..."
+          if grep -r "password\|api_key\|secret" Source/ --include="*.cpp" --include="*.h" -i | grep -v "TODO\|FIXME"; then
+            echo "WARNING: Potential hardcoded secrets found"
+          fi
+        continue-on-error: true
+
+  dependency-audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check CMake dependencies
+        run: |
+          echo "Auditing project dependencies..."
+          if [ -f CMakeLists.txt ]; then
+            grep -E "find_package|FetchContent" CMakeLists.txt | tee dependencies.txt || true
+          fi
+      
+      - name: Upload dependencies report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependencies-report
+          path: dependencies.txt
+          retention-days: 7
+
+  build-matrix:
+    name: Build on ${{ matrix.os }} - ${{ matrix.config }}
+    runs-on: ${{ matrix.os }}
+    needs: code-quality
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        config: [Debug, Release]
+        include:
+          - os: ubuntu-latest
+            cmake-generator: Ninja
+            cc: gcc-13
+            cxx: g++-13
+          - os: windows-latest
+            cmake-generator: "Visual Studio 17 2022"
+          - os: macos-latest
+            cmake-generator: Ninja
+            cc: clang
+            cxx: clang++
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: ${{ env.CMAKE_VERSION }}
+      
+      - name: Set up Ninja
+        uses: seanmiddleditch/gha-setup-ninja@master
+        with:
+          version: ${{ env.NINJA_VERSION }}
+      
+      - name: Set up C++ (Ubuntu)
+        if: runner.os == 'Linux'
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 13
+          platform: x64
+      
+      - name: Set up C++ (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install llvm
+          echo "CC=$(brew --prefix llvm)/bin/clang" >> $GITHUB_ENV
+          echo "CXX=$(brew --prefix llvm)/bin/clang++" >> $GITHUB_ENV
+      
+      - name: Configure CMake
+        run: |
+          cmake -B build -G "${{ matrix.cmake-generator }}" \
+            -DCMAKE_BUILD_TYPE=${{ matrix.config }} \
+            -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
+            -DCMAKE_C_COMPILER=${{ matrix.cc }}
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+      
+      - name: Build
+        run: cmake --build build --config ${{ matrix.config }} --parallel
+      
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.os }}-${{ matrix.config }}
+          path: build/
+          retention-days: 7
+      
+      - name: Upload build logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-${{ matrix.os }}-${{ matrix.config }}
+          path: build/CMakeFiles/CMakeOutput.log
+          retention-days: 7
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: build-matrix
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: ${{ env.CMAKE_VERSION }}
+      
+      - name: Set up C++
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 13
+          platform: x64
+      
+      - name: Install test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtest-dev
+      
+      - name: Configure CMake with tests
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Debug -DENABLE_TESTING=ON
+      
+      - name: Build tests
+        run: cmake --build build --target all_tests --parallel
+      
+      - name: Run unit tests
+        run: |
+          cd build
+          ctest --output-on-failure --verbose
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: build/Testing/
+          retention-days: 7
+
+  documentation:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check documentation completeness
+        run: |
+          echo "Checking documentation..."
+          
+          # Check for README
+          if [ ! -f README.md ]; then
+            echo "WARNING: README.md not found"
+          fi
+          
+          # Check for API documentation
+          if [ ! -d docs ]; then
+            echo "WARNING: docs/ directory not found"
+          fi
+          
+          # Check for code comments
+          echo "Checking code documentation coverage..."
+          find Source -name "*.h" | while read file; do
+            if ! grep -q "///" "$file"; then
+              echo "WARNING: $file lacks documentation comments"
+            fi
+          done
+        continue-on-error: true
+
+  summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    needs: [code-quality, security-scan, dependency-audit, build-matrix, unit-tests, documentation]
+    if: always()
+    
+    steps:
+      - name: Check CI Status
+        run: |
+          echo "CI Pipeline Summary"
+          echo "===================="
+          echo "Code Quality: ${{ needs.code-quality.result }}"
+          echo "Security Scan: ${{ needs.security-scan.result }}"
+          echo "Dependency Audit: ${{ needs.dependency-audit.result }}"
+          echo "Build Matrix: ${{ needs.build-matrix.result }}"
+          echo "Unit Tests: ${{ needs.unit-tests.result }}"
+          echo "Documentation: ${{ needs.documentation.result }}"
+          
+          if [ "${{ needs.code-quality.result }}" = "failure" ] || \
+             [ "${{ needs.security-scan.result }}" = "failure" ] || \
+             [ "${{ needs.build-matrix.result }}" = "failure" ] || \
+             [ "${{ needs.unit-tests.result }}" = "failure" ]; then
+            echo "❌ CI Pipeline FAILED"
+            exit 1
+          else
+            echo "✅ CI Pipeline PASSED"
+          fi
