@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/EchoCog/echollama/core/deeptreeecho"
-	"github.com/EchoCog/echollama/core/echobeats"
+	// "github.com/EchoCog/echollama/core/echobeats" // Disabled for now
 	"github.com/EchoCog/echollama/core/echodream"
 )
 
@@ -24,7 +24,7 @@ type AutonomousEchoself struct {
 	// Integrated cognitive systems
 	wakeRestManager *deeptreeecho.AutonomousWakeRestManager
 	consciousness   *deeptreeecho.ConsciousnessLayerCommunication
-	echobeats       *echobeats.EchoBeatsThreePhase
+	// echobeats       *echobeats.EchoBeatsThreePhase // TODO: Implement EchoBeatsThreePhase
 	echodream       *echodream.DreamCycleIntegration
 	
 	// Stream of consciousness
@@ -196,7 +196,7 @@ func NewAutonomousEchoself() *AutonomousEchoself {
 		identity:         loadIdentityKernel(),
 		wakeRestManager:  deeptreeecho.NewAutonomousWakeRestManager(),
 		consciousness:    deeptreeecho.NewConsciousnessLayerCommunication(),
-		echobeats:        echobeats.NewEchoBeatsThreePhase(),
+			// echobeats:        echobeats.NewEchoBeatsThreePhase(), // TODO: Implement EchoBeatsThreePhase
 		echodream:        echodream.NewDreamCycleIntegration(),
 		thoughtStream:    make(chan Thought, 1000),
 		internalMonologue: make([]Thought, 0),
@@ -273,7 +273,7 @@ func (ae *AutonomousEchoself) setupCallbacks() {
 	ae.echodream.SetDreamCompleteCallback(ae.onDreamComplete)
 	
 	// EchoBeats callbacks
-	ae.echobeats.SetThoughtCallback(ae.onThoughtGenerated)
+	// ae.echobeats.SetThoughtCallback(ae.onThoughtGenerated) // TODO: Implement EchoBeatsThreePhase
 }
 
 // Start begins the autonomous operation
@@ -303,9 +303,9 @@ func (ae *AutonomousEchoself) Start() error {
 		return fmt.Errorf("failed to start consciousness layers: %w", err)
 	}
 	
-	if err := ae.echobeats.Start(); err != nil {
-		return fmt.Errorf("failed to start echobeats: %w", err)
-	}
+	// if err := ae.echobeats.Start(); err != nil { // TODO: Implement EchoBeatsThreePhase
+	// 	return fmt.Errorf("failed to start echobeats: %w", err)
+	// }
 	
 	// Start autonomous loops
 	go ae.streamOfConsciousness()
@@ -338,7 +338,7 @@ func (ae *AutonomousEchoself) Stop() error {
 	// Stop all subsystems
 	ae.wakeRestManager.Stop()
 	ae.consciousness.Stop()
-	ae.echobeats.Stop()
+	// ae.echobeats.Stop() // TODO: Implement EchoBeatsThreePhase
 	
 	ae.cancel()
 	

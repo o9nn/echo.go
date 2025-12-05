@@ -31,14 +31,7 @@ type EchoDream struct {
 	running               bool
 }
 
-// EpisodicMemory represents a memory to be consolidated
-type EpisodicMemory struct {
-	ID          string
-	Timestamp   time.Time
-	Content     string
-	Importance  float64
-	Consolidated bool
-}
+// EpisodicMemory is defined in dream_cycle_integration.go
 
 // KnowledgeItem represents consolidated knowledge
 type KnowledgeItem struct {

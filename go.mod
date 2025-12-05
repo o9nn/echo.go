@@ -1,7 +1,7 @@
 module github.com/EchoCog/echollama
 
 // Deep Tree Echo - compatible with Go 1.23+
-go 1.22
+go 1.23
 
 require (
 	github.com/containerd/console v1.0.3

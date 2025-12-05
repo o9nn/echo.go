@@ -168,7 +168,8 @@ func NewConsolidationAlgorithms() *ConsolidationAlgorithms {
 }
 
 // ConsolidateMemories performs multi-algorithm memory consolidation
-func (ca *ConsolidationAlgorithms) ConsolidateMemories(traces []*MemoryTrace) (*ConsolidationResult, error) {
+// ConsolidateMemories is temporarily disabled - MemoryTrace type needs to be defined
+// func (ca *ConsolidationAlgorithms) ConsolidateMemories(traces []*MemoryTrace) (*ConsolidationResult, error) {
 	ca.mu.Lock()
 	defer ca.mu.Unlock()
 	
@@ -429,7 +430,8 @@ func NewMemoryTensorEncoder(embeddingDim int) *MemoryTensorEncoder {
 	}
 }
 
-func (mte *MemoryTensorEncoder) Encode(trace *MemoryTrace) (*EncodedMemory, error) {
+// Encode is temporarily disabled - MemoryTrace type needs to be defined
+// func (mte *MemoryTensorEncoder) Encode(trace *MemoryTrace) (*EncodedMemory, error) {
 	mte.mu.Lock()
 	defer mte.mu.Unlock()
 	

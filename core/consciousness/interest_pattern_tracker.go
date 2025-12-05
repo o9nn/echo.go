@@ -100,7 +100,7 @@ func (ipt *InterestPatternTracker) RecordInterest(category, name string, depth f
 		
 		// Update tags
 		for _, tag := range tags {
-			if !contains(score.Tags, tag) {
+			if !containsString(score.Tags, tag) {
 				score.Tags = append(score.Tags, tag)
 			}
 		}
@@ -298,13 +298,13 @@ func (ipt *InterestPatternTracker) LinkTopics(topic1, topic2 string) {
 	defer ipt.mu.Unlock()
 	
 	if score1, exists := ipt.topics[topic1]; exists {
-		if !contains(score1.RelatedTopics, topic2) {
+		if !containsString(score1.RelatedTopics, topic2) {
 			score1.RelatedTopics = append(score1.RelatedTopics, topic2)
 		}
 	}
 	
 	if score2, exists := ipt.topics[topic2]; exists {
-		if !contains(score2.RelatedTopics, topic1) {
+		if !containsString(score2.RelatedTopics, topic1) {
 			score2.RelatedTopics = append(score2.RelatedTopics, topic1)
 		}
 	}
@@ -373,7 +373,7 @@ func (ipt *InterestPatternTracker) ImportInterests(data map[string]map[string]*I
 }
 
 // Helper function to check if slice contains string
-func contains(slice []string, item string) bool {
+func containsString(slice []string, item string) bool {
 	for _, s := range slice {
 		if s == item {
 			return true

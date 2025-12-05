@@ -64,6 +64,7 @@ type EpisodicMemory struct {
 	Emotional   map[string]float64     `json:"emotional"`
 	Importance  float64                `json:"importance"`
 	Tags        []string               `json:"tags"`
+	Consolidated bool                  `json:"consolidated"`
 }
 
 // WorkingMemoryItem represents active cognitive content
@@ -518,6 +519,10 @@ func (dci *DreamCycleIntegration) GetMetrics() map[string]interface{} {
 }
 
 // Helper functions
+
+func generateDreamID() string {
+	return fmt.Sprintf("dream_%d", time.Now().UnixNano())
+}
 
 func generateWisdomID() string {
 	return fmt.Sprintf("wisdom_%d", time.Now().UnixNano())

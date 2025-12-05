@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echollama/core/deeptreeecho"
+	// "github.com/EchoCog/echollama/core/deeptreeecho" // Disabled for now
 )
 
 // CognitivePhase represents one of the three phases in the cognitive loop
@@ -44,7 +44,7 @@ type EchobeatsCycle struct {
 
 // Echobeats is the core autonomous cognitive event loop orchestrator
 type Echobeats struct {
-	Identity        *deeptreeecho.EmbodiedCognition
+	// Identity        *deeptreeecho.EmbodiedCognition // TODO: Implement EmbodiedCognition
 	CurrentCycle    *EchobeatsCycle
 	CycleHistory    []*EchobeatsCycle
 	IsRunning       bool
@@ -57,9 +57,9 @@ type Echobeats struct {
 }
 
 // NewEchobeats creates a new Echobeats instance
-func NewEchobeats(identity *deeptreeecho.EmbodiedCognition) *Echobeats {
+func NewEchobeats() *Echobeats {
 	return &Echobeats{
-		Identity:       identity,
+		// Identity:       identity, // TODO: Implement EmbodiedCognition
 		CycleHistory:   make([]*EchobeatsCycle, 0),
 		StopChan:       make(chan bool),
 		CycleInterval:  30 * time.Second, // Default 30-second cycle
@@ -282,11 +282,11 @@ func (e *Echobeats) executeExpressiveStep(ctx context.Context, cycle *EchobeatsC
 	e.InferenceCount++
 
 	// Generate a thought or action based on current state
-	thought := e.Identity.Think("What should I focus on right now?")
+	// thought := e.Identity.Think("What should I focus on right now?") // TODO: Implement EmbodiedCognition
 	step.Result = map[string]interface{}{
-		"thought":  thought,
+		"thought":  "Focusing on current cognitive state",
 		"mode":     "expressive",
-		"coherence": e.Identity.Identity.Coherence,
+		"coherence": 0.8, // Placeholder
 	}
 
 	cycle.Results[fmt.Sprintf("step_%d", step.StepNum)] = step.Result
@@ -297,11 +297,11 @@ func (e *Echobeats) executeReflectiveStep(ctx context.Context, cycle *EchobeatsC
 	e.ReflectionCount++
 
 	// Perform introspection and learning
-	status := e.Identity.GetStatus()
+	// status := e.Identity.GetStatus() // TODO: Implement EmbodiedCognition
 	step.Result = map[string]interface{}{
 		"reflection": "Analyzing patterns and consolidating learning",
 		"mode":       "reflective",
-		"status":     status,
+		"status":     "operational", // Placeholder
 	}
 
 	cycle.Results[fmt.Sprintf("step_%d", step.StepNum)] = step.Result
