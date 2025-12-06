@@ -106,8 +106,8 @@ Technical Specifications
 
   Base Template: miara_pro_en structure
   Texture Resolution: 4096x4096 (4K optimized)
-  Available Resolutions: 128, 256, 512, 1K, 2K, 4K
-  Format: PNG (web) / TGA (high-fidelity)
+  Texture Source: DeepTreeEcho_Profile_4K.png from UI/Textures
+  Source Textures Available: 128, 256, 512, 1K, 2K, 4K (PNG and TGA)
   
   Parameters:
   - Standard Live2D parameter set
