@@ -1,7 +1,7 @@
 module github.com/EchoCog/echollama
 
-// Deep Tree Echo - compatible with Go 1.23+
-go 1.23
+// Deep Tree Echo - compatible with Go 1.21+
+go 1.21
 
 require (
 	github.com/containerd/console v1.0.3
@@ -34,7 +34,7 @@ require (
 
 require (
 	github.com/mattn/go-sqlite3 v1.14.32
-	github.com/pdevine/tensor v0.0.0-20250402003834-09d804610a08
+	// github.com/pdevine/tensor v0.0.0-20250402003834-09d804610a08 // Temporarily disabled - requires Go 1.22+
 )
 
 require (
@@ -86,8 +86,8 @@ require (
 	golang.org/x/crypto v0.17.0
 	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa // indirect
 	golang.org/x/net v0.19.0 // indirect
-	golang.org/x/sys v0.31.0
-	golang.org/x/term v0.30.0
+	golang.org/x/sys v0.15.0
+	golang.org/x/term v0.15.0
 	golang.org/x/text v0.15.0
 	google.golang.org/protobuf v1.34.1
 	gopkg.in/yaml.v3 v3.0.1 // indirect
