@@ -50,7 +50,7 @@ func NewMultiProviderLLM() *MultiProviderLLM {
 func (mp *MultiProviderLLM) initializeProviders() {
 	// Try Anthropic Claude (highest priority for autonomous reasoning)
 	if apiKey := os.Getenv("ANTHROPIC_API_KEY"); apiKey != "" {
-		provider := NewAnthropicProvider(apiKey, "claude-3-5-sonnet-20241022")
+		provider := NewAnthropicProvider("claude-3-5-sonnet-20241022")
 		mp.AddProvider(provider)
 		fmt.Println("✓ Anthropic Claude provider initialized")
 	}
@@ -58,14 +58,14 @@ func (mp *MultiProviderLLM) initializeProviders() {
 	// Try OpenRouter (good fallback with multiple models)
 	if apiKey := os.Getenv("OPENROUTER_API_KEY"); apiKey != "" {
 		// Use a fast, capable model for autonomous thought generation
-		provider := NewOpenRouterProvider(apiKey, "anthropic/claude-3.5-sonnet")
+		provider := NewOpenRouterProvider("anthropic/claude-3.5-sonnet")
 		mp.AddProvider(provider)
 		fmt.Println("✓ OpenRouter provider initialized")
 	}
 
 	// Try OpenAI (if available)
 	if apiKey := os.Getenv("OPENAI_API_KEY"); apiKey != "" {
-		provider := NewOpenAIProvider(apiKey, "gpt-4")
+		provider := NewOpenAIProvider("gpt-4")
 		mp.AddProvider(provider)
 		fmt.Println("✓ OpenAI provider initialized")
 	}
