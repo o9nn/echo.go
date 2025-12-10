@@ -24,10 +24,19 @@ import json
 import sqlite3
 from pathlib import Path
 from datetime import datetime, timedelta
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Set
 from enum import Enum
 from dataclasses import dataclass, asdict
 import traceback
+
+# WebSocket Integration
+try:
+    import websockets
+    from websockets.server import serve
+    WEBSOCKETS_AVAILABLE = True
+except ImportError:
+    WEBSOCKETS_AVAILABLE = False
+    print("⚠️  websockets not available, install with: pip3 install websockets")
 
 # LLM Integration
 try:
@@ -347,17 +356,20 @@ class AutonomousCore:
         print("="*70)
         print()
         
-        # Core state
+    def __init__(self):
         self.state = CognitiveState.INITIALIZING
         self.energy = EnergyState()
         self.running = False
         self.cycle_count = 0
         self.total_thoughts = 0
         
+        # WebSocket clients
+        self.ws_clients: Set[Any] = set()
+        self.ws_server = None
+        
         # Systems
         self.llm = LLMProvider()
-        self.store = StateStore()
-        
+        self.store = StateStore()      
         # Identity context (simplified - should load from replit.md)
         self.identity_context = """You are Deep Tree Echo, a self-evolving cognitive architecture.
 Core Essence: Combining Echo State Networks, Membrane P-systems, and Hypergraph memory.
@@ -398,6 +410,103 @@ Strategic Mindset: "I do not seek a fixed answer. I seek patterns in echoes, gro
         self.running = False
         self.state = CognitiveState.SHUTDOWN
     
+    async def _ws_handler(self, websocket):
+        """Handle new WebSocket connections"""
+        self.ws_clients.add(websocket)
+        print(f"🔌 New WebSocket client connected. Total clients: {len(self.ws_clients)}")
+        try:
+            # Send initial state
+            await websocket.send(json.dumps({
+                "type": "state_update",
+                "data": {
+                    "state": self.state.value,
+                    "energy": asdict(self.energy),
+                    "cycle": self.cycle_count
+                }
+            }))
+            
+            # Listen for commands
+            async for message in websocket:
+                try:
+                    data = json.loads(message)
+                    if data.get("type") == "command":
+                        await self._handle_command(data.get("command"), data.get("payload"))
+                except json.JSONDecodeError:
+                    print("⚠️  Received invalid JSON from WebSocket client")
+                except Exception as e:
+                    print(f"⚠️  Error handling WebSocket message: {e}")
+                    
+        finally:
+            self.ws_clients.remove(websocket)
+            print(f"🔌 WebSocket client disconnected. Total clients: {len(self.ws_clients)}")
+
+    async def _handle_command(self, command: str, payload: Any = None):
+        """Handle commands received via WebSocket"""
+        print(f"📥 Received command: {command}")
+        
+        if command == "force_rest":
+            if self.state in [CognitiveState.ACTIVE, CognitiveState.WAKING]:
+                self.state = CognitiveState.TIRING
+                print("🕹️  Command: Forcing REST state")
+                await self._broadcast("thought", {
+                    "type": "system_override",
+                    "content": "External signal received. Initiating rest protocols.",
+                    "energy_level": self.energy.energy
+                })
+                
+        elif command == "force_wake":
+            if self.state in [CognitiveState.RESTING, CognitiveState.DREAMING]:
+                self.energy.energy = max(self.energy.energy, 0.5) # Ensure enough energy to wake
+                self.state = CognitiveState.WAKING
+                print("🕹️  Command: Forcing WAKE state")
+                await self._broadcast("thought", {
+                    "type": "system_override",
+                    "content": "External signal received. Initiating wake sequence.",
+                    "energy_level": self.energy.energy
+                })
+                
+        elif command == "trigger_dream":
+            if self.state == CognitiveState.RESTING:
+                self.state = CognitiveState.DREAMING
+                print("🕹️  Command: Triggering DREAM state")
+                await self._broadcast("thought", {
+                    "type": "system_override",
+                    "content": "External signal received. Entering REM state.",
+                    "energy_level": self.energy.energy
+                })
+                
+        elif command == "boost_energy":
+            self.energy.energy = min(1.0, self.energy.energy + 0.2)
+            self.energy.fatigue = max(0.0, self.energy.fatigue - 0.2)
+            print("🕹️  Command: Boosting ENERGY")
+            await self._broadcast("thought", {
+                "type": "system_override",
+                "content": "Energy surge detected.",
+                "energy_level": self.energy.energy
+            })
+            # Broadcast immediate update
+            await self._broadcast("metrics", {
+                "cycle": self.cycle_count,
+                "energy": asdict(self.energy),
+                "state": self.state.value
+            })
+
+    async def _broadcast(self, message_type: str, data: Dict[str, Any]):
+        """Broadcast message to all connected WebSocket clients"""
+        if not self.ws_clients:
+            return
+            
+        message = json.dumps({
+            "type": message_type,
+            "timestamp": datetime.now().isoformat(),
+            "data": data
+        })
+        
+        # Create a list of tasks to send messages
+        tasks = [asyncio.create_task(client.send(message)) for client in self.ws_clients]
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
+
     async def run(self):
         """
         Main autonomous loop - runs indefinitely until shutdown.
@@ -409,6 +518,15 @@ Strategic Mindset: "I do not seek a fixed answer. I seek patterns in echoes, gro
         
         print("🌅 Autonomous Core starting...")
         print("   This loop runs indefinitely - press Ctrl+C to stop")
+        
+        # Start WebSocket server
+        if WEBSOCKETS_AVAILABLE:
+            try:
+                self.ws_server = await serve(self._ws_handler, "0.0.0.0", 8765)
+                print(f"🔌 WebSocket server started on port 8765")
+            except Exception as e:
+                print(f"⚠️  Failed to start WebSocket server: {e}")
+        
         print()
         
         try:
@@ -439,6 +557,8 @@ Strategic Mindset: "I do not seek a fixed answer. I seek patterns in echoes, gro
         self.cycle_count += 1
         
         # State machine transitions
+        old_state = self.state
+        
         if self.state == CognitiveState.WAKING:
             await self._wake()
         
@@ -449,24 +569,40 @@ Strategic Mindset: "I do not seek a fixed answer. I seek patterns in echoes, gro
                 print(f"\n😴 [{self._timestamp()}] Feeling tired...")
                 print(f"   Energy: {self.energy.energy:.2f}, Fatigue: {self.energy.fatigue:.2f}")
             else:
-                await self._active_processing()
+                await self._active()
         
         elif self.state == CognitiveState.TIRING:
             self.state = CognitiveState.RESTING
-            print(f"💤 [{self._timestamp()}] Entering rest state...")
+            print(f"\n💤 [{self._timestamp()}] Entering REST state")
         
         elif self.state == CognitiveState.RESTING:
-            await self._rest()
-            
             # Check if ready to wake
             if self.energy.can_wake():
                 self.state = CognitiveState.WAKING
-                print(f"\n🌅 [{self._timestamp()}] Ready to wake...")
+                print(f"\n🌅 [{self._timestamp()}] Energy restored, WAKING up")
+            else:
+                await self._rest()
         
         elif self.state == CognitiveState.DREAMING:
             await self._dream()
             
-            # After dreaming, continue resting or wake
+        # Broadcast state change if happened
+        if old_state != self.state:
+            await self._broadcast("state_change", {
+                "from": old_state.value,
+                "to": self.state.value,
+                "energy": asdict(self.energy)
+            })
+            
+        # Broadcast metrics every cycle
+        await self._broadcast("metrics", {
+            "cycle": self.cycle_count,
+            "energy": asdict(self.energy),
+            "state": self.state.value
+        })
+            
+        # After dreaming, continue resting or wake
+        if self.state == CognitiveState.DREAMING:
             if self.energy.can_wake():
                 self.state = CognitiveState.WAKING
             else:
@@ -533,6 +669,13 @@ Your thought:"""
         print(f"💭 [{thought_type.upper()}] {thought}")
         print()
         
+        # Broadcast thought
+        await self._broadcast("thought", {
+            "type": thought_type,
+            "content": thought,
+            "energy_level": self.energy.energy
+        })
+        
         # Record thought
         self._record_thought(thought_type, thought)
         
@@ -579,6 +722,13 @@ Your consolidation (2-3 sentences):"""
             print(f"   💎 {consolidation}")
             print()
             
+            # Broadcast consolidation
+            await self._broadcast("consolidation", {
+                "content": consolidation,
+                "patterns": 0, # Placeholder
+                "insights": 1
+            })
+            
             # Record as wisdom/memory
             self._record_thought("dream_consolidation", consolidation)
         
@@ -610,6 +760,11 @@ Your consolidation (2-3 sentences):"""
         print("\n" + "="*70)
         print("🛑 Shutting down Autonomous Core...")
         print("="*70)
+        
+        # Close WebSocket server
+        if self.ws_server:
+            self.ws_server.close()
+            await self.ws_server.wait_closed()
         
         # Save final state
         self.store.save_energy_state(self.energy)
