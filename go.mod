@@ -1,9 +1,9 @@
 module github.com/EchoCog/echollama
 
 // Deep Tree Echo - compatible with Go 1.21+
-go 1.21.1
+go 1.24.0
 
-toolchain go1.21.5
+toolchain go1.24.11
 
 require (
 	github.com/containerd/console v1.0.3
@@ -14,7 +14,7 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.9.0
 	github.com/x448/float16 v0.8.4
-	golang.org/x/sync v0.5.0
+	golang.org/x/sync v0.17.0
 )
 
 require (
@@ -29,9 +29,9 @@ require (
 	// github.com/pdevine/tensor v0.0.0-20240510204454-f88f4562727c
 	github.com/supabase-community/postgrest-go v0.0.11
 	github.com/supabase-community/supabase-go v0.0.4
-	golang.org/x/image v0.16.0
-	golang.org/x/tools v0.16.1
-	gonum.org/v1/gonum v0.15.0
+	golang.org/x/image v0.25.0
+	golang.org/x/tools v0.37.0
+	gonum.org/v1/gonum v0.16.0
 )
 
 require github.com/mattn/go-sqlite3 v1.14.32
@@ -58,6 +58,8 @@ require (
 	github.com/xtgo/set v1.0.0 // indirect
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
+	google.golang.org/grpc v1.77.0 // indirect
 	gorgonia.org/vecf32 v0.9.0 // indirect
 	gorgonia.org/vecf64 v0.9.0 // indirect
 )
@@ -83,12 +85,12 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/crypto v0.17.0
+	golang.org/x/crypto v0.43.0
 	golang.org/x/exp v0.0.0-20231110203233-9a3e6036ecaa // indirect
-	golang.org/x/net v0.19.0 // indirect
-	golang.org/x/sys v0.15.0
-	golang.org/x/term v0.15.0
-	golang.org/x/text v0.15.0
-	google.golang.org/protobuf v1.34.1
+	golang.org/x/net v0.46.1-0.20251013234738-63d1a5100f82 // indirect
+	golang.org/x/sys v0.37.0
+	golang.org/x/term v0.36.0
+	golang.org/x/text v0.30.0
+	google.golang.org/protobuf v1.36.10
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
