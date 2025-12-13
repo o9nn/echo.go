@@ -1,0 +1,26 @@
+[Unit]
+Description=Deep Tree Echo Autonomous Core
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/echo9llama
+Environment="ANTHROPIC_API_KEY=your_key_here"
+Environment="OPENROUTER_API_KEY=your_key_here"
+ExecStart=/usr/bin/python3.11 /home/ubuntu/echo9llama/core/autonomous_core_v11.py
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/echo-autonomous.log
+StandardError=append:/var/log/echo-autonomous-error.log
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/ubuntu/echo9llama/data
+
+[Install]
+WantedBy=multi-user.target
