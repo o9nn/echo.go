@@ -29,8 +29,13 @@ import traceback
 import logging
 import math
 import random
-from aiohttp import web
-import aiohttp
+# aiohttp optional - only needed for web server
+try:
+    from aiohttp import web
+    import aiohttp
+    AIOHTTP_AVAILABLE = True
+except ImportError:
+    AIOHTTP_AVAILABLE = False
 
 # LLM Integration with fallback
 try:
