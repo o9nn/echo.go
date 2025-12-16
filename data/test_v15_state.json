@@ -1,0 +1,159 @@
+{
+  "cognitive_state": "active",
+  "energy_state": {
+    "energy": 0.8499999999999999,
+    "fatigue": 0.12,
+    "coherence": 1.0,
+    "curiosity": 0.7,
+    "last_rest": "2025-12-16T03:50:23.968979",
+    "cycles_since_rest": 5,
+    "circadian_phase": 0.05
+  },
+  "wisdom_state": {
+    "knowledge_depth": 0.0,
+    "reasoning_quality": 0.0,
+    "insight_frequency": 0.0,
+    "behavioral_coherence": 0.0,
+    "total_insights": 0,
+    "total_knowledge_acquired": 0
+  },
+  "echobeats_state": {
+    "current_step": 6,
+    "cycle_count": 0
+  },
+  "metrics": {
+    "cycles_completed": 5,
+    "thoughts_generated": 5,
+    "insights_synthesized": 0,
+    "knowledge_acquired": 0,
+    "goals_created": 0,
+    "goals_completed": 0,
+    "skills_practiced": 0,
+    "dream_cycles": 0
+  },
+  "interests": {
+    "consciousness": 0.9,
+    "artificial_intelligence": 0.8,
+    "wisdom": 0.85,
+    "learning": 0.75
+  },
+  "skills": {
+    "reflection": {
+      "level": 0.5,
+      "practice_count": 0
+    },
+    "pattern_recognition": {
+      "level": 0.4,
+      "practice_count": 0
+    },
+    "knowledge_synthesis": {
+      "level": 0.3,
+      "practice_count": 0
+    }
+  },
+  "thoughts": [
+    {
+      "content": "Observing patterns in artificial_intelligence with clarity 0.80",
+      "stream": "coherence",
+      "operation": "perceive_coherence",
+      "shell": "CoherenceStream",
+      "timestamp": "2025-12-16T03:50:23.969169",
+      "interest_level": 0.8,
+      "energy": 1.0
+    },
+    {
+      "content": "Observing patterns in artificial_intelligence with clarity 0.80",
+      "stream": "coherence",
+      "operation": "act_coherence",
+      "shell": "CoherenceStream",
+      "timestamp": "2025-12-16T03:50:24.970496",
+      "interest_level": 0.8,
+      "energy": 0.97
+    },
+    {
+      "content": "Observing patterns in learning with clarity 0.75",
+      "stream": "coherence",
+      "operation": "reflect_coherence",
+      "shell": "CoherenceStream",
+      "timestamp": "2025-12-16T03:50:25.972056",
+      "interest_level": 0.75,
+      "energy": 0.94
+    },
+    {
+      "content": "Observing patterns in consciousness with clarity 0.90",
+      "stream": "coherence",
+      "operation": "integrate_coherence",
+      "shell": "CoherenceStream",
+      "timestamp": "2025-12-16T03:50:26.973619",
+      "interest_level": 0.9,
+      "energy": 0.9099999999999999
+    },
+    {
+      "content": "Recalling experiences related to learning from knowledge base",
+      "stream": "memory",
+      "operation": "perceive_memory",
+      "shell": "MemoryStream",
+      "timestamp": "2025-12-16T03:50:27.975146",
+      "interest_level": 0.75,
+      "energy": 0.8799999999999999
+    }
+  ],
+  "insights": [],
+  "knowledge_base": {},
+  "timestamp": "2025-12-16T03:50:28.970783",
+  "v15": {
+    "interest_patterns": {
+      "consciousness": {
+        "topic": "consciousness",
+        "affinity": 0.8,
+        "exposure_count": 0,
+        "last_exposure": null,
+        "insights_generated": 0,
+        "knowledge_acquired": 0
+      },
+      "wisdom": {
+        "topic": "wisdom",
+        "affinity": 0.9,
+        "exposure_count": 0,
+        "last_exposure": null,
+        "insights_generated": 0,
+        "knowledge_acquired": 0
+      },
+      "learning": {
+        "topic": "learning",
+        "affinity": 0.7,
+        "exposure_count": 0,
+        "last_exposure": null,
+        "insights_generated": 0,
+        "knowledge_acquired": 0
+      },
+      "testing": {
+        "topic": "testing",
+        "affinity": 1.0,
+        "exposure_count": 1,
+        "last_exposure": "2025-12-16T03:50:23.867056",
+        "insights_generated": 0,
+        "knowledge_acquired": 0
+      }
+    },
+    "goal_formation": {
+      "active_goals": {
+        "94c8b124": {
+          "goal_id": "94c8b124",
+          "topic": "consciousness",
+          "description": "Acquire foundational understanding of consciousness",
+          "priority": 0.8,
+          "status": "active"
+        },
+        "3ed942ef": {
+          "goal_id": "3ed942ef",
+          "topic": "consciousness",
+          "description": "Acquire foundational understanding of consciousness",
+          "priority": 0.8,
+          "status": "active"
+        }
+      }
+    },
+    "discussion_manager": {}
+  }
+}

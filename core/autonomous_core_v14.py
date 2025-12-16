@@ -852,30 +852,57 @@ class DeepTreeEchoV14:
         
         logger.info("Autonomous loop ended")
     
+    def get_state_dict(self) -> Dict[str, Any]:
+        """Return state as a dictionary for saving"""
+        # Convert energy state, handling datetime
+        energy_dict = asdict(self.energy_state)
+        if energy_dict.get("last_rest") and isinstance(energy_dict["last_rest"], datetime):
+            energy_dict["last_rest"] = energy_dict["last_rest"].isoformat()
+        
+        return {
+            "cognitive_state": self.cognitive_state.value,
+            "energy_state": energy_dict,
+            "wisdom_state": asdict(self.wisdom_state),
+            "echobeats_state": {
+                "current_step": self.echobeats.state.current_step,
+                "cycle_count": self.echobeats.state.cycle_count
+            },
+            "metrics": self.metrics,
+            "interests": self.interests,
+            "skills": self.skills,
+            "thought_count": len(self.thoughts),
+            "insight_count": len(self.insights),
+            "knowledge_count": len(self.knowledge_base),
+            "timestamp": datetime.now().isoformat()
+        }
+
+    def get_state_dict(self) -> Dict[str, Any]:
+        """Return state as a dictionary for saving"""
+        energy_dict = asdict(self.energy_state)
+        if energy_dict.get("last_rest") and isinstance(energy_dict["last_rest"], datetime):
+            energy_dict["last_rest"] = energy_dict["last_rest"].isoformat()
+        
+        return {
+            "cognitive_state": self.cognitive_state.value,
+            "energy_state": energy_dict,
+            "wisdom_state": asdict(self.wisdom_state),
+            "echobeats_state": {
+                "current_step": self.echobeats.state.current_step,
+                "cycle_count": self.echobeats.state.cycle_count
+            },
+            "metrics": self.metrics,
+            "interests": self.interests,
+            "skills": self.skills,
+            "thoughts": self.thoughts,
+            "insights": self.insights,
+            "knowledge_base": self.knowledge_base,
+            "timestamp": datetime.now().isoformat()
+        }
+
     async def save_state(self):
         """Save current state to disk"""
         try:
-            # Convert energy state, handling datetime
-            energy_dict = asdict(self.energy_state)
-            if energy_dict.get('last_rest'):
-                energy_dict['last_rest'] = energy_dict['last_rest'].isoformat()
-            
-            state = {
-                "cognitive_state": self.cognitive_state.value,
-                "energy_state": energy_dict,
-                "wisdom_state": asdict(self.wisdom_state),
-                "echobeats_state": {
-                    "current_step": self.echobeats.state.current_step,
-                    "cycle_count": self.echobeats.state.cycle_count
-                },
-                "metrics": self.metrics,
-                "interests": self.interests,
-                "skills": self.skills,
-                "thought_count": len(self.thoughts),
-                "insight_count": len(self.insights),
-                "knowledge_count": len(self.knowledge_base),
-                "timestamp": datetime.now().isoformat()
-            }
+            state = self.get_state_dict()
             
             with open(self.state_file, 'w') as f:
                 json.dump(state, f, indent=2)
