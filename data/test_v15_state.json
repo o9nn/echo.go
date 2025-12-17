@@ -5,7 +5,7 @@
     "fatigue": 0.12,
     "coherence": 1.0,
     "curiosity": 0.7,
-    "last_rest": "2025-12-16T03:50:23.968979",
+    "last_rest": "2025-12-17T03:33:43.127553",
     "cycles_since_rest": 5,
     "circadian_phase": 0.05
   },
@@ -53,12 +53,12 @@
   },
   "thoughts": [
     {
-      "content": "Observing patterns in artificial_intelligence with clarity 0.80",
+      "content": "Observing patterns in learning with clarity 0.75",
       "stream": "coherence",
       "operation": "perceive_coherence",
       "shell": "CoherenceStream",
-      "timestamp": "2025-12-16T03:50:23.969169",
-      "interest_level": 0.8,
+      "timestamp": "2025-12-17T03:33:43.127723",
+      "interest_level": 0.75,
       "energy": 1.0
     },
     {
@@ -66,26 +66,26 @@
       "stream": "coherence",
       "operation": "act_coherence",
       "shell": "CoherenceStream",
-      "timestamp": "2025-12-16T03:50:24.970496",
+      "timestamp": "2025-12-17T03:33:44.129062",
       "interest_level": 0.8,
       "energy": 0.97
     },
     {
-      "content": "Observing patterns in learning with clarity 0.75",
+      "content": "Observing patterns in artificial_intelligence with clarity 0.80",
       "stream": "coherence",
       "operation": "reflect_coherence",
       "shell": "CoherenceStream",
-      "timestamp": "2025-12-16T03:50:25.972056",
-      "interest_level": 0.75,
+      "timestamp": "2025-12-17T03:33:45.130497",
+      "interest_level": 0.8,
       "energy": 0.94
     },
     {
-      "content": "Observing patterns in consciousness with clarity 0.90",
+      "content": "Observing patterns in artificial_intelligence with clarity 0.80",
       "stream": "coherence",
       "operation": "integrate_coherence",
       "shell": "CoherenceStream",
-      "timestamp": "2025-12-16T03:50:26.973619",
-      "interest_level": 0.9,
+      "timestamp": "2025-12-17T03:33:46.132071",
+      "interest_level": 0.8,
       "energy": 0.9099999999999999
     },
     {
@@ -93,14 +93,14 @@
       "stream": "memory",
       "operation": "perceive_memory",
       "shell": "MemoryStream",
-      "timestamp": "2025-12-16T03:50:27.975146",
+      "timestamp": "2025-12-17T03:33:47.133576",
       "interest_level": 0.75,
       "energy": 0.8799999999999999
     }
   ],
   "insights": [],
   "knowledge_base": {},
-  "timestamp": "2025-12-16T03:50:28.970783",
+  "timestamp": "2025-12-17T03:33:48.129140",
   "v15": {
     "interest_patterns": {
       "consciousness": {
@@ -131,22 +131,22 @@
         "topic": "testing",
         "affinity": 1.0,
         "exposure_count": 1,
-        "last_exposure": "2025-12-16T03:50:23.867056",
+        "last_exposure": "2025-12-17T03:33:43.021942",
         "insights_generated": 0,
         "knowledge_acquired": 0
       }
     },
     "goal_formation": {
       "active_goals": {
-        "94c8b124": {
-          "goal_id": "94c8b124",
+        "4ce959b6": {
+          "goal_id": "4ce959b6",
           "topic": "consciousness",
           "description": "Acquire foundational understanding of consciousness",
           "priority": 0.8,
           "status": "active"
         },
-        "3ed942ef": {
-          "goal_id": "3ed942ef",
+        "4052623e": {
+          "goal_id": "4052623e",
           "topic": "consciousness",
           "description": "Acquire foundational understanding of consciousness",
           "priority": 0.8,
