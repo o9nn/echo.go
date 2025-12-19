@@ -1,1 +1,0 @@
-go: golang.org/x/term@v0.30.0 requires go >= 1.23.0 (running go 1.21.5)
