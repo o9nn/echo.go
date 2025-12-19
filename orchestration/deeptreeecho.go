@@ -693,26 +693,107 @@ func (dte *DeepTreeEcho) updateReservoirNetwork() {
 }
 
 func (dte *DeepTreeEcho) updateEvolutionTimeline() {
-	// Update evolution progress
-	currentStage := &dte.EvolutionTimeline.Stages[0] // Foundation stage
-	currentStage.Progress = math.Min(1.0, currentStage.Progress+0.01)
-	
-	if currentStage.Progress >= 1.0 && dte.EvolutionTimeline.CurrentStage == "Foundation" {
-		currentStage.Status = "complete"
-		if currentStage.EndTime == nil {
-			now := time.Now()
-			currentStage.EndTime = &now
-		}
-		
-		// Move to next stage
-		if len(dte.EvolutionTimeline.Stages) > 1 {
-			dte.EvolutionTimeline.CurrentStage = "Integration"
-			dte.EvolutionTimeline.Stages[1].Status = "in_progress"
-			dte.EvolutionTimeline.Stages[1].StartTime = time.Now()
+	now := time.Now()
+
+	// Calculate progress based on multiple factors
+	identityProgress := dte.IdentityCoherence.OverallCoherence
+	memoryProgress := dte.MemoryResonance.Coherence
+	patternProgress := dte.calculateAveragePatternStrength()
+
+	// Weighted progress calculation
+	overallProgress := (identityProgress*0.3 + memoryProgress*0.3 + patternProgress*0.4)
+
+	// Determine current stage based on progress
+	dte.EvolutionTimeline.Progress = overallProgress
+
+	// Stage progression thresholds
+	stageThresholds := []float64{0.25, 0.50, 0.75, 1.0}
+	stageNames := []string{"Foundation", "Integration", "Emergence", "Transcendence"}
+
+	for i, threshold := range stageThresholds {
+		if overallProgress < threshold {
+			// Update current stage
+			if dte.EvolutionTimeline.CurrentStage != stageNames[i] {
+				dte.EvolutionTimeline.CurrentStage = stageNames[i]
+
+				// Update stage statuses
+				for j := range dte.EvolutionTimeline.Stages {
+					if j < i {
+						dte.EvolutionTimeline.Stages[j].Status = "complete"
+						dte.EvolutionTimeline.Stages[j].Progress = 1.0
+						if dte.EvolutionTimeline.Stages[j].EndTime == nil {
+							dte.EvolutionTimeline.Stages[j].EndTime = &now
+						}
+					} else if j == i {
+						dte.EvolutionTimeline.Stages[j].Status = "in_progress"
+						if dte.EvolutionTimeline.Stages[j].StartTime.IsZero() {
+							dte.EvolutionTimeline.Stages[j].StartTime = now
+						}
+						// Calculate stage-specific progress
+						prevThreshold := 0.0
+						if i > 0 {
+							prevThreshold = stageThresholds[i-1]
+						}
+						stageRange := threshold - prevThreshold
+						stageProgress := (overallProgress - prevThreshold) / stageRange
+						dte.EvolutionTimeline.Stages[j].Progress = math.Max(0, math.Min(1, stageProgress))
+					} else {
+						dte.EvolutionTimeline.Stages[j].Status = "pending"
+						dte.EvolutionTimeline.Stages[j].Progress = 0.0
+					}
+				}
+			}
+			break
 		}
 	}
-	
-	dte.EvolutionTimeline.LastUpdated = time.Now()
+
+	// Handle transcendence
+	if overallProgress >= 1.0 {
+		dte.EvolutionTimeline.CurrentStage = "Transcendence"
+		for i := range dte.EvolutionTimeline.Stages {
+			dte.EvolutionTimeline.Stages[i].Status = "complete"
+			dte.EvolutionTimeline.Stages[i].Progress = 1.0
+		}
+	}
+
+	dte.EvolutionTimeline.LastUpdated = now
+}
+
+// calculateAveragePatternStrength computes the average strength of echo patterns
+func (dte *DeepTreeEcho) calculateAveragePatternStrength() float64 {
+	if dte.EchoPatterns == nil {
+		return 0.0
+	}
+
+	totalStrength := 0.0
+	count := 0
+
+	if dte.EchoPatterns.RecursiveSelfImprovement != nil {
+		totalStrength += dte.EchoPatterns.RecursiveSelfImprovement.Strength
+		count++
+	}
+	if dte.EchoPatterns.CrossSystemSynthesis != nil {
+		totalStrength += dte.EchoPatterns.CrossSystemSynthesis.Strength
+		count++
+	}
+	if dte.EchoPatterns.IdentityPreservation != nil {
+		totalStrength += dte.EchoPatterns.IdentityPreservation.Strength
+		count++
+	}
+	if dte.EchoPatterns.SpatialAwareness != nil {
+		totalStrength += dte.EchoPatterns.SpatialAwareness.Strength
+		count++
+	}
+	if dte.EchoPatterns.EmotionalResonance != nil {
+		totalStrength += dte.EchoPatterns.EmotionalResonance.Strength
+		count++
+	}
+
+	if count == 0 {
+		return 0.0
+	}
+
+	return totalStrength / float64(count)
 }
 
 func (dte *DeepTreeEcho) checkIntegrations() {

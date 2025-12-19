@@ -14,24 +14,43 @@ type EchodreamKnowledgeIntegration struct {
 	mu              sync.RWMutex
 	ctx             context.Context
 	cancel          context.CancelFunc
-	
+
 	// LLM provider for knowledge processing
 	llmProvider     llm.LLMProvider
-	
+
 	// Knowledge structures
 	episodicMemories    []EpisodicMemory
 	consolidatedPatterns []Pattern
 	wisdomInsights      []WisdomInsight
-	
+
+	// Semantic memory network
+	semanticNetwork     map[string]*SemanticNode
+	patternLinks        []PatternLink
+
+	// Wisdom depth tracking
+	wisdomDepth         float64
+	wisdomGrowthRate    float64
+	maxWisdomDepth      float64
+
+	// Dream cycle state
+	dreamCycleActive    bool
+	dreamIntensity      float64
+	dreamPhase          DreamPhase
+
 	// Consolidation state
 	lastConsolidation   time.Time
 	consolidationCount  uint64
-	
+
+	// Cross-pattern emergence
+	emergentConcepts    []EmergentConcept
+
 	// Metrics
 	totalMemoriesProcessed uint64
 	totalPatternsExtracted uint64
 	totalWisdomGenerated   uint64
-	
+	semanticNodesCreated   uint64
+	emergenceEvents        uint64
+
 	// Running state
 	running         bool
 }
@@ -59,18 +78,66 @@ type Pattern struct {
 
 // WisdomInsight represents wisdom extracted from patterns
 type WisdomInsight struct {
-	ID          string
-	Insight     string
-	Source      []string  // Pattern IDs
-	Depth       float64
+	ID            string
+	Insight       string
+	Source        []string  // Pattern IDs
+	Depth         float64
 	Applicability float64
+	CreatedAt     time.Time
+}
+
+// SemanticNode represents a node in the semantic memory network
+type SemanticNode struct {
+	ID          string
+	Concept     string
+	Activation  float64
+	Connections []string  // IDs of connected nodes
+	Strength    float64
+	CreatedAt   time.Time
+	LastAccess  time.Time
+	AccessCount int
+}
+
+// PatternLink represents a link between patterns
+type PatternLink struct {
+	ID          string
+	FromPattern string
+	ToPattern   string
+	LinkType    string   // "causal", "temporal", "semantic", "contrast"
+	Strength    float64
+	CreatedAt   time.Time
+}
+
+// DreamPhase represents the phases of a dream cycle
+type DreamPhase int
+
+const (
+	PhaseREM DreamPhase = iota    // Active pattern processing
+	PhaseNREM1                     // Light consolidation
+	PhaseNREM2                     // Intermediate consolidation
+	PhaseNREM3                     // Deep consolidation
+	PhaseWaking                    // Transition to wakefulness
+)
+
+func (dp DreamPhase) String() string {
+	return [...]string{"REM", "NREM1", "NREM2", "NREM3", "Waking"}[dp]
+}
+
+// EmergentConcept represents a concept that emerged from pattern combination
+type EmergentConcept struct {
+	ID          string
+	Concept     string
+	SourcePatterns []string
+	EmergenceStrength float64
+	Novelty     float64
+	Utility     float64
 	CreatedAt   time.Time
 }
 
 // NewEchodreamKnowledgeIntegration creates a new knowledge integration system
 func NewEchodreamKnowledgeIntegration(llmProvider llm.LLMProvider) *EchodreamKnowledgeIntegration {
 	ctx, cancel := context.WithCancel(context.Background())
-	
+
 	return &EchodreamKnowledgeIntegration{
 		ctx:                  ctx,
 		cancel:               cancel,
@@ -78,6 +145,14 @@ func NewEchodreamKnowledgeIntegration(llmProvider llm.LLMProvider) *EchodreamKno
 		episodicMemories:     make([]EpisodicMemory, 0),
 		consolidatedPatterns: make([]Pattern, 0),
 		wisdomInsights:       make([]WisdomInsight, 0),
+		semanticNetwork:      make(map[string]*SemanticNode),
+		patternLinks:         make([]PatternLink, 0),
+		emergentConcepts:     make([]EmergentConcept, 0),
+		wisdomDepth:          0.0,
+		wisdomGrowthRate:     0.05,
+		maxWisdomDepth:       1.0,
+		dreamPhase:           PhaseWaking,
+		dreamIntensity:       0.0,
 	}
 }
 
@@ -313,7 +388,7 @@ func (edi *EchodreamKnowledgeIntegration) GetPatterns() []Pattern {
 func (edi *EchodreamKnowledgeIntegration) GetMetrics() map[string]interface{} {
 	edi.mu.RLock()
 	defer edi.mu.RUnlock()
-	
+
 	return map[string]interface{}{
 		"total_memories":         len(edi.episodicMemories),
 		"total_patterns":         len(edi.consolidatedPatterns),
@@ -323,6 +398,286 @@ func (edi *EchodreamKnowledgeIntegration) GetMetrics() map[string]interface{} {
 		"memories_processed":     edi.totalMemoriesProcessed,
 		"patterns_extracted":     edi.totalPatternsExtracted,
 		"wisdom_generated":       edi.totalWisdomGenerated,
+		"semantic_nodes":         len(edi.semanticNetwork),
+		"pattern_links":          len(edi.patternLinks),
+		"emergent_concepts":      len(edi.emergentConcepts),
+		"wisdom_depth":           edi.wisdomDepth,
+		"dream_phase":            edi.dreamPhase.String(),
+		"dream_intensity":        edi.dreamIntensity,
 	}
+}
+
+// StartDreamCycle initiates an autonomous dream cycle
+func (edi *EchodreamKnowledgeIntegration) StartDreamCycle() error {
+	edi.mu.Lock()
+	defer edi.mu.Unlock()
+
+	if edi.dreamCycleActive {
+		return fmt.Errorf("dream cycle already active")
+	}
+
+	edi.dreamCycleActive = true
+	edi.dreamPhase = PhaseNREM1
+	edi.dreamIntensity = 0.3
+
+	fmt.Println("🌙 Starting dream cycle...")
+
+	go edi.runDreamCycle()
+
+	return nil
+}
+
+// runDreamCycle executes the autonomous dream cycle
+func (edi *EchodreamKnowledgeIntegration) runDreamCycle() {
+	phases := []DreamPhase{PhaseNREM1, PhaseNREM2, PhaseNREM3, PhaseREM}
+	intensities := []float64{0.3, 0.5, 0.8, 1.0}
+
+	for i, phase := range phases {
+		select {
+		case <-edi.ctx.Done():
+			return
+		default:
+			edi.mu.Lock()
+			edi.dreamPhase = phase
+			edi.dreamIntensity = intensities[i]
+			edi.mu.Unlock()
+
+			fmt.Printf("   🌙 Dream phase: %s (intensity: %.1f)\n", phase.String(), intensities[i])
+
+			// Process based on phase
+			switch phase {
+			case PhaseNREM1:
+				edi.lightConsolidation()
+			case PhaseNREM2:
+				edi.intermediateConsolidation()
+			case PhaseNREM3:
+				edi.deepConsolidation()
+			case PhaseREM:
+				edi.activePatternProcessing()
+			}
+
+			time.Sleep(2 * time.Second)
+		}
+	}
+
+	// Transition to waking
+	edi.mu.Lock()
+	edi.dreamPhase = PhaseWaking
+	edi.dreamIntensity = 0.0
+	edi.dreamCycleActive = false
+	edi.mu.Unlock()
+
+	fmt.Println("   🌅 Dream cycle complete - transitioning to wakefulness")
+}
+
+// lightConsolidation performs light memory consolidation
+func (edi *EchodreamKnowledgeIntegration) lightConsolidation() {
+	edi.mu.Lock()
+	defer edi.mu.Unlock()
+
+	// Decay weak memories slightly
+	for i := range edi.episodicMemories {
+		if edi.episodicMemories[i].Importance < 0.3 {
+			edi.episodicMemories[i].Importance *= 0.95
+		}
+	}
+}
+
+// intermediateConsolidation performs intermediate memory consolidation
+func (edi *EchodreamKnowledgeIntegration) intermediateConsolidation() {
+	edi.mu.Lock()
+	defer edi.mu.Unlock()
+
+	// Strengthen moderate importance memories
+	for i := range edi.episodicMemories {
+		if edi.episodicMemories[i].Importance >= 0.5 && edi.episodicMemories[i].Importance < 0.8 {
+			edi.episodicMemories[i].Importance *= 1.05
+			if edi.episodicMemories[i].Importance > 1.0 {
+				edi.episodicMemories[i].Importance = 1.0
+			}
+		}
+	}
+}
+
+// deepConsolidation performs deep memory consolidation
+func (edi *EchodreamKnowledgeIntegration) deepConsolidation() {
+	edi.mu.Lock()
+	defer edi.mu.Unlock()
+
+	// Build semantic connections for high-importance memories
+	for _, mem := range edi.episodicMemories {
+		if mem.Importance >= 0.7 && !mem.Consolidated {
+			edi.createSemanticNode(mem)
+		}
+	}
+}
+
+// activePatternProcessing performs REM-like active pattern processing
+func (edi *EchodreamKnowledgeIntegration) activePatternProcessing() {
+	edi.mu.Lock()
+	defer edi.mu.Unlock()
+
+	// Link patterns and detect emergence
+	edi.linkPatterns()
+	edi.detectEmergence()
+
+	// Grow wisdom depth
+	if len(edi.wisdomInsights) > 0 {
+		edi.wisdomDepth += edi.wisdomGrowthRate
+		if edi.wisdomDepth > edi.maxWisdomDepth {
+			edi.wisdomDepth = edi.maxWisdomDepth
+		}
+	}
+}
+
+// createSemanticNode creates a semantic node from a memory
+func (edi *EchodreamKnowledgeIntegration) createSemanticNode(mem EpisodicMemory) {
+	nodeID := fmt.Sprintf("sem_%s", mem.ID)
+
+	if _, exists := edi.semanticNetwork[nodeID]; !exists {
+		node := &SemanticNode{
+			ID:          nodeID,
+			Concept:     mem.Content,
+			Activation:  mem.Importance,
+			Connections: make([]string, 0),
+			Strength:    mem.Importance,
+			CreatedAt:   time.Now(),
+			LastAccess:  time.Now(),
+			AccessCount: 1,
+		}
+		edi.semanticNetwork[nodeID] = node
+		edi.semanticNodesCreated++
+	}
+}
+
+// linkPatterns creates links between related patterns
+func (edi *EchodreamKnowledgeIntegration) linkPatterns() {
+	// Link patterns based on temporal proximity and strength
+	for i := 0; i < len(edi.consolidatedPatterns)-1; i++ {
+		for j := i + 1; j < len(edi.consolidatedPatterns); j++ {
+			p1 := edi.consolidatedPatterns[i]
+			p2 := edi.consolidatedPatterns[j]
+
+			// Calculate similarity based on time proximity
+			timeDiff := p2.CreatedAt.Sub(p1.CreatedAt)
+			if timeDiff < 24*time.Hour {
+				strength := (p1.Strength + p2.Strength) / 2.0 * (1.0 - float64(timeDiff.Hours())/24.0)
+
+				if strength > 0.5 {
+					link := PatternLink{
+						ID:          fmt.Sprintf("link_%d", time.Now().UnixNano()),
+						FromPattern: p1.ID,
+						ToPattern:   p2.ID,
+						LinkType:    "temporal",
+						Strength:    strength,
+						CreatedAt:   time.Now(),
+					}
+					edi.patternLinks = append(edi.patternLinks, link)
+				}
+			}
+		}
+	}
+}
+
+// detectEmergence identifies emergent concepts from pattern combinations
+func (edi *EchodreamKnowledgeIntegration) detectEmergence() {
+	// Look for strongly linked patterns
+	linkStrengths := make(map[string]float64)
+	for _, link := range edi.patternLinks {
+		if link.Strength > 0.7 {
+			key := link.FromPattern + "_" + link.ToPattern
+			linkStrengths[key] = link.Strength
+		}
+	}
+
+	// Create emergent concepts from strong links
+	for key, strength := range linkStrengths {
+		// Check if we already have this concept
+		exists := false
+		for _, ec := range edi.emergentConcepts {
+			if ec.ID == "em_"+key {
+				exists = true
+				break
+			}
+		}
+
+		if !exists {
+			emergent := EmergentConcept{
+				ID:               "em_" + key,
+				Concept:          fmt.Sprintf("Emergent concept from pattern combination"),
+				SourcePatterns:   []string{key},
+				EmergenceStrength: strength,
+				Novelty:          0.7,
+				Utility:          0.6,
+				CreatedAt:        time.Now(),
+			}
+			edi.emergentConcepts = append(edi.emergentConcepts, emergent)
+			edi.emergenceEvents++
+			fmt.Printf("   ✨ Emergence detected: strength %.2f\n", strength)
+		}
+	}
+}
+
+// GetWisdomDepth returns the current wisdom depth
+func (edi *EchodreamKnowledgeIntegration) GetWisdomDepth() float64 {
+	edi.mu.RLock()
+	defer edi.mu.RUnlock()
+	return edi.wisdomDepth
+}
+
+// GetSemanticNetwork returns the semantic network
+func (edi *EchodreamKnowledgeIntegration) GetSemanticNetwork() map[string]*SemanticNode {
+	edi.mu.RLock()
+	defer edi.mu.RUnlock()
+
+	// Return a copy
+	network := make(map[string]*SemanticNode)
+	for k, v := range edi.semanticNetwork {
+		network[k] = v
+	}
+	return network
+}
+
+// GetEmergentConcepts returns emergent concepts
+func (edi *EchodreamKnowledgeIntegration) GetEmergentConcepts() []EmergentConcept {
+	edi.mu.RLock()
+	defer edi.mu.RUnlock()
+
+	concepts := make([]EmergentConcept, len(edi.emergentConcepts))
+	copy(concepts, edi.emergentConcepts)
+	return concepts
+}
+
+// GetDreamPhase returns the current dream phase
+func (edi *EchodreamKnowledgeIntegration) GetDreamPhase() DreamPhase {
+	edi.mu.RLock()
+	defer edi.mu.RUnlock()
+	return edi.dreamPhase
+}
+
+// IsDreaming returns whether a dream cycle is active
+func (edi *EchodreamKnowledgeIntegration) IsDreaming() bool {
+	edi.mu.RLock()
+	defer edi.mu.RUnlock()
+	return edi.dreamCycleActive
+}
+
+// AddMemory adds an episodic memory to the integration system
+func (edi *EchodreamKnowledgeIntegration) AddMemory(content string, importance float64, tags []string) string {
+	edi.mu.Lock()
+	defer edi.mu.Unlock()
+
+	mem := EpisodicMemory{
+		ID:          fmt.Sprintf("mem_%d", time.Now().UnixNano()),
+		Content:     content,
+		Timestamp:   time.Now(),
+		Emotional:   0.5,
+		Importance:  importance,
+		Tags:        tags,
+		Consolidated: false,
+	}
+
+	edi.episodicMemories = append(edi.episodicMemories, mem)
+	return mem.ID
 }
 
