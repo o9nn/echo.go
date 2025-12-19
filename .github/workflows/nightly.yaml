@@ -1,0 +1,291 @@
+name: Nightly - Deep Integration Tests
+
+on:
+  schedule:
+    # Run at 2 AM UTC every day
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+env:
+  GO_VERSION: '1.24'
+  CGO_ENABLED: '1'
+
+jobs:
+  # ============================================================================
+  # Full Cognitive Loop Tests
+  # ============================================================================
+  cognitive-loop-tests:
+    name: Full Cognitive Loop Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    services:
+      dgraph-zero:
+        image: dgraph/dgraph:latest
+        ports:
+          - 5080:5080
+          - 6080:6080
+      dgraph-alpha:
+        image: dgraph/dgraph:latest
+        ports:
+          - 8080:8080
+          - 9080:9080
+    env:
+      DGRAPH_ENDPOINT: localhost:9080
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Wait for services
+        run: |
+          timeout 120 bash -c 'until curl -s http://localhost:8080/health; do sleep 2; done'
+
+      - name: Run full cognitive loop tests
+        run: |
+          go test -v -timeout 30m -tags=nightly \
+            -coverprofile=coverage-nightly.out \
+            ./test/integration/... \
+            ./test/e2e/...
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage-nightly.out
+          flags: nightly-tests
+          name: nightly
+
+  # ============================================================================
+  # LLM Provider Tests
+  # ============================================================================
+  llm-provider-tests:
+    name: LLM Provider Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Run LLM provider tests
+        run: |
+          go test -v -timeout 20m -tags=llm \
+            ./test/integration/llm_provider_test.go
+
+  # ============================================================================
+  # Memory Persistence Tests
+  # ============================================================================
+  memory-persistence-tests:
+    name: Memory Persistence Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    services:
+      dgraph-zero:
+        image: dgraph/dgraph:latest
+        ports:
+          - 5080:5080
+          - 6080:6080
+      dgraph-alpha:
+        image: dgraph/dgraph:latest
+        ports:
+          - 8080:8080
+          - 9080:9080
+    env:
+      DGRAPH_ENDPOINT: localhost:9080
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Wait for Dgraph
+        run: |
+          timeout 120 bash -c 'until curl -s http://localhost:8080/health; do sleep 2; done'
+
+      - name: Apply schema
+        run: |
+          curl -X POST http://localhost:8080/alter -d @core/memory/schema.dql
+
+      - name: Run memory persistence tests
+        run: |
+          go test -v -timeout 30m -tags=persistence \
+            ./core/memory/... \
+            ./core/persistence/...
+
+  # ============================================================================
+  # Extended Benchmarks
+  # ============================================================================
+  extended-benchmarks:
+    name: Extended Benchmarks
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Run extended benchmarks
+        run: |
+          go test -v -bench=. -benchmem -benchtime=10s -run=^$ \
+            ./core/memory/... \
+            ./core/echobeats/... \
+            ./test/integration/... \
+            | tee benchmark-nightly.txt
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-nightly
+          path: benchmark-nightly.txt
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'go'
+          output-file-path: benchmark-nightly.txt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          alert-threshold: '150%'
+          comment-on-alert: true
+          fail-on-alert: false
+
+  # ============================================================================
+  # Stress Tests
+  # ============================================================================
+  stress-tests:
+    name: Stress Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    services:
+      dgraph-zero:
+        image: dgraph/dgraph:latest
+        ports:
+          - 5080:5080
+          - 6080:6080
+      dgraph-alpha:
+        image: dgraph/dgraph:latest
+        ports:
+          - 8080:8080
+          - 9080:9080
+    env:
+      DGRAPH_ENDPOINT: localhost:9080
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Wait for services
+        run: |
+          timeout 120 bash -c 'until curl -s http://localhost:8080/health; do sleep 2; done'
+
+      - name: Build server
+        run: |
+          go build -o echoself ./cmd/autonomous/
+
+      - name: Run stress tests
+        run: |
+          ./echoself &
+          SERVER_PID=$!
+          sleep 10
+
+          # Run concurrent requests
+          for i in {1..100}; do
+            curl -s http://localhost:8081/health &
+          done
+          wait
+
+          # Run sustained load test
+          go test -v -timeout 60m -tags=stress \
+            -run TestStress \
+            ./test/e2e/...
+
+          kill $SERVER_PID || true
+
+  # ============================================================================
+  # Chaos Tests
+  # ============================================================================
+  chaos-tests:
+    name: Chaos Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Run chaos tests
+        run: |
+          # Test graceful degradation
+          go test -v -timeout 30m -tags=chaos \
+            -run TestChaos \
+            ./test/e2e/...
+
+  # ============================================================================
+  # Nightly Summary
+  # ============================================================================
+  nightly-summary:
+    name: Nightly Summary
+    runs-on: ubuntu-latest
+    needs: [cognitive-loop-tests, llm-provider-tests, memory-persistence-tests, extended-benchmarks, stress-tests, chaos-tests]
+    if: always()
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## Nightly Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Run Date: $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Cognitive Loop | ${{ needs.cognitive-loop-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| LLM Providers | ${{ needs.llm-provider-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Memory Persistence | ${{ needs.memory-persistence-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Extended Benchmarks | ${{ needs.extended-benchmarks.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Stress Tests | ${{ needs.stress-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Chaos Tests | ${{ needs.chaos-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Nightly tests failed on ${new Date().toISOString().split('T')[0]}`,
+              body: `The nightly test suite has failed. Please investigate.\n\nRun: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
+              labels: ['bug', 'ci-failure']
+            })
