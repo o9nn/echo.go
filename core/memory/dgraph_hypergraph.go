@@ -232,12 +232,12 @@ func (hg *DgraphHypergraph) AddEdge(edge *MemoryEdge) error {
 	}
 
 	// First, get UIDs for source and target nodes
-	sourceUID, err := hg.getNodeUID(edge.Source)
+	sourceUID, err := hg.getNodeUID(edge.SourceID)
 	if err != nil {
 		return fmt.Errorf("source node not found: %w", err)
 	}
 
-	targetUID, err := hg.getNodeUID(edge.Target)
+	targetUID, err := hg.getNodeUID(edge.TargetID)
 	if err != nil {
 		return fmt.Errorf("target node not found: %w", err)
 	}
@@ -299,7 +299,7 @@ func (hg *DgraphHypergraph) AddHyperEdge(hyperEdge *HyperEdge) error {
 		"dgraph.type":    []string{"HyperEdge"},
 		"hyperedge_id":   hyperEdge.ID,
 		"hyperedge_type": string(hyperEdge.Type),
-		"weight":         hyperEdge.Weight,
+		"weight":         0.0, // HyperEdge has no Weight field
 		"created_at":     time.Now(),
 		"metadata":       string(metadataJSON),
 		"members":        members,

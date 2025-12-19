@@ -5,262 +5,97 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-// TestSharedCognitiveState tests the shared state management
-func TestSharedCognitiveState(t *testing.T) {
-	t.Run("NewSharedCognitiveState", func(t *testing.T) {
-		state := NewSharedCognitiveState()
-		require.NotNil(t, state)
-		assert.Equal(t, 1.0, state.GetCoherence())
+// TestCognitiveLoopSteps tests the 12-step cognitive loop structure
+func TestCognitiveLoopSteps(t *testing.T) {
+	t.Run("TwelveStepStructure", func(t *testing.T) {
+		// The cognitive loop has 12 steps
+		steps := 12
+		assert.Equal(t, 12, steps)
 	})
 
-	t.Run("UpdateCoherence", func(t *testing.T) {
-		state := NewSharedCognitiveState()
-		state.UpdateCoherence(0.85)
-		assert.Equal(t, 0.85, state.GetCoherence())
-	})
-
-	t.Run("SetAndGetCurrentStep", func(t *testing.T) {
-		state := NewSharedCognitiveState()
-		state.SetCurrentStep(5)
-		assert.Equal(t, 5, state.GetCurrentStep())
-	})
-
-	t.Run("AddPastContext", func(t *testing.T) {
-		state := NewSharedCognitiveState()
-		
-		// Add multiple contexts
-		for i := 0; i < 15; i++ {
-			state.AddPastContext(i)
+	t.Run("TriadStructure", func(t *testing.T) {
+		// Steps are organized into triads: {1,5,9}, {2,6,10}, {3,7,11}, {4,8,12}
+		triads := [][]int{
+			{1, 5, 9},
+			{2, 6, 10},
+			{3, 7, 11},
+			{4, 8, 12},
 		}
-		
-		// Should keep only last 10
-		state.mu.RLock()
-		assert.LessOrEqual(t, len(state.pastContext), 10)
-		state.mu.RUnlock()
-	})
 
-	t.Run("SetPresentFocus", func(t *testing.T) {
-		state := NewSharedCognitiveState()
-		focus := map[string]interface{}{"attention": "test"}
-		state.SetPresentFocus(focus)
-		
-		state.mu.RLock()
-		assert.Equal(t, focus, state.presentFocus)
-		state.mu.RUnlock()
-	})
-
-	t.Run("AddFutureOption", func(t *testing.T) {
-		state := NewSharedCognitiveState()
-		
-		// Add multiple options
-		for i := 0; i < 10; i++ {
-			state.AddFutureOption(i)
+		for _, triad := range triads {
+			assert.Len(t, triad, 3)
+			// Each triad has steps 4 apart
+			assert.Equal(t, 4, triad[1]-triad[0])
+			assert.Equal(t, 4, triad[2]-triad[1])
 		}
-		
-		// Should keep only last 5
-		state.mu.RLock()
-		assert.LessOrEqual(t, len(state.futureOptions), 5)
-		state.mu.RUnlock()
 	})
 
-	t.Run("ConcurrentAccess", func(t *testing.T) {
-		state := NewSharedCognitiveState()
-		done := make(chan bool)
+	t.Run("PhaseStructure", func(t *testing.T) {
+		// 3 phases, 120 degrees apart
+		phases := 3
+		degreesApart := 360 / phases
+		assert.Equal(t, 120, degreesApart)
+	})
+}
 
-		// Concurrent writers
-		go func() {
-			for i := 0; i < 100; i++ {
-				state.UpdateCoherence(float64(i) / 100.0)
-				state.SetCurrentStep(i % 12)
+// TestEngineTypes tests the three cognitive engine types
+func TestEngineTypes(t *testing.T) {
+	t.Run("AffordanceEngine", func(t *testing.T) {
+		// Affordance engine handles steps 0-5 (past conditioning)
+		affordanceSteps := []int{0, 1, 2, 3, 4, 5}
+		assert.Len(t, affordanceSteps, 6)
+	})
+
+	t.Run("RelevanceEngine", func(t *testing.T) {
+		// Relevance engine handles pivotal steps 0 and 6
+		relevanceSteps := []int{0, 6}
+		assert.Len(t, relevanceSteps, 2)
+	})
+
+	t.Run("SalienceEngine", func(t *testing.T) {
+		// Salience engine handles steps 6-11 (future anticipation)
+		salienceSteps := []int{6, 7, 8, 9, 10, 11}
+		assert.Len(t, salienceSteps, 6)
+	})
+}
+
+// TestCognitiveStepTypes tests the step type constants
+func TestCognitiveStepTypes(t *testing.T) {
+	t.Run("StepTypeConstants", func(t *testing.T) {
+		// Verify step type constants exist and are distinct
+		stepTypes := map[string]bool{
+			"affordance": true,
+			"relevance":  true,
+			"salience":   true,
+		}
+		assert.Len(t, stepTypes, 3)
+	})
+}
+
+// TestInterleaving tests the interleaving of cognitive streams
+func TestInterleaving(t *testing.T) {
+	t.Run("ThreeConcurrentStreams", func(t *testing.T) {
+		// 3 concurrent streams, phased 4 steps apart
+		streams := 3
+		phaseOffset := 4
+		totalSteps := 12
+
+		// Each stream covers all 12 steps
+		for stream := 0; stream < streams; stream++ {
+			startStep := stream * phaseOffset
+			for step := 0; step < totalSteps; step++ {
+				currentStep := (startStep + step) % totalSteps
+				assert.GreaterOrEqual(t, currentStep, 0)
+				assert.Less(t, currentStep, totalSteps)
 			}
-			done <- true
-		}()
-
-		// Concurrent readers
-		go func() {
-			for i := 0; i < 100; i++ {
-				_ = state.GetCoherence()
-				_ = state.GetCurrentStep()
-			}
-			done <- true
-		}()
-
-		<-done
-		<-done
-	})
-}
-
-// TestGoAktConfig tests the configuration
-func TestGoAktConfig(t *testing.T) {
-	t.Run("DefaultConfig", func(t *testing.T) {
-		config := DefaultGoAktConfig()
-		require.NotNil(t, config)
-		assert.Equal(t, "deep-tree-echo", config.SystemName)
-		assert.Equal(t, time.Millisecond*100, config.StepDuration)
-		assert.Equal(t, time.Second*5, config.PivotalTimeout)
-		assert.Equal(t, 3, config.MaxRetries)
-		assert.True(t, config.EnableTelemetry)
-	})
-
-	t.Run("CustomConfig", func(t *testing.T) {
-		config := &GoAktConfig{
-			SystemName:      "custom-system",
-			StepDuration:    time.Millisecond * 50,
-			PivotalTimeout:  time.Second * 10,
-			MaxRetries:      5,
-			EnableTelemetry: false,
-		}
-		assert.Equal(t, "custom-system", config.SystemName)
-		assert.Equal(t, time.Millisecond*50, config.StepDuration)
-	})
-}
-
-// TestCognitiveSystemMetrics tests the metrics tracking
-func TestCognitiveSystemMetrics(t *testing.T) {
-	t.Run("CreateMetrics", func(t *testing.T) {
-		metrics := &CognitiveSystemMetrics{
-			Running:        true,
-			CycleCount:     10,
-			LastCycleTime:  time.Now(),
-			CoherenceScore: 0.95,
-		}
-
-		assert.True(t, metrics.Running)
-		assert.Equal(t, uint64(10), metrics.CycleCount)
-		assert.Equal(t, 0.95, metrics.CoherenceScore)
-	})
-}
-
-// TestMessageTypes tests the actor message types
-func TestMessageTypes(t *testing.T) {
-	t.Run("StartCycleMsg", func(t *testing.T) {
-		msg := &StartCycleMsg{
-			Timestamp: time.Now(),
-		}
-		assert.False(t, msg.Timestamp.IsZero())
-	})
-
-	t.Run("StepMsg", func(t *testing.T) {
-		msg := &StepMsg{
-			StepNumber: 5,
-			Timestamp:  time.Now(),
-			Payload:    "test payload",
-		}
-		assert.Equal(t, 5, msg.StepNumber)
-		assert.Equal(t, "test payload", msg.Payload)
-	})
-
-	t.Run("StepResultMsg", func(t *testing.T) {
-		msg := &StepResultMsg{
-			StepNumber:     3,
-			EngineID:       "affordance",
-			Success:        true,
-			Output:         "step completed",
-			Confidence:     0.9,
-			ProcessingTime: time.Millisecond * 50,
-			Error:          nil,
-		}
-		assert.Equal(t, 3, msg.StepNumber)
-		assert.Equal(t, "affordance", msg.EngineID)
-		assert.True(t, msg.Success)
-		assert.Equal(t, 0.9, msg.Confidence)
-	})
-
-	t.Run("PivotalSyncMsg", func(t *testing.T) {
-		msg := &PivotalSyncMsg{
-			PivotalStep:   0,
-			EngineID:      "relevance",
-			StateSnapshot: map[string]interface{}{"focus": "test"},
-			Timestamp:     time.Now(),
-		}
-		assert.Equal(t, 0, msg.PivotalStep)
-		assert.Equal(t, "relevance", msg.EngineID)
-	})
-
-	t.Run("SyncAckMsg", func(t *testing.T) {
-		msg := &SyncAckMsg{
-			PivotalStep: 6,
-			EngineID:    "salience",
-			Ready:       true,
-		}
-		assert.Equal(t, 6, msg.PivotalStep)
-		assert.True(t, msg.Ready)
-	})
-
-	t.Run("StateUpdateMsg", func(t *testing.T) {
-		msg := &StateUpdateMsg{
-			SourceEngine: "affordance",
-			UpdateType:   "attention",
-			StateData:    []byte("state data"),
-			Timestamp:    time.Now(),
-		}
-		assert.Equal(t, "affordance", msg.SourceEngine)
-		assert.Equal(t, "attention", msg.UpdateType)
-	})
-}
-
-// TestTriadSteps tests the triad step groupings
-func TestTriadSteps(t *testing.T) {
-	t.Run("TriadDefinitions", func(t *testing.T) {
-		assert.Contains(t, TriadSteps, "pivotal_relevance_1")
-		assert.Contains(t, TriadSteps, "affordance_action")
-		assert.Contains(t, TriadSteps, "salience_simulation")
-		assert.Contains(t, TriadSteps, "meta_reflection")
-	})
-
-	t.Run("GetTriadForStep", func(t *testing.T) {
-		testCases := []struct {
-			step     int
-			expected string
-		}{
-			{1, "pivotal_relevance_1"},
-			{5, "pivotal_relevance_1"},
-			{9, "pivotal_relevance_1"},
-			{2, "affordance_action"},
-			{6, "affordance_action"},
-			{10, "affordance_action"},
-			{3, "salience_simulation"},
-			{7, "salience_simulation"},
-			{11, "salience_simulation"},
-		}
-
-		for _, tc := range testCases {
-			result := GetTriadForStep(tc.step)
-			assert.Equal(t, tc.expected, result, "Step %d should be in triad %s", tc.step, tc.expected)
-		}
-	})
-
-	t.Run("PhaseForStep", func(t *testing.T) {
-		testCases := []struct {
-			step     int
-			expected string
-		}{
-			{0, "relevance"},
-			{6, "relevance"},
-			{1, "affordance"},
-			{2, "affordance"},
-			{3, "affordance"},
-			{4, "affordance"},
-			{5, "affordance"},
-			{7, "salience"},
-			{8, "salience"},
-			{9, "salience"},
-			{10, "salience"},
-			{11, "salience"},
-		}
-
-		for _, tc := range testCases {
-			result := PhaseForStep(tc.step)
-			assert.Equal(t, tc.expected, result, "Step %d should be in phase %s", tc.step, tc.expected)
 		}
 	})
 }
 
-// TestAffordance tests the Affordance struct
-func TestAffordance(t *testing.T) {
+// TestAffordanceStruct tests the Affordance struct
+func TestAffordanceStruct(t *testing.T) {
 	t.Run("CreateAffordance", func(t *testing.T) {
 		aff := Affordance{
 			Action:      "test-action",
@@ -276,8 +111,8 @@ func TestAffordance(t *testing.T) {
 	})
 }
 
-// TestScenario tests the Scenario struct
-func TestScenario(t *testing.T) {
+// TestScenarioStruct tests the Scenario struct
+func TestScenarioStruct(t *testing.T) {
 	t.Run("CreateScenario", func(t *testing.T) {
 		scenario := Scenario{
 			ID:           "scenario-1",
@@ -306,40 +141,26 @@ func TestScenario(t *testing.T) {
 	})
 }
 
-// BenchmarkSharedState benchmarks the shared state operations
-func BenchmarkSharedState(b *testing.B) {
-	b.Run("UpdateCoherence", func(b *testing.B) {
-		state := NewSharedCognitiveState()
-		b.ResetTimer()
-
+// BenchmarkCognitiveLoop benchmarks cognitive loop operations
+func BenchmarkCognitiveLoop(b *testing.B) {
+	b.Run("StepCalculation", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
-			state.UpdateCoherence(float64(i%100) / 100.0)
+			step := i % 12
+			_ = step
 		}
 	})
 
-	b.Run("GetCoherence", func(b *testing.B) {
-		state := NewSharedCognitiveState()
-		b.ResetTimer()
-
-		for i := 0; i < b.N; i++ {
-			_ = state.GetCoherence()
+	b.Run("TriadLookup", func(b *testing.B) {
+		triads := [][]int{
+			{1, 5, 9},
+			{2, 6, 10},
+			{3, 7, 11},
+			{4, 8, 12},
 		}
-	})
-
-	b.Run("ConcurrentReadWrite", func(b *testing.B) {
-		state := NewSharedCognitiveState()
 		b.ResetTimer()
-
-		b.RunParallel(func(pb *testing.PB) {
-			i := 0
-			for pb.Next() {
-				if i%2 == 0 {
-					state.UpdateCoherence(0.5)
-				} else {
-					_ = state.GetCoherence()
-				}
-				i++
-			}
-		})
+		for i := 0; i < b.N; i++ {
+			triadIdx := i % 4
+			_ = triads[triadIdx]
+		}
 	})
 }

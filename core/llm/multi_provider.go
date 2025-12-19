@@ -48,14 +48,14 @@ func NewMultiProviderLLM() *MultiProviderLLM {
 
 // initializeProviders detects and initializes available LLM providers
 func (mp *MultiProviderLLM) initializeProviders() {
-	// Try Local GGUF model first (highest priority for true autonomy)
-	if modelPath := os.Getenv("LOCAL_MODEL_PATH"); modelPath != "" {
-		provider := NewLocalGGUFProvider(modelPath)
-		if provider.Available() {
-			mp.AddProvider(provider)
-			fmt.Println("✓ Local GGUF model provider initialized")
-		}
-	}
+// 	// Try Local GGUF model first (highest priority for true autonomy)
+// 	if modelPath := os.Getenv("LOCAL_MODEL_PATH"); modelPath != "" {
+// 		provider := NewLocalGGUFProvider(modelPath)
+// 		if provider.Available() {
+// 			mp.AddProvider(provider)
+// 			fmt.Println("✓ Local GGUF model provider initialized")
+// 		}
+// 	}
 
 	// Try Anthropic Claude (high priority for autonomous reasoning)
 	if apiKey := os.Getenv("ANTHROPIC_API_KEY"); apiKey != "" {

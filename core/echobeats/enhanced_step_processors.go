@@ -39,12 +39,6 @@ type EmotionalSystem interface {
 }
 
 // Goal represents a cognitive goal
-type Goal struct {
-	ID          string
-	Description string
-	Priority    float64
-	Progress    float64
-}
 
 // NewEnhancedStepProcessor creates a new enhanced processor
 func NewEnhancedStepProcessor(llmManager *llm.ProviderManager, memory CognitiveMemory, goals GoalSystem, emotions EmotionalSystem) *EnhancedStepProcessor {
@@ -532,7 +526,7 @@ func (esp *EnhancedStepProcessor) formatGoals(goals []Goal) string {
 	
 	var sb strings.Builder
 	for _, goal := range goals {
-		sb.WriteString(fmt.Sprintf("- %s (priority: %.2f, progress: %.2f)\n", 
+		sb.WriteString(fmt.Sprintf("- %s (priority: %d, progress: %.2f)\n", 
 			goal.Description, goal.Priority, goal.Progress))
 	}
 	return sb.String()

@@ -1,0 +1,17 @@
+# github.com/EchoCog/echollama/core/llm
+core/llm/local_gguf_provider.go:19:20: undefined: llama.LLama
+core/llm/local_gguf_provider.go:97:22: undefined: llama.New
+# github.com/EchoCog/echollama/core/memory [github.com/EchoCog/echollama/core/memory.test]
+core/memory/dgraph_hypergraph.go:235:70: edge.Source undefined (type *MemoryEdge has no field or method Source)
+core/memory/dgraph_hypergraph.go:240:70: edge.Target undefined (type *MemoryEdge has no field or method Target)
+core/memory/dgraph_hypergraph.go:302:31: hyperEdge.Weight undefined (type *HyperEdge has no field or method Weight)
+core/memory/hypergraph_test.go:16:15: undefined: NodeTypeEpisodic
+core/memory/hypergraph_test.go:25:19: undefined: NodeTypeEpisodic
+core/memory/hypergraph_test.go:32:4: undefined: NodeTypeEpisodic
+core/memory/hypergraph_test.go:33:4: undefined: NodeTypeSemantic
+core/memory/hypergraph_test.go:34:4: undefined: NodeTypeProcedural
+core/memory/hypergraph_test.go:35:4: undefined: NodeTypeWorking
+core/memory/hypergraph_test.go:49:12: undefined: EdgeTypeAssociation
+core/memory/hypergraph_test.go:49:12: too many errors
+FAIL	github.com/EchoCog/echollama/core/memory [build failed]
+FAIL	github.com/EchoCog/echollama/core/echobeats [build failed]
