@@ -1,0 +1,70 @@
+version: "3.8"
+
+# Docker Compose configuration for Deep Tree Echo with Dgraph
+# This provides persistent hypergraph storage for wisdom accumulation
+
+services:
+  # Dgraph Zero - Cluster management
+  dgraph-zero:
+    image: dgraph/dgraph:v23.1.0
+    container_name: echo9-dgraph-zero
+    volumes:
+      - dgraph-zero-data:/dgraph
+    ports:
+      - "5080:5080"
+      - "6080:6080"
+    restart: unless-stopped
+    command: dgraph zero --my=dgraph-zero:5080
+
+  # Dgraph Alpha - Data storage and queries
+  dgraph-alpha:
+    image: dgraph/dgraph:v23.1.0
+    container_name: echo9-dgraph-alpha
+    volumes:
+      - dgraph-alpha-data:/dgraph
+    ports:
+      - "8080:8080"
+      - "9080:9080"
+    restart: unless-stopped
+    depends_on:
+      - dgraph-zero
+    command: dgraph alpha --my=dgraph-alpha:7080 --zero=dgraph-zero:5080 --security whitelist=0.0.0.0/0
+
+  # Dgraph Ratel - Web UI for Dgraph (optional, for debugging)
+  dgraph-ratel:
+    image: dgraph/ratel:v21.03.0
+    container_name: echo9-dgraph-ratel
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    depends_on:
+      - dgraph-alpha
+
+  # Deep Tree Echo Autonomous Server
+  echoself:
+    build:
+      context: .
+      dockerfile: Dockerfile.autonomous
+    container_name: echo9-echoself
+    environment:
+      - DGRAPH_ENDPOINT=dgraph-alpha:9080
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+    ports:
+      - "11434:11434"
+      - "8081:8081"
+    restart: unless-stopped
+    depends_on:
+      - dgraph-alpha
+
+volumes:
+  dgraph-zero-data:
+    driver: local
+  dgraph-alpha-data:
+    driver: local
+
+networks:
+  default:
+    name: echo9-network

@@ -1,0 +1,25 @@
+# Cog configuration for Deep Tree Echo autonomous agent
+# https://github.com/replicate/cog
+
+build:
+  # Go 1.24 for production
+  system_packages:
+    - "golang-go"
+    - "git"
+    - "ca-certificates"
+    - "tzdata"
+  
+  # Pre-build commands
+  pre_install:
+    - "go version"
+  
+  # Build the echoself binary
+  run:
+    - "cd /src && go mod download"
+    - "cd /src && go build -ldflags='-s -w' -o /usr/local/bin/echoself ./cmd/autonomous/"
+
+# Prediction interface
+predict: "predict.go:Predictor"
+
+# Image configuration
+image: "echo9llama"

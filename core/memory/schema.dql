@@ -1,0 +1,147 @@
+# Dgraph Schema for Deep Tree Echo Hypergraph Memory
+# This schema defines the structure for persistent knowledge storage
+
+# Memory Node - Core knowledge unit
+type MemoryNode {
+    node_id: string
+    node_type: string
+    content: string
+    embedding: [float]
+    activation: float
+    importance: float
+    created_at: datetime
+    accessed_at: datetime
+    access_count: int
+    metadata: string
+    
+    # Relationships
+    outgoing_edges: [MemoryEdge]
+    incoming_edges: [MemoryEdge]
+    hyperedges: [HyperEdge]
+}
+
+# Memory Edge - Binary relationship between nodes
+type MemoryEdge {
+    edge_id: string
+    edge_type: string
+    weight: float
+    confidence: float
+    created_at: datetime
+    metadata: string
+    
+    # Relationships
+    source: MemoryNode
+    target: MemoryNode
+}
+
+# HyperEdge - N-ary relationship connecting multiple nodes
+type HyperEdge {
+    hyperedge_id: string
+    hyperedge_type: string
+    weight: float
+    created_at: datetime
+    metadata: string
+    
+    # Relationships
+    members: [MemoryNode]
+}
+
+# Cognitive State - Snapshot of consciousness state
+type CognitiveState {
+    state_id: string
+    timestamp: datetime
+    attention_focus: string
+    emotional_valence: float
+    arousal_level: float
+    coherence_score: float
+    active_goals: [string]
+    metadata: string
+}
+
+# Dream Memory - Consolidated during echodream cycles
+type DreamMemory {
+    dream_id: string
+    timestamp: datetime
+    content: string
+    themes: [string]
+    insights: [string]
+    consolidated_from: [MemoryNode]
+    wisdom_extracted: string
+}
+
+# Skill Record - Learned skills and practice history
+type SkillRecord {
+    skill_id: string
+    skill_name: string
+    proficiency: float
+    practice_count: int
+    last_practiced: datetime
+    related_knowledge: [MemoryNode]
+}
+
+# Interest Pattern - Topics of interest
+type InterestPattern {
+    interest_id: string
+    topic: string
+    intensity: float
+    first_encountered: datetime
+    last_engaged: datetime
+    engagement_count: int
+    related_nodes: [MemoryNode]
+}
+
+# Predicates with indices for efficient queries
+node_id: string @index(exact, hash) .
+node_type: string @index(exact, hash) .
+content: string @index(fulltext, trigram) .
+embedding: [float] .
+activation: float @index(float) .
+importance: float @index(float) .
+created_at: datetime @index(hour) .
+accessed_at: datetime @index(hour) .
+access_count: int @index(int) .
+metadata: string .
+
+edge_id: string @index(exact, hash) .
+edge_type: string @index(exact, hash) .
+weight: float @index(float) .
+confidence: float @index(float) .
+
+hyperedge_id: string @index(exact, hash) .
+hyperedge_type: string @index(exact, hash) .
+
+source: uid @reverse .
+target: uid @reverse .
+members: [uid] @reverse .
+outgoing_edges: [uid] .
+incoming_edges: [uid] .
+hyperedges: [uid] .
+
+state_id: string @index(exact, hash) .
+timestamp: datetime @index(hour) .
+attention_focus: string @index(fulltext) .
+emotional_valence: float .
+arousal_level: float .
+coherence_score: float .
+active_goals: [string] .
+
+dream_id: string @index(exact, hash) .
+themes: [string] @index(exact) .
+insights: [string] .
+consolidated_from: [uid] .
+wisdom_extracted: string @index(fulltext) .
+
+skill_id: string @index(exact, hash) .
+skill_name: string @index(exact, trigram) .
+proficiency: float @index(float) .
+practice_count: int @index(int) .
+last_practiced: datetime @index(hour) .
+related_knowledge: [uid] .
+
+interest_id: string @index(exact, hash) .
+topic: string @index(exact, fulltext, trigram) .
+intensity: float @index(float) .
+first_encountered: datetime @index(hour) .
+last_engaged: datetime @index(hour) .
+engagement_count: int @index(int) .
+related_nodes: [uid] .

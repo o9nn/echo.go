@@ -94,3 +94,8 @@ require (
 	google.golang.org/protobuf v1.36.10
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+require (
+github.com/dgraph-io/dgo/v230 v230.0.1
+google.golang.org/grpc v1.59.0
+)
