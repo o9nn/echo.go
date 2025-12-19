@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/echobridge"
+	"github.com/EchoCog/echollama/core/echobridge"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )

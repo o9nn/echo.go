@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/echocog/echollama/core/llm"
+	"github.com/EchoCog/echollama/core/llm"
 )
 
 // EnhancedStepProcessor implements deep cognitive processing for each step

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/echocog/echollama/core/llm"
+	"github.com/EchoCog/echollama/core/llm"
 )
 
 // IdentityGoalGenerator creates goals aligned with Deep Tree Echo identity
