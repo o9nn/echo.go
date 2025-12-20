@@ -1,7 +1,9 @@
 module github.com/EchoCog/echollama
 
 // Deep Tree Echo - compatible with Go 1.18+
-go 1.18
+go 1.24.0
+
+toolchain go1.24.11
 
 require (
 	github.com/containerd/console v1.0.3
@@ -35,62 +37,26 @@ require (
 require github.com/mattn/go-sqlite3 v1.14.32
 
 require (
-	connectrpc.com/connect v1.18.1 // indirect
-	github.com/RoaringBitmap/roaring v1.9.4 // indirect
-	github.com/Workiva/go-datastructures v1.1.5 // indirect
 	github.com/apache/arrow/go/arrow v0.0.0-20211112161151-bc219186db40 // indirect
-	github.com/armon/go-metrics v0.4.1 // indirect
-	github.com/bits-and-blooms/bitset v1.20.0 // indirect
-	github.com/buraksezer/consistent v0.10.0 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
-	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/chewxy/hm v1.0.0 // indirect
 	github.com/chewxy/math32 v1.11.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/deckarep/golang-set/v2 v2.7.0 // indirect
-	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/flowchartsman/retry v1.2.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/google/btree v1.1.3 // indirect
 	github.com/google/flatbuffers v24.3.25+incompatible // indirect
-	github.com/hashicorp/errwrap v1.1.0 // indirect
-	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
-	github.com/hashicorp/go-metrics v0.5.4 // indirect
-	github.com/hashicorp/go-msgpack/v2 v2.1.2 // indirect
-	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/hashicorp/go-sockaddr v1.0.7 // indirect
-	github.com/hashicorp/golang-lru v1.0.2 // indirect
-	github.com/hashicorp/logutils v1.0.0 // indirect
-	github.com/hashicorp/memberlist v0.5.3 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
-	github.com/miekg/dns v1.1.63 // indirect
-	github.com/mschoch/smat v0.2.0 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/redis/go-redis/v9 v9.7.0 // indirect
-	github.com/reugn/go-quartz v0.13.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529 // indirect
-	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/supabase-community/functions-go v0.0.0-20220927045802-22373e6cb51d // indirect
 	github.com/supabase-community/gotrue-go v1.2.0 // indirect
 	github.com/supabase-community/storage-go v0.7.0 // indirect
-	github.com/tidwall/btree v1.7.0 // indirect
-	github.com/tidwall/match v1.1.1 // indirect
-	github.com/tidwall/redcon v1.6.2 // indirect
-	github.com/tochemey/olric v0.2.0-alpha // indirect
 	github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80 // indirect
-	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
-	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/xtgo/set v1.0.0 // indirect
-	github.com/zeebo/xxh3 v1.0.2 // indirect
-	go.uber.org/atomic v1.11.0 // indirect
-	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.27.0 // indirect
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6 // indirect
-	golang.org/x/mod v0.28.0 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
 	gorgonia.org/vecf32 v0.9.0 // indirect
@@ -130,8 +96,6 @@ require (
 
 require (
 	github.com/dgraph-io/dgo/v230 v230.0.1
-	github.com/go-skynet/go-llama.cpp v0.0.0-20240314183750-6a8041ef6b46
 	github.com/pdevine/tensor v0.0.0-20250402003834-09d804610a08
-	github.com/tochemey/goakt/v2 v2.13.0
-	google.golang.org/grpc v1.77.0
+	google.golang.org/grpc v1.64.0
 )

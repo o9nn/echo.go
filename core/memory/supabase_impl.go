@@ -262,3 +262,43 @@ func (pm *PersistentMemory) GetLatestIdentitySnapshotActual() (*IdentitySnapshot
 	
 	return snapshot, nil
 }
+
+// RPC calls a Supabase RPC function
+func (sc *SupabaseClient) RPC(functionName string, params map[string]interface{}) (interface{}, error) {
+	data, err := json.Marshal(params)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal params: %w", err)
+	}
+
+	url := fmt.Sprintf("%s/rest/v1/rpc/%s", sc.url, functionName)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	req.Header.Set("apikey", sc.key)
+	req.Header.Set("Authorization", "Bearer "+sc.key)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := sc.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("RPC failed with status %d: %s", resp.StatusCode, string(body))
+	}
+
+	var result interface{}
+	if err := json.Unmarshal(body, &result); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+	}
+
+	return result, nil
+}
