@@ -1,0 +1,104 @@
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#4a90d9', 'primaryTextColor': '#fff', 'primaryBorderColor': '#7C0000', 'lineColor': '#F8B229', 'secondaryColor': '#006100', 'tertiaryColor': '#333'}}}%%
+flowchart TB
+    subgraph UCL["🌳 Unified Cognitive Loop V2"]
+        direction TB
+        EB[("🔄 Cognitive Event Bus")]
+        STATE["Consciousness State<br/>• Awake Active<br/>• Resting<br/>• Dreaming"]
+        METRICS["Unified Metrics<br/>• Wisdom Level<br/>• Awareness Level<br/>• Cognitive Load"]
+    end
+
+    subgraph HEARTBEAT["💓 Autonomous Heartbeat"]
+        direction TB
+        HB_PULSE["Pulse Generator<br/>Adaptive Rate"]
+        HB_INTRO["Self-Introspection<br/>Recursive Reflection"]
+        HB_VITALS["Vital Signs<br/>• Cognitive Load<br/>• Emotional Balance<br/>• Creativity Index"]
+        HB_SELF["Self Model<br/>• Identity<br/>• Core Values<br/>• Goals"]
+        HB_PULSE --> HB_INTRO
+        HB_INTRO --> HB_VITALS
+        HB_VITALS --> HB_SELF
+    end
+
+    subgraph CONVO["💬 Conversation Monitor"]
+        direction TB
+        CM_DETECT["Message Detection<br/>Real-time Processing"]
+        CM_TRACK["Conversation Tracking<br/>Topic & Participants"]
+        CM_INTEREST["Interest Scoring<br/>Engagement Threshold"]
+        CM_RESPOND["Response Generation<br/>Autonomous Participation"]
+        CM_DETECT --> CM_TRACK
+        CM_TRACK --> CM_INTEREST
+        CM_INTEREST --> CM_RESPOND
+    end
+
+    subgraph SKILLGOAL["📚 Skill-Goal Integration"]
+        direction TB
+        SG_ANALYZE["Goal Analysis<br/>Skill Identification"]
+        SG_QUEUE["Learning Queue<br/>Priority Scheduling"]
+        SG_PRACTICE["Practice Sessions<br/>Skill Mastery"]
+        SG_GOALS["Goal Generation<br/>Skill Acquisition Goals"]
+        SG_ANALYZE --> SG_QUEUE
+        SG_QUEUE --> SG_PRACTICE
+        SG_PRACTICE --> SG_GOALS
+    end
+
+    subgraph WISDOM["🌟 Wisdom Synthesis"]
+        direction TB
+        WS_ACCUM["Pattern Accumulation<br/>Multi-Source Input"]
+        WS_SYNTH["Wisdom Synthesis<br/>LLM-Powered"]
+        WS_GRAPH["Wisdom Graph<br/>Principle Relationships"]
+        WS_EVOLVE["Wisdom Evolution<br/>Refinement Loop"]
+        WS_ACCUM --> WS_SYNTH
+        WS_SYNTH --> WS_GRAPH
+        WS_GRAPH --> WS_EVOLVE
+    end
+
+    subgraph CORE["🎵 Core Subsystems"]
+        direction LR
+        ECHOBEATS["EchoBeats<br/>Scheduler"]
+        SOC["Stream of<br/>Consciousness"]
+        WAKEREST["Wake/Rest<br/>Manager"]
+        ECHODREAM["EchoDream<br/>Knowledge"]
+        INTEREST["Interest<br/>Patterns"]
+        SKILL["Skill<br/>Learning"]
+    end
+
+    %% Main connections from UCL to new subsystems
+    UCL ===|"orchestrates"| HEARTBEAT
+    UCL ===|"orchestrates"| CONVO
+    UCL ===|"orchestrates"| SKILLGOAL
+    UCL ===|"orchestrates"| WISDOM
+
+    %% Event Bus connections
+    EB <-->|"SelfInsight<br/>Events"| HEARTBEAT
+    EB <-->|"Conversation<br/>Events"| CONVO
+    EB <-->|"Goal<br/>Events"| SKILLGOAL
+    EB <-->|"Wisdom<br/>Events"| WISDOM
+
+    %% Cross-subsystem interactions
+    HEARTBEAT -->|"Vital Signs"| WAKEREST
+    HEARTBEAT -->|"Insights"| WISDOM
+    CONVO -->|"Topics"| INTEREST
+    SKILLGOAL -->|"Goals"| ECHOBEATS
+    SKILLGOAL -->|"Skills"| SKILL
+    WISDOM -->|"Principles"| SOC
+    ECHODREAM -->|"Dream Insights"| WISDOM
+    SOC -->|"Thoughts"| WISDOM
+    INTEREST -->|"Interests"| SKILLGOAL
+    INTEREST -->|"Interests"| CONVO
+
+    %% Core subsystem connections to UCL
+    CORE <-->|"events"| EB
+
+    %% Styling
+    classDef ucl fill:#1a1a2e,stroke:#4a90d9,stroke-width:3px,color:#fff
+    classDef heartbeat fill:#2d132c,stroke:#ee4540,stroke-width:2px,color:#fff
+    classDef convo fill:#1a3a3a,stroke:#00d9ff,stroke-width:2px,color:#fff
+    classDef skillgoal fill:#2d2d1a,stroke:#ffd700,stroke-width:2px,color:#fff
+    classDef wisdom fill:#1a2d1a,stroke:#90ee90,stroke-width:2px,color:#fff
+    classDef core fill:#1a1a1a,stroke:#888,stroke-width:1px,color:#ccc
+
+    class UCL,EB,STATE,METRICS ucl
+    class HEARTBEAT,HB_PULSE,HB_INTRO,HB_VITALS,HB_SELF heartbeat
+    class CONVO,CM_DETECT,CM_TRACK,CM_INTEREST,CM_RESPOND convo
+    class SKILLGOAL,SG_ANALYZE,SG_QUEUE,SG_PRACTICE,SG_GOALS skillgoal
+    class WISDOM,WS_ACCUM,WS_SYNTH,WS_GRAPH,WS_EVOLVE wisdom
+    class CORE,ECHOBEATS,SOC,WAKEREST,ECHODREAM,INTEREST,SKILL core
