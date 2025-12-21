@@ -12,11 +12,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/EchoCog/echollama/core/consciousness"
-	"github.com/EchoCog/echollama/core/echobeats"
-	"github.com/EchoCog/echollama/core/echodream"
-	"github.com/EchoCog/echollama/core/goals"
-	"github.com/EchoCog/echollama/core/llm"
+	"github.com/cogpy/echo9llama/core/consciousness"
+	"github.com/cogpy/echo9llama/core/echobeats"
+	"github.com/cogpy/echo9llama/core/echodream"
+	"github.com/cogpy/echo9llama/core/goals"
+	"github.com/cogpy/echo9llama/core/llm"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )

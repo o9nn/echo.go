@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/EchoCog/echollama/api"
+	"github.com/cogpy/echo9llama/api"
 )
 
 func TestNewEngine(t *testing.T) {

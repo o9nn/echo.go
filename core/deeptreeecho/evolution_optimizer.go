@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echollama/core/llm"
+	"github.com/cogpy/echo9llama/core/llm"
 )
 
 // EvolutionOptimizer orchestrates the evolutionary optimization of Deep Tree Echo
@@ -21,7 +21,7 @@ type EvolutionOptimizer struct {
 	// Core subsystems
 	consciousness      *StreamOfConsciousness
 	scheduler          *EchobeatsScheduler
-	dreamIntegration   *EchodreamKnowledgeIntegration
+	dreamIntegration   *EchoDreamKnowledgeIntegration
 
 	// LLM provider
 	llmProvider llm.LLMProvider
@@ -138,7 +138,7 @@ func NewEvolutionOptimizer(llmProvider llm.LLMProvider, config EvolutionConfig) 
 	// Initialize core subsystems
 	eo.consciousness = NewStreamOfConsciousness(llmProvider)
 	eo.scheduler = NewEchobeatsScheduler(llmProvider)
-	eo.dreamIntegration = NewEchodreamKnowledgeIntegration(llmProvider)
+	eo.dreamIntegration = NewEchoDreamKnowledgeIntegration(llmProvider)
 
 	// Initialize genetic traits
 	eo.initializeGeneticTraits()
@@ -662,7 +662,7 @@ func (eo *EvolutionOptimizer) GetScheduler() *EchobeatsScheduler {
 }
 
 // GetDreamIntegration returns the dream integration system
-func (eo *EvolutionOptimizer) GetDreamIntegration() *EchodreamKnowledgeIntegration {
+func (eo *EvolutionOptimizer) GetDreamIntegration() *EchoDreamKnowledgeIntegration {
 	return eo.dreamIntegration
 }
 

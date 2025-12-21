@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echollama/core/llm"
+	"github.com/cogpy/echo9llama/core/llm"
 )
 
 // UnifiedCognitiveLoop orchestrates all cognitive subsystems into a cohesive

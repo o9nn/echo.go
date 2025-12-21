@@ -34,17 +34,17 @@ import (
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/term"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/envconfig"
-	"github.com/EchoCog/echollama/format"
-	"github.com/EchoCog/echollama/parser"
-	"github.com/EchoCog/echollama/progress"
-	"github.com/EchoCog/echollama/readline"
-	"github.com/EchoCog/echollama/runner"
-	"github.com/EchoCog/echollama/server"
-	"github.com/EchoCog/echollama/types/model"
-	"github.com/EchoCog/echollama/types/syncmap"
-	"github.com/EchoCog/echollama/version"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/envconfig"
+	"github.com/cogpy/echo9llama/format"
+	"github.com/cogpy/echo9llama/parser"
+	"github.com/cogpy/echo9llama/progress"
+	"github.com/cogpy/echo9llama/readline"
+	"github.com/cogpy/echo9llama/runner"
+	"github.com/cogpy/echo9llama/server"
+	"github.com/cogpy/echo9llama/types/model"
+	"github.com/cogpy/echo9llama/types/syncmap"
+	"github.com/cogpy/echo9llama/version"
 )
 
 // ensureThinkingSupport emits a warning if the model does not advertise thinking support

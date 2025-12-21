@@ -11,10 +11,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/fs/ggml"
-	"github.com/EchoCog/echollama/template"
-	"github.com/EchoCog/echollama/types/model"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/fs/ggml"
+	"github.com/cogpy/echo9llama/template"
+	"github.com/cogpy/echo9llama/types/model"
 )
 
 var intermediateBlobs map[string]string = make(map[string]string)

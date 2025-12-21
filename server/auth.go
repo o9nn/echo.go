@@ -15,8 +15,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/auth"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/auth"
 )
 
 type registryChallenge struct {

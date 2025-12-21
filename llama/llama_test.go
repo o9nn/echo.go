@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-// https://github.com/EchoCog/echollama/issues/7978
+// https://github.com/cogpy/echo9llama/issues/7978
 const issue7978JSONSchema = `{
   "type": "object",
   "properties": {

@@ -9,7 +9,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/EchoCog/echollama/core/echobeats"
+	"github.com/cogpy/echo9llama/core/echobeats"
 )
 
 var threePhaseManager *echobeats.ThreePhaseManager

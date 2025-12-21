@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echollama/core/llm"
+	"github.com/cogpy/echo9llama/core/llm"
 )
 
 // EchobeatsScheduler implements the 12-step 3-phase cognitive loop

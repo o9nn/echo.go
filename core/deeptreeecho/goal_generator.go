@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echollama/core/llm"
+	"github.com/cogpy/echo9llama/core/llm"
 	"github.com/google/uuid"
 )
 
@@ -67,14 +67,14 @@ const (
 )
 
 // GoalStatus tracks goal state
-type GoalStatus string
-
-const (
-	StatusActive    GoalStatus = "active"
-	StatusPaused    GoalStatus = "paused"
-	StatusCompleted GoalStatus = "completed"
-	StatusAbandoned GoalStatus = "abandoned"
-)
+// type GoalStatus string
+// 
+// const (
+// 	StatusActive    GoalStatus = "active"
+// 	StatusPaused    GoalStatus = "paused"
+// 	StatusCompleted GoalStatus = "completed"
+// 	StatusAbandoned GoalStatus = "abandoned"
+// )
 
 // KnowledgeGap represents something the system wants to learn
 type KnowledgeGap struct {

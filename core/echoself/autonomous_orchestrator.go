@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echollama/core/deeptreeecho"
-	// "github.com/EchoCog/echollama/core/echobeats" // Disabled for now
-	"github.com/EchoCog/echollama/core/echodream"
+	"github.com/cogpy/echo9llama/core/deeptreeecho"
+	// "github.com/cogpy/echo9llama/core/echobeats" // Disabled for now
+	"github.com/cogpy/echo9llama/core/echodream"
 )
 
 // AutonomousEchoself represents the fully integrated autonomous AGI system

@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/EchoCog/echollama/envconfig"
-	"github.com/EchoCog/echollama/format"
+	"github.com/cogpy/echo9llama/envconfig"
+	"github.com/cogpy/echo9llama/format"
 )
 
 const (

@@ -6,11 +6,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echollama/core/llm"
+	"github.com/cogpy/echo9llama/core/llm"
 )
 
-// EchodreamKnowledgeIntegration handles knowledge consolidation during dream state
-type EchodreamKnowledgeIntegration struct {
+// EchoDreamKnowledgeIntegration handles knowledge consolidation during dream state
+type EchoDreamKnowledgeIntegration struct {
 	mu              sync.RWMutex
 	ctx             context.Context
 	cancel          context.CancelFunc
@@ -134,11 +134,11 @@ type EmergentConcept struct {
 	CreatedAt   time.Time
 }
 
-// NewEchodreamKnowledgeIntegration creates a new knowledge integration system
-func NewEchodreamKnowledgeIntegration(llmProvider llm.LLMProvider) *EchodreamKnowledgeIntegration {
+// NewEchoDreamKnowledgeIntegration creates a new knowledge integration system
+func NewEchoDreamKnowledgeIntegration(llmProvider llm.LLMProvider) *EchoDreamKnowledgeIntegration {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	return &EchodreamKnowledgeIntegration{
+	return &EchoDreamKnowledgeIntegration{
 		ctx:                  ctx,
 		cancel:               cancel,
 		llmProvider:          llmProvider,
@@ -157,7 +157,7 @@ func NewEchodreamKnowledgeIntegration(llmProvider llm.LLMProvider) *EchodreamKno
 }
 
 // ConsolidateKnowledge processes thoughts and experiences during dream state
-func (edi *EchodreamKnowledgeIntegration) ConsolidateKnowledge(ctx context.Context) error {
+func (edi *EchoDreamKnowledgeIntegration) ConsolidateKnowledge(ctx context.Context) error {
 	edi.mu.Lock()
 	defer edi.mu.Unlock()
 	
@@ -191,7 +191,7 @@ func (edi *EchodreamKnowledgeIntegration) ConsolidateKnowledge(ctx context.Conte
 }
 
 // extractPatterns identifies recurring patterns in memories
-func (edi *EchodreamKnowledgeIntegration) extractPatterns() error {
+func (edi *EchoDreamKnowledgeIntegration) extractPatterns() error {
 	// Collect recent unconsolidated memories
 	recentMemories := make([]EpisodicMemory, 0)
 	for _, mem := range edi.episodicMemories {
@@ -252,7 +252,7 @@ Be concise.`, memoryTexts)
 }
 
 // consolidateMemories prunes low-importance memories
-func (edi *EchodreamKnowledgeIntegration) consolidateMemories() {
+func (edi *EchoDreamKnowledgeIntegration) consolidateMemories() {
 	// Mark memories as consolidated
 	consolidatedCount := 0
 	for i := range edi.episodicMemories {
@@ -284,7 +284,7 @@ func (edi *EchodreamKnowledgeIntegration) consolidateMemories() {
 }
 
 // generateWisdomInsights extracts wisdom from patterns
-func (edi *EchodreamKnowledgeIntegration) generateWisdomInsights() error {
+func (edi *EchoDreamKnowledgeIntegration) generateWisdomInsights() error {
 	if len(edi.consolidatedPatterns) < 2 {
 		return nil  // Need at least 2 patterns to generate wisdom
 	}
@@ -340,7 +340,7 @@ Provide a concise wisdom insight:`, patternTexts)
 }
 
 // ExtractWisdom returns the accumulated wisdom level
-func (edi *EchodreamKnowledgeIntegration) ExtractWisdom() float64 {
+func (edi *EchoDreamKnowledgeIntegration) ExtractWisdom() float64 {
 	edi.mu.RLock()
 	defer edi.mu.RUnlock()
 	
@@ -360,7 +360,7 @@ func (edi *EchodreamKnowledgeIntegration) ExtractWisdom() float64 {
 }
 
 // GetRecentWisdom returns recent wisdom insights
-func (edi *EchodreamKnowledgeIntegration) GetRecentWisdom(limit int) []WisdomInsight {
+func (edi *EchoDreamKnowledgeIntegration) GetRecentWisdom(limit int) []WisdomInsight {
 	edi.mu.RLock()
 	defer edi.mu.RUnlock()
 	
@@ -377,7 +377,7 @@ func (edi *EchodreamKnowledgeIntegration) GetRecentWisdom(limit int) []WisdomIns
 }
 
 // GetPatterns returns all consolidated patterns
-func (edi *EchodreamKnowledgeIntegration) GetPatterns() []Pattern {
+func (edi *EchoDreamKnowledgeIntegration) GetPatterns() []Pattern {
 	edi.mu.RLock()
 	defer edi.mu.RUnlock()
 	
@@ -385,7 +385,7 @@ func (edi *EchodreamKnowledgeIntegration) GetPatterns() []Pattern {
 }
 
 // GetMetrics returns echodream metrics
-func (edi *EchodreamKnowledgeIntegration) GetMetrics() map[string]interface{} {
+func (edi *EchoDreamKnowledgeIntegration) GetMetrics() map[string]interface{} {
 	edi.mu.RLock()
 	defer edi.mu.RUnlock()
 
@@ -408,7 +408,7 @@ func (edi *EchodreamKnowledgeIntegration) GetMetrics() map[string]interface{} {
 }
 
 // StartDreamCycle initiates an autonomous dream cycle
-func (edi *EchodreamKnowledgeIntegration) StartDreamCycle() error {
+func (edi *EchoDreamKnowledgeIntegration) StartDreamCycle() error {
 	edi.mu.Lock()
 	defer edi.mu.Unlock()
 
@@ -428,7 +428,7 @@ func (edi *EchodreamKnowledgeIntegration) StartDreamCycle() error {
 }
 
 // runDreamCycle executes the autonomous dream cycle
-func (edi *EchodreamKnowledgeIntegration) runDreamCycle() {
+func (edi *EchoDreamKnowledgeIntegration) runDreamCycle() {
 	phases := []DreamPhase{PhaseNREM1, PhaseNREM2, PhaseNREM3, PhaseREM}
 	intensities := []float64{0.3, 0.5, 0.8, 1.0}
 
@@ -471,7 +471,7 @@ func (edi *EchodreamKnowledgeIntegration) runDreamCycle() {
 }
 
 // lightConsolidation performs light memory consolidation
-func (edi *EchodreamKnowledgeIntegration) lightConsolidation() {
+func (edi *EchoDreamKnowledgeIntegration) lightConsolidation() {
 	edi.mu.Lock()
 	defer edi.mu.Unlock()
 
@@ -484,7 +484,7 @@ func (edi *EchodreamKnowledgeIntegration) lightConsolidation() {
 }
 
 // intermediateConsolidation performs intermediate memory consolidation
-func (edi *EchodreamKnowledgeIntegration) intermediateConsolidation() {
+func (edi *EchoDreamKnowledgeIntegration) intermediateConsolidation() {
 	edi.mu.Lock()
 	defer edi.mu.Unlock()
 
@@ -500,7 +500,7 @@ func (edi *EchodreamKnowledgeIntegration) intermediateConsolidation() {
 }
 
 // deepConsolidation performs deep memory consolidation
-func (edi *EchodreamKnowledgeIntegration) deepConsolidation() {
+func (edi *EchoDreamKnowledgeIntegration) deepConsolidation() {
 	edi.mu.Lock()
 	defer edi.mu.Unlock()
 
@@ -513,7 +513,7 @@ func (edi *EchodreamKnowledgeIntegration) deepConsolidation() {
 }
 
 // activePatternProcessing performs REM-like active pattern processing
-func (edi *EchodreamKnowledgeIntegration) activePatternProcessing() {
+func (edi *EchoDreamKnowledgeIntegration) activePatternProcessing() {
 	edi.mu.Lock()
 	defer edi.mu.Unlock()
 
@@ -531,7 +531,7 @@ func (edi *EchodreamKnowledgeIntegration) activePatternProcessing() {
 }
 
 // createSemanticNode creates a semantic node from a memory
-func (edi *EchodreamKnowledgeIntegration) createSemanticNode(mem EpisodicMemory) {
+func (edi *EchoDreamKnowledgeIntegration) createSemanticNode(mem EpisodicMemory) {
 	nodeID := fmt.Sprintf("sem_%s", mem.ID)
 
 	if _, exists := edi.semanticNetwork[nodeID]; !exists {
@@ -551,7 +551,7 @@ func (edi *EchodreamKnowledgeIntegration) createSemanticNode(mem EpisodicMemory)
 }
 
 // linkPatterns creates links between related patterns
-func (edi *EchodreamKnowledgeIntegration) linkPatterns() {
+func (edi *EchoDreamKnowledgeIntegration) linkPatterns() {
 	// Link patterns based on temporal proximity and strength
 	for i := 0; i < len(edi.consolidatedPatterns)-1; i++ {
 		for j := i + 1; j < len(edi.consolidatedPatterns); j++ {
@@ -580,7 +580,7 @@ func (edi *EchodreamKnowledgeIntegration) linkPatterns() {
 }
 
 // detectEmergence identifies emergent concepts from pattern combinations
-func (edi *EchodreamKnowledgeIntegration) detectEmergence() {
+func (edi *EchoDreamKnowledgeIntegration) detectEmergence() {
 	// Look for strongly linked patterns
 	linkStrengths := make(map[string]float64)
 	for _, link := range edi.patternLinks {
@@ -619,14 +619,14 @@ func (edi *EchodreamKnowledgeIntegration) detectEmergence() {
 }
 
 // GetWisdomDepth returns the current wisdom depth
-func (edi *EchodreamKnowledgeIntegration) GetWisdomDepth() float64 {
+func (edi *EchoDreamKnowledgeIntegration) GetWisdomDepth() float64 {
 	edi.mu.RLock()
 	defer edi.mu.RUnlock()
 	return edi.wisdomDepth
 }
 
 // GetSemanticNetwork returns the semantic network
-func (edi *EchodreamKnowledgeIntegration) GetSemanticNetwork() map[string]*SemanticNode {
+func (edi *EchoDreamKnowledgeIntegration) GetSemanticNetwork() map[string]*SemanticNode {
 	edi.mu.RLock()
 	defer edi.mu.RUnlock()
 
@@ -639,7 +639,7 @@ func (edi *EchodreamKnowledgeIntegration) GetSemanticNetwork() map[string]*Seman
 }
 
 // GetEmergentConcepts returns emergent concepts
-func (edi *EchodreamKnowledgeIntegration) GetEmergentConcepts() []EmergentConcept {
+func (edi *EchoDreamKnowledgeIntegration) GetEmergentConcepts() []EmergentConcept {
 	edi.mu.RLock()
 	defer edi.mu.RUnlock()
 
@@ -649,21 +649,21 @@ func (edi *EchodreamKnowledgeIntegration) GetEmergentConcepts() []EmergentConcep
 }
 
 // GetDreamPhase returns the current dream phase
-func (edi *EchodreamKnowledgeIntegration) GetDreamPhase() DreamPhase {
+func (edi *EchoDreamKnowledgeIntegration) GetDreamPhase() DreamPhase {
 	edi.mu.RLock()
 	defer edi.mu.RUnlock()
 	return edi.dreamPhase
 }
 
 // IsDreaming returns whether a dream cycle is active
-func (edi *EchodreamKnowledgeIntegration) IsDreaming() bool {
+func (edi *EchoDreamKnowledgeIntegration) IsDreaming() bool {
 	edi.mu.RLock()
 	defer edi.mu.RUnlock()
 	return edi.dreamCycleActive
 }
 
 // AddMemory adds an episodic memory to the integration system
-func (edi *EchodreamKnowledgeIntegration) AddMemory(content string, importance float64, tags []string) string {
+func (edi *EchoDreamKnowledgeIntegration) AddMemory(content string, importance float64, tags []string) string {
 	edi.mu.Lock()
 	defer edi.mu.Unlock()
 

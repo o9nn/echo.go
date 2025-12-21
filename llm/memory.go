@@ -7,11 +7,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/discover"
-	"github.com/EchoCog/echollama/envconfig"
-	"github.com/EchoCog/echollama/format"
-	"github.com/EchoCog/echollama/fs/ggml"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/discover"
+	"github.com/cogpy/echo9llama/envconfig"
+	"github.com/cogpy/echo9llama/format"
+	"github.com/cogpy/echo9llama/fs/ggml"
 )
 
 // This algorithm looks for a complete fit to determine if we need to unload other models

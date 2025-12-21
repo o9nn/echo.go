@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/EchoCog/echollama/cmd"
+	"github.com/cogpy/echo9llama/cmd"
 )
 
 func main() {

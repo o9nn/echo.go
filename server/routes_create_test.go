@@ -17,9 +17,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/envconfig"
-	"github.com/EchoCog/echollama/fs/ggml"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/envconfig"
+	"github.com/cogpy/echo9llama/fs/ggml"
 )
 
 var stream bool = false

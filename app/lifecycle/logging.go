@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/EchoCog/echollama/envconfig"
-	"github.com/EchoCog/echollama/logutil"
+	"github.com/cogpy/echo9llama/envconfig"
+	"github.com/cogpy/echo9llama/logutil"
 )
 
 func InitLogging() {

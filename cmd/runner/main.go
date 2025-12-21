@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/EchoCog/echollama/runner"
+	"github.com/cogpy/echo9llama/runner"
 )
 
 func main() {

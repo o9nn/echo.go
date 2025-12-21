@@ -15,7 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/EchoCog/echollama/api"
+	"github.com/cogpy/echo9llama/api"
 )
 
 const (

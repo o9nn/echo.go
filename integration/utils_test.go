@@ -22,9 +22,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/app/lifecycle"
-	"github.com/EchoCog/echollama/format"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/app/lifecycle"
+	"github.com/cogpy/echo9llama/format"
 	"github.com/stretchr/testify/require"
 )
 

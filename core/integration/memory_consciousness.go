@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echollama/core/consciousness"
-	"github.com/EchoCog/echollama/core/memory"
+	"github.com/cogpy/echo9llama/core/consciousness"
+	"github.com/cogpy/echo9llama/core/memory"
 	"github.com/google/uuid"
 )
 

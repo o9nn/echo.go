@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/EchoCog/echollama/app/assets"
-	"github.com/EchoCog/echollama/app/tray/commontray"
+	"github.com/cogpy/echo9llama/app/assets"
+	"github.com/cogpy/echo9llama/app/tray/commontray"
 )
 
 func NewTray() (commontray.OllamaTray, error) {

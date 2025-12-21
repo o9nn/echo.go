@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echollama/core/llm"
+	"github.com/cogpy/echo9llama/core/llm"
 )
 
 // DiscussionAutonomySystem enables echoself to start, end, and respond to discussions

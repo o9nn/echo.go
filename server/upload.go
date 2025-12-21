@@ -19,8 +19,8 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/format"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/format"
 )
 
 var blobUploadManager sync.Map

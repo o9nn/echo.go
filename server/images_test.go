@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/EchoCog/echollama/fs/ggml"
-	"github.com/EchoCog/echollama/template"
-	"github.com/EchoCog/echollama/types/model"
+	"github.com/cogpy/echo9llama/fs/ggml"
+	"github.com/cogpy/echo9llama/template"
+	"github.com/cogpy/echo9llama/types/model"
 )
 
 func TestModelCapabilities(t *testing.T) {

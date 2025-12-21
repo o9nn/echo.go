@@ -21,12 +21,12 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/envconfig"
-	"github.com/EchoCog/echollama/llama"
-	"github.com/EchoCog/echollama/llm"
-	"github.com/EchoCog/echollama/logutil"
-	"github.com/EchoCog/echollama/runner/common"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/envconfig"
+	"github.com/cogpy/echo9llama/llama"
+	"github.com/cogpy/echo9llama/llm"
+	"github.com/cogpy/echo9llama/logutil"
+	"github.com/cogpy/echo9llama/runner/common"
 )
 
 // input is an element of the prompt to process, either

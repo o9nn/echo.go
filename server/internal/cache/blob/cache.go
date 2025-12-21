@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/EchoCog/echollama/server/internal/internal/names"
+	"github.com/cogpy/echo9llama/server/internal/internal/names"
 )
 
 // Entry contains metadata about a blob in the cache.

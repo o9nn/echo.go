@@ -1,9 +1,7 @@
-module github.com/EchoCog/echollama
+module github.com/cogpy/echo9llama
 
 // Deep Tree Echo - compatible with Go 1.18+
-go 1.24.0
-
-toolchain go1.24.11
+go 1.18
 
 require (
 	github.com/containerd/console v1.0.3

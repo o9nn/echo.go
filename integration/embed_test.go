@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/EchoCog/echollama/api"
+	"github.com/cogpy/echo9llama/api"
 )
 
 func dotProduct[V float32 | float64](v1, v2 []V) V {

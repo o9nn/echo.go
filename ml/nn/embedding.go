@@ -1,6 +1,6 @@
 package nn
 
-import "github.com/EchoCog/echollama/ml"
+import "github.com/cogpy/echo9llama/ml"
 
 type Embedding struct {
 	Weight ml.Tensor `gguf:"weight"`

@@ -9,7 +9,7 @@ import (
 
 	"google.golang.org/protobuf/proto"
 
-	"github.com/EchoCog/echollama/convert/sentencepiece"
+	"github.com/cogpy/echo9llama/convert/sentencepiece"
 )
 
 func loadSentencePieceVocab(t *testing.T) SentencePieceModel {

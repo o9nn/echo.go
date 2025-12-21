@@ -11,7 +11,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/EchoCog/echollama/types/model"
+	"github.com/cogpy/echo9llama/types/model"
 )
 
 type Manifest struct {

@@ -1,8 +1,8 @@
 package tray
 
 import (
-	"github.com/EchoCog/echollama/app/tray/commontray"
-	"github.com/EchoCog/echollama/app/tray/wintray"
+	"github.com/cogpy/echo9llama/app/tray/commontray"
+	"github.com/cogpy/echo9llama/app/tray/wintray"
 )
 
 func InitPlatformTray(icon, updateIcon []byte) (commontray.OllamaTray, error) {

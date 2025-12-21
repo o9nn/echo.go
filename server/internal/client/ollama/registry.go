@@ -36,8 +36,8 @@ import (
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/EchoCog/echollama/server/internal/cache/blob"
-	"github.com/EchoCog/echollama/server/internal/internal/names"
+	"github.com/cogpy/echo9llama/server/internal/cache/blob"
+	"github.com/cogpy/echo9llama/server/internal/internal/names"
 
 	_ "embed"
 )

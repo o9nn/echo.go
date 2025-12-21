@@ -9,9 +9,9 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/llm"
-	"github.com/EchoCog/echollama/template"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/llm"
+	"github.com/cogpy/echo9llama/template"
 )
 
 type tokenizeFunc func(context.Context, string) ([]int, error)

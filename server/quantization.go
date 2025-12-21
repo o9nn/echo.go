@@ -9,8 +9,8 @@ import (
 	"strings"
 	"unsafe"
 
-	fsggml "github.com/EchoCog/echollama/fs/ggml"
-	"github.com/EchoCog/echollama/ml/backend/ggml"
+	fsggml "github.com/cogpy/echo9llama/fs/ggml"
+	"github.com/cogpy/echo9llama/ml/backend/ggml"
 )
 
 type quantizer struct {

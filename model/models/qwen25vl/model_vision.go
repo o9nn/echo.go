@@ -4,9 +4,9 @@ import (
 	"math"
 	"slices"
 
-	"github.com/EchoCog/echollama/fs"
-	"github.com/EchoCog/echollama/ml"
-	"github.com/EchoCog/echollama/ml/nn"
+	"github.com/cogpy/echo9llama/fs"
+	"github.com/cogpy/echo9llama/ml"
+	"github.com/cogpy/echo9llama/ml/nn"
 )
 
 // We only support batch size of 1

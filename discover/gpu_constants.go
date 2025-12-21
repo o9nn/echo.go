@@ -2,7 +2,7 @@
 
 package discover
 
-import "github.com/EchoCog/echollama/format"
+import "github.com/cogpy/echo9llama/format"
 
 // GPU memory and compute requirements
 const (

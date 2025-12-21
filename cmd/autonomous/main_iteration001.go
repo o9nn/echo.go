@@ -8,8 +8,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/EchoCog/echollama/core/autonomous"
-	"github.com/EchoCog/echollama/core/echobeats"
+	"github.com/cogpy/echo9llama/core/autonomous"
+	"github.com/cogpy/echo9llama/core/echobeats"
 )
 
 func main() {

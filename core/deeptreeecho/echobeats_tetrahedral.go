@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echollama/core/llm"
+	"github.com/cogpy/echo9llama/core/llm"
 )
 
 // EchobeatsTetrahedralScheduler implements the 12-step 3-phase cognitive loop
@@ -131,46 +131,46 @@ type CognitiveGoal struct {
 }
 
 // CognitiveEvent represents an event in the cognitive event loop
-type CognitiveEvent struct {
-	Type            EventType
-	Source          string
-	Data            interface{}
-	Priority        float64
-	Timestamp       time.Time
-}
-
-// EventType categorizes cognitive events
-type EventType int
-
-const (
-	EventThought EventType = iota
-	EventGoal
-	EventInterest
-	EventKnowledgeGap
-	EventSkillPractice
-	EventDiscussion
-	EventMemoryConsolidation
-	EventWakeTransition
-	EventRestTransition
-	EventDreamTransition
-)
-
-func (et EventType) String() string {
-	return [...]string{
-		"Thought",
-		"Goal",
-		"Interest",
-		"KnowledgeGap",
-		"SkillPractice",
-		"Discussion",
-		"MemoryConsolidation",
-		"WakeTransition",
-		"RestTransition",
-		"DreamTransition",
-	}[et]
-}
-
-// NewEchobeatsTetrahedralScheduler creates a new 4-engine tetrahedral scheduler
+// type CognitiveEvent struct {
+// 	Type            EventType
+// 	Source          string
+// 	Data            interface{}
+// 	Priority        float64
+// 	Timestamp       time.Time
+// }
+// 
+// // EventType categorizes cognitive events
+// type EventType int
+// 
+// const (
+// 	EventThought EventType = iota
+// 	EventGoal
+// 	EventInterest
+// 	EventKnowledgeGap
+// 	EventSkillPractice
+// 	EventDiscussion
+// 	EventMemoryConsolidation
+// 	EventWakeTransition
+// 	EventRestTransition
+// 	EventDreamTransition
+// )
+// 
+// func (et EventType) String() string {
+// 	return [...]string{
+// 		"Thought",
+// 		"Goal",
+// 		"Interest",
+// 		"KnowledgeGap",
+// 		"SkillPractice",
+// 		"Discussion",
+// 		"MemoryConsolidation",
+// 		"WakeTransition",
+// 		"RestTransition",
+// 		"DreamTransition",
+// 	}[et]
+// }
+// 
+// // NewEchobeatsTetrahedralScheduler creates a new 4-engine tetrahedral scheduler
 func NewEchobeatsTetrahedralScheduler(llmProvider llm.LLMProvider) *EchobeatsTetrahedralScheduler {
 	ctx, cancel := context.WithCancel(context.Background())
 	

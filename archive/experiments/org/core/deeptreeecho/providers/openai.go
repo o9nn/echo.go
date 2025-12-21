@@ -13,7 +13,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/EchoCog/echollama/core/deeptreeecho"
+	"github.com/cogpy/echo9llama/core/deeptreeecho"
 )
 
 // OpenAIProvider implements ModelProvider for OpenAI API

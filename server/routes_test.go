@@ -24,12 +24,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/go-cmp/cmp"
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/fs/ggml"
-	"github.com/EchoCog/echollama/openai"
-	"github.com/EchoCog/echollama/server/internal/client/ollama"
-	"github.com/EchoCog/echollama/types/model"
-	"github.com/EchoCog/echollama/version"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/fs/ggml"
+	"github.com/cogpy/echo9llama/openai"
+	"github.com/cogpy/echo9llama/server/internal/client/ollama"
+	"github.com/cogpy/echo9llama/types/model"
+	"github.com/cogpy/echo9llama/version"
 )
 
 func createTestFile(t *testing.T, name string) (string, string) {

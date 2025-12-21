@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/EchoCog/echollama/fs/ggml"
+	"github.com/cogpy/echo9llama/fs/ggml"
 )
 
 type phi3Model struct {

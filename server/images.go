@@ -21,14 +21,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/envconfig"
-	"github.com/EchoCog/echollama/fs/gguf"
-	"github.com/EchoCog/echollama/parser"
-	"github.com/EchoCog/echollama/template"
-	"github.com/EchoCog/echollama/thinking"
-	"github.com/EchoCog/echollama/types/model"
-	"github.com/EchoCog/echollama/version"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/envconfig"
+	"github.com/cogpy/echo9llama/fs/gguf"
+	"github.com/cogpy/echo9llama/parser"
+	"github.com/cogpy/echo9llama/template"
+	"github.com/cogpy/echo9llama/thinking"
+	"github.com/cogpy/echo9llama/types/model"
+	"github.com/cogpy/echo9llama/version"
 )
 
 var (

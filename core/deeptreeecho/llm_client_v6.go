@@ -140,7 +140,7 @@ func (llm *LLMClientV6) GenerateWithOpenRouter(prompt string, model string) (str
 	// Set headers
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+llm.openrouterKey)
-	req.Header.Set("HTTP-Referer", "https://github.com/EchoCog/echollama")
+	req.Header.Set("HTTP-Referer", "https://github.com/cogpy/echo9llama")
 	req.Header.Set("X-Title", "Deep Tree Echo V6")
 
 	// Send request

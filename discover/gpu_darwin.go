@@ -14,7 +14,7 @@ import (
 	"runtime"
 	"syscall"
 
-	"github.com/EchoCog/echollama/format"
+	"github.com/cogpy/echo9llama/format"
 )
 
 const (

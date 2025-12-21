@@ -2,8 +2,8 @@
 package fast
 
 import (
-	"github.com/EchoCog/echollama/ml"
-	"github.com/EchoCog/echollama/ml/nn/rope"
+	"github.com/cogpy/echo9llama/ml"
+	"github.com/cogpy/echo9llama/ml/nn/rope"
 )
 
 // fastRoPE is an interface for tensors that support fast rotary positional embedding.

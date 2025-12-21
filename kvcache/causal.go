@@ -7,8 +7,8 @@ import (
 	"math"
 	"slices"
 
-	"github.com/EchoCog/echollama/ml"
-	"github.com/EchoCog/echollama/model/input"
+	"github.com/cogpy/echo9llama/ml"
+	"github.com/cogpy/echo9llama/model/input"
 )
 
 type shiftFn func(ctx ml.Context, layer int, key, shift ml.Tensor) (ml.Tensor, error)

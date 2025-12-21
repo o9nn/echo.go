@@ -11,8 +11,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/core/deeptreeecho"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/core/deeptreeecho"
 )
 
 // EchoAssessHandler handles the 'ollama echo assess' command for self-assessment

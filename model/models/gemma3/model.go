@@ -6,12 +6,12 @@ import (
 	"math"
 	"slices"
 
-	"github.com/EchoCog/echollama/fs"
-	"github.com/EchoCog/echollama/kvcache"
-	"github.com/EchoCog/echollama/ml"
-	"github.com/EchoCog/echollama/ml/nn"
-	"github.com/EchoCog/echollama/model"
-	"github.com/EchoCog/echollama/model/input"
+	"github.com/cogpy/echo9llama/fs"
+	"github.com/cogpy/echo9llama/kvcache"
+	"github.com/cogpy/echo9llama/ml"
+	"github.com/cogpy/echo9llama/ml/nn"
+	"github.com/cogpy/echo9llama/model"
+	"github.com/cogpy/echo9llama/model/input"
 )
 
 type Model struct {

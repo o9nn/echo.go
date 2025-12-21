@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/EchoCog/echollama/core/llm"
+	"github.com/cogpy/echo9llama/core/llm"
 	"github.com/google/uuid"
 )
 

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/EchoCog/echollama/format"
+	"github.com/cogpy/echo9llama/format"
 )
 
 type memInfo struct {

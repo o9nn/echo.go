@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echollama/core/llm"
+	"github.com/cogpy/echo9llama/core/llm"
 )
 
 // LLMThoughtEngine generates autonomous thoughts using LLM providers

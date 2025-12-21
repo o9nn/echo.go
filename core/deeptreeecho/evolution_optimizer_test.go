@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/EchoCog/echollama/core/llm"
+	"github.com/cogpy/echo9llama/core/llm"
 )
 
 // MockLLMProvider for testing
@@ -220,12 +220,12 @@ func TestEchobeatsPhaseRotation(t *testing.T) {
 	}
 }
 
-func TestEchodreamKnowledgeIntegration(t *testing.T) {
+func TestEchoDreamKnowledgeIntegration(t *testing.T) {
 	provider := &MockLLMProvider{}
-	edi := NewEchodreamKnowledgeIntegration(provider)
+	edi := NewEchoDreamKnowledgeIntegration(provider)
 
 	if edi == nil {
-		t.Fatal("Expected non-nil EchodreamKnowledgeIntegration")
+		t.Fatal("Expected non-nil EchoDreamKnowledgeIntegration")
 	}
 
 	// Test adding memory
@@ -254,7 +254,7 @@ func TestEchodreamKnowledgeIntegration(t *testing.T) {
 
 func TestEchodreamSemanticNetwork(t *testing.T) {
 	provider := &MockLLMProvider{}
-	edi := NewEchodreamKnowledgeIntegration(provider)
+	edi := NewEchoDreamKnowledgeIntegration(provider)
 
 	network := edi.GetSemanticNetwork()
 	if len(network) != 0 {

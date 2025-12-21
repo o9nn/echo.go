@@ -4,7 +4,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/EchoCog/echollama/fs/ggml"
+	"github.com/cogpy/echo9llama/fs/ggml"
 	"github.com/pdevine/tensor"
 	"github.com/pdevine/tensor/native"
 	"gonum.org/v1/gonum/stat/distuv"

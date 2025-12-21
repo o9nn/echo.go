@@ -9,7 +9,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/EchoCog/echollama/core/opencog"
+	"github.com/cogpy/echo9llama/core/opencog"
 )
 
 func main() {

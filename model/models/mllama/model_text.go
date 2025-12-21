@@ -4,12 +4,12 @@ import (
 	"math"
 	"slices"
 
-	"github.com/EchoCog/echollama/fs"
-	"github.com/EchoCog/echollama/kvcache"
-	"github.com/EchoCog/echollama/ml"
-	"github.com/EchoCog/echollama/ml/nn"
-	"github.com/EchoCog/echollama/ml/nn/fast"
-	"github.com/EchoCog/echollama/ml/nn/rope"
+	"github.com/cogpy/echo9llama/fs"
+	"github.com/cogpy/echo9llama/kvcache"
+	"github.com/cogpy/echo9llama/ml"
+	"github.com/cogpy/echo9llama/ml/nn"
+	"github.com/cogpy/echo9llama/ml/nn/fast"
+	"github.com/cogpy/echo9llama/ml/nn/rope"
 )
 
 type TextSelfAttention struct {

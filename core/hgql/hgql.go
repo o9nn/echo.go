@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echollama/core/deeptreeecho"
+	"github.com/cogpy/echo9llama/core/deeptreeecho"
 )
 
 // HGQLEngine represents the core HGQL processing engine

@@ -8,11 +8,11 @@ import (
 	"log"
 	"time"
 
-	"github.com/EchoCog/echollama/core/consciousness"
-	"github.com/EchoCog/echollama/core/emergence"
-	"github.com/EchoCog/echollama/core/meta"
-	"github.com/EchoCog/echollama/core/quantum"
-	"github.com/EchoCog/echollama/lang/apl"
+	"github.com/cogpy/echo9llama/core/consciousness"
+	"github.com/cogpy/echo9llama/core/emergence"
+	"github.com/cogpy/echo9llama/core/meta"
+	"github.com/cogpy/echo9llama/core/quantum"
+	"github.com/cogpy/echo9llama/lang/apl"
 )
 
 func main() {

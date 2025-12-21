@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/EchoCog/echollama/core/deeptreeecho"
+	"github.com/cogpy/echo9llama/core/deeptreeecho"
 )
 
 // Demo of opponent processing for wisdom cultivation

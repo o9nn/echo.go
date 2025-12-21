@@ -159,13 +159,13 @@ type MetaCognitiveLayer struct {
 }
 
 // SelfModel represents the system's model of itself
-type SelfModel struct {
-	Identity        string
-	Capabilities    []string
-	Limitations     []string
-	CurrentState    string
-	Confidence      float64
-}
+// type SelfModel struct {
+// 	Identity        string
+// 	Capabilities    []string
+// 	Limitations     []string
+// 	CurrentState    string
+// 	Confidence      float64
+// }
 
 // Strategy represents a high-level strategy
 type Strategy struct {

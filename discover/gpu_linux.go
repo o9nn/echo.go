@@ -10,7 +10,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/EchoCog/echollama/format"
+	"github.com/cogpy/echo9llama/format"
 )
 
 var CudartGlobs = []string{

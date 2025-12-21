@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/EchoCog/echollama/logutil"
+	"github.com/cogpy/echo9llama/logutil"
 )
 
 const spmWhitespaceSep = "▁"

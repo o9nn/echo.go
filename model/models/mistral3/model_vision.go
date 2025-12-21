@@ -3,9 +3,9 @@ package mistral3
 import (
 	"math"
 
-	"github.com/EchoCog/echollama/fs"
-	"github.com/EchoCog/echollama/ml"
-	"github.com/EchoCog/echollama/ml/nn"
+	"github.com/cogpy/echo9llama/fs"
+	"github.com/cogpy/echo9llama/ml"
+	"github.com/cogpy/echo9llama/ml/nn"
 )
 
 var batchSize int = 1

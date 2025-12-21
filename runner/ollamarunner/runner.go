@@ -25,17 +25,17 @@ import (
 	"golang.org/x/image/bmp"
 	"golang.org/x/sync/semaphore"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/envconfig"
-	"github.com/EchoCog/echollama/llm"
-	"github.com/EchoCog/echollama/logutil"
-	"github.com/EchoCog/echollama/ml"
-	"github.com/EchoCog/echollama/model"
-	"github.com/EchoCog/echollama/model/input"
-	"github.com/EchoCog/echollama/runner/common"
-	"github.com/EchoCog/echollama/sample"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/envconfig"
+	"github.com/cogpy/echo9llama/llm"
+	"github.com/cogpy/echo9llama/logutil"
+	"github.com/cogpy/echo9llama/ml"
+	"github.com/cogpy/echo9llama/model"
+	"github.com/cogpy/echo9llama/model/input"
+	"github.com/cogpy/echo9llama/runner/common"
+	"github.com/cogpy/echo9llama/sample"
 
-	_ "github.com/EchoCog/echollama/model/models"
+	_ "github.com/cogpy/echo9llama/model/models"
 )
 
 type Sequence struct {

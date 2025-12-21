@@ -6,8 +6,8 @@ import (
 	_ "image/png"
 	"math"
 
-	"github.com/EchoCog/echollama/fs"
-	"github.com/EchoCog/echollama/model/imageproc"
+	"github.com/cogpy/echo9llama/fs"
+	"github.com/cogpy/echo9llama/model/imageproc"
 )
 
 type ImageProcessor struct {

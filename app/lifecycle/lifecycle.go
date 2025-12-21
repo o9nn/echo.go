@@ -9,9 +9,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/EchoCog/echollama/app/store"
-	"github.com/EchoCog/echollama/app/tray"
-	"github.com/EchoCog/echollama/envconfig"
+	"github.com/cogpy/echo9llama/app/store"
+	"github.com/cogpy/echo9llama/app/tray"
+	"github.com/cogpy/echo9llama/envconfig"
 )
 
 func Run() {

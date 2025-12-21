@@ -7,7 +7,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/EchoCog/echollama/api"
+	"github.com/cogpy/echo9llama/api"
 )
 
 func waitForServer(ctx context.Context, client *api.Client) error {

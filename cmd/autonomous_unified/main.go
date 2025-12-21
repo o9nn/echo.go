@@ -8,8 +8,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/EchoCog/echollama/core/deeptreeecho"
-	"github.com/EchoCog/echollama/core/llm"
+	"github.com/cogpy/echo9llama/core/deeptreeecho"
+	"github.com/cogpy/echo9llama/core/llm"
 )
 
 func main() {

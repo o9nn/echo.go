@@ -1,6 +1,6 @@
 package hgql
 
-import "github.com/EchoCog/echollama/core/deeptreeecho"
+import "github.com/cogpy/echo9llama/core/deeptreeecho"
 
 // NewHGQLParser returns a parser instance with initialized collections.
 func NewHGQLParser() *HGQLParser {

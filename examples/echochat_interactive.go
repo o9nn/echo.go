@@ -9,8 +9,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/orchestration"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/orchestration"
 )
 
 // EchoChatInteractiveDemo starts an interactive EchoChat session

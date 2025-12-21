@@ -21,7 +21,7 @@ import (
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 
-	"github.com/EchoCog/echollama/api"
+	"github.com/cogpy/echo9llama/api"
 )
 
 var ErrModelNotFound = errors.New("no Modelfile or safetensors files found")

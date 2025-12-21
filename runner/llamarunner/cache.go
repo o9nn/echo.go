@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/EchoCog/echollama/llama"
+	"github.com/cogpy/echo9llama/llama"
 )
 
 type InputCache struct {

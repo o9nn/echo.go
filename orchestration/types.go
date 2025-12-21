@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/EchoCog/echollama/api"
+	"github.com/cogpy/echo9llama/api"
 )
 
 // Agent represents an orchestration agent that can coordinate multiple models and tasks

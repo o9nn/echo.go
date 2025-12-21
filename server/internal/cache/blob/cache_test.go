@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/EchoCog/echollama/server/internal/testutil"
+	"github.com/cogpy/echo9llama/server/internal/testutil"
 )
 
 func init() {

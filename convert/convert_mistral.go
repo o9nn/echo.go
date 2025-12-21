@@ -8,7 +8,7 @@ import (
 	"github.com/pdevine/tensor"
 	"github.com/pdevine/tensor/native"
 
-	"github.com/EchoCog/echollama/fs/ggml"
+	"github.com/cogpy/echo9llama/fs/ggml"
 )
 
 type mistral3Model struct {

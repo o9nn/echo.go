@@ -10,8 +10,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/EchoCog/echollama/envconfig"
-	"github.com/EchoCog/echollama/types/model"
+	"github.com/cogpy/echo9llama/envconfig"
+	"github.com/cogpy/echo9llama/types/model"
 )
 
 type ModelPath struct {

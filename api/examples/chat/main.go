@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/EchoCog/echollama/api"
+	"github.com/cogpy/echo9llama/api"
 )
 
 func main() {

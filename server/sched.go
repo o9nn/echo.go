@@ -15,13 +15,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/discover"
-	"github.com/EchoCog/echollama/envconfig"
-	"github.com/EchoCog/echollama/format"
-	"github.com/EchoCog/echollama/fs/ggml"
-	"github.com/EchoCog/echollama/llm"
-	"github.com/EchoCog/echollama/types/model"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/discover"
+	"github.com/cogpy/echo9llama/envconfig"
+	"github.com/cogpy/echo9llama/format"
+	"github.com/cogpy/echo9llama/fs/ggml"
+	"github.com/cogpy/echo9llama/llm"
+	"github.com/cogpy/echo9llama/types/model"
 )
 
 type LlmRequest struct {
@@ -132,7 +132,7 @@ func (s *Scheduler) processPending(ctx context.Context) {
 			}
 			numParallel := int(envconfig.NumParallel())
 			// `mllama` is a snowflake and uses an encoder cache which cannot be used with num_parallel > 1
-			// ref: https://github.com/EchoCog/echollama/issues/4165
+			// ref: https://github.com/cogpy/echo9llama/issues/4165
 			if slices.Contains(pending.model.Config.ModelFamilies, "mllama") && numParallel != 1 {
 				numParallel = 1
 				slog.Warn("mllama does not currently support parallel requests")

@@ -9,8 +9,8 @@
 // Several examples of using this package are available [in the GitHub
 // repository].
 //
-// [the API documentation]: https://github.com/EchoCog/echollama/blob/main/docs/api.md
-// [in the GitHub repository]: https://github.com/EchoCog/echollama/tree/main/api/examples
+// [the API documentation]: https://github.com/cogpy/echo9llama/blob/main/docs/api.md
+// [in the GitHub repository]: https://github.com/cogpy/echo9llama/tree/main/api/examples
 package api
 
 import (
@@ -27,10 +27,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/EchoCog/echollama/auth"
-	"github.com/EchoCog/echollama/envconfig"
-	"github.com/EchoCog/echollama/format"
-	"github.com/EchoCog/echollama/version"
+	"github.com/cogpy/echo9llama/auth"
+	"github.com/cogpy/echo9llama/envconfig"
+	"github.com/cogpy/echo9llama/format"
+	"github.com/cogpy/echo9llama/version"
 )
 
 // Client encapsulates client state for interacting with the ollama
@@ -327,7 +327,7 @@ type CreateProgressFunc func(ProgressResponse) error
 // Create creates a model from a [Modelfile]. fn is a progress function that
 // behaves similarly to other methods (see [Client.Pull]).
 //
-// [Modelfile]: https://github.com/EchoCog/echollama/blob/main/docs/modelfile.md
+// [Modelfile]: https://github.com/cogpy/echo9llama/blob/main/docs/modelfile.md
 func (c *Client) Create(ctx context.Context, req *CreateRequest, fn CreateProgressFunc) error {
 	return c.stream(ctx, http.MethodPost, "/api/create", req, func(bts []byte) error {
 		var resp ProgressResponse

@@ -6,8 +6,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/logutil"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/logutil"
 )
 
 type harmonyParserState int

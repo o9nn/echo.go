@@ -6,10 +6,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echollama/core/deeptreeecho"
-	"github.com/EchoCog/echollama/core/echobeats"
-	"github.com/EchoCog/echollama/core/echodream"
-	"github.com/EchoCog/echollama/llm"
+	"github.com/cogpy/echo9llama/core/deeptreeecho"
+	"github.com/cogpy/echo9llama/core/echobeats"
+	"github.com/cogpy/echo9llama/core/echodream"
+	"github.com/cogpy/echo9llama/llm"
 )
 
 // UnifiedAutonomousAgent orchestrates all cognitive subsystems into a cohesive

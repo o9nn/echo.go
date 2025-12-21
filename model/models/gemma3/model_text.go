@@ -3,13 +3,13 @@ package gemma3
 import (
 	"math"
 
-	"github.com/EchoCog/echollama/fs"
-	"github.com/EchoCog/echollama/kvcache"
-	"github.com/EchoCog/echollama/ml"
-	"github.com/EchoCog/echollama/ml/nn"
-	"github.com/EchoCog/echollama/ml/nn/fast"
-	"github.com/EchoCog/echollama/ml/nn/rope"
-	"github.com/EchoCog/echollama/model/input"
+	"github.com/cogpy/echo9llama/fs"
+	"github.com/cogpy/echo9llama/kvcache"
+	"github.com/cogpy/echo9llama/ml"
+	"github.com/cogpy/echo9llama/ml/nn"
+	"github.com/cogpy/echo9llama/ml/nn/fast"
+	"github.com/cogpy/echo9llama/ml/nn/rope"
+	"github.com/cogpy/echo9llama/model/input"
 )
 
 type TextConfig struct {

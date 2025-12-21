@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/EchoCog/echollama/fs"
+	"github.com/cogpy/echo9llama/fs"
 )
 
 type Backend interface {

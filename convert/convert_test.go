@@ -18,7 +18,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/EchoCog/echollama/fs/ggml"
+	"github.com/cogpy/echo9llama/fs/ggml"
 )
 
 type tensorData struct {

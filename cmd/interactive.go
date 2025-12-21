@@ -14,11 +14,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/envconfig"
-	"github.com/EchoCog/echollama/readline"
-	"github.com/EchoCog/echollama/types/errtypes"
-	"github.com/EchoCog/echollama/types/model"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/envconfig"
+	"github.com/cogpy/echo9llama/readline"
+	"github.com/cogpy/echo9llama/types/errtypes"
+	"github.com/cogpy/echo9llama/types/model"
 )
 
 type MultilineState int

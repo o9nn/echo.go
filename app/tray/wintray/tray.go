@@ -16,7 +16,7 @@ import (
 
 	"golang.org/x/sys/windows"
 
-	"github.com/EchoCog/echollama/app/tray/commontray"
+	"github.com/cogpy/echo9llama/app/tray/commontray"
 )
 
 // Helpful sources: https://github.com/golang/exp/blob/master/shiny/driver/internal/win32

@@ -24,13 +24,13 @@ import (
 	"unicode"
 	"unsafe"
 
-	"github.com/EchoCog/echollama/format"
-	"github.com/EchoCog/echollama/fs"
-	fsggml "github.com/EchoCog/echollama/fs/ggml"
-	"github.com/EchoCog/echollama/logutil"
-	"github.com/EchoCog/echollama/ml"
-	ggml "github.com/EchoCog/echollama/ml/backend/ggml/ggml/src"
-	"github.com/EchoCog/echollama/ml/nn/rope"
+	"github.com/cogpy/echo9llama/format"
+	"github.com/cogpy/echo9llama/fs"
+	fsggml "github.com/cogpy/echo9llama/fs/ggml"
+	"github.com/cogpy/echo9llama/logutil"
+	"github.com/cogpy/echo9llama/ml"
+	ggml "github.com/cogpy/echo9llama/ml/backend/ggml/ggml/src"
+	"github.com/cogpy/echo9llama/ml/nn/rope"
 	"golang.org/x/sync/errgroup"
 )
 

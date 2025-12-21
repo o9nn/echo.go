@@ -15,9 +15,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/EchoCog/echollama/server/internal/cache/blob"
-	"github.com/EchoCog/echollama/server/internal/client/ollama"
-	"github.com/EchoCog/echollama/server/internal/testutil"
+	"github.com/cogpy/echo9llama/server/internal/cache/blob"
+	"github.com/cogpy/echo9llama/server/internal/client/ollama"
+	"github.com/cogpy/echo9llama/server/internal/testutil"
 	"golang.org/x/tools/txtar"
 
 	_ "embed"

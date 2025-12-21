@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/discover"
-	"github.com/EchoCog/echollama/fs/ggml"
-	"github.com/EchoCog/echollama/llm"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/discover"
+	"github.com/cogpy/echo9llama/fs/ggml"
+	"github.com/cogpy/echo9llama/llm"
 )
 
 func getTestTools() []api.Tool {

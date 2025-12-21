@@ -1,6 +1,6 @@
 package input
 
-import "github.com/EchoCog/echollama/ml"
+import "github.com/cogpy/echo9llama/ml"
 
 // Multimodal is a multimodal embedding or a component of one.
 // For example, it could be a row of an image that can be processed

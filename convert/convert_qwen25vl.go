@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/EchoCog/echollama/fs/ggml"
+	"github.com/cogpy/echo9llama/fs/ggml"
 )
 
 type qwen25VLModel struct {

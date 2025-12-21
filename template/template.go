@@ -17,7 +17,7 @@ import (
 
 	"github.com/agnivade/levenshtein"
 
-	"github.com/EchoCog/echollama/api"
+	"github.com/cogpy/echo9llama/api"
 )
 
 //go:embed index.json

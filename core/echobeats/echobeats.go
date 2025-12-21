@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	// "github.com/EchoCog/echollama/core/deeptreeecho" // Disabled for now
+	// "github.com/cogpy/echo9llama/core/deeptreeecho" // Disabled for now
 )
 
 // CognitivePhase represents one of the three phases in the cognitive loop

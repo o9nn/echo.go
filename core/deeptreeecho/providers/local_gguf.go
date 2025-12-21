@@ -9,7 +9,7 @@ import (
         "strings"
         "time"
 
-        "github.com/EchoCog/echollama/core/deeptreeecho"
+        "github.com/cogpy/echo9llama/core/deeptreeecho"
 )
 
 // LocalGGUFProvider implements ModelProvider for local GGUF models

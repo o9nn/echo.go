@@ -15,8 +15,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/EchoCog/echollama/api"
-	"github.com/EchoCog/echollama/format"
+	"github.com/cogpy/echo9llama/api"
+	"github.com/cogpy/echo9llama/format"
 )
 
 func TestModelsGenerate(t *testing.T) {

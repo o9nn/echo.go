@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/EchoCog/echollama/core/deeptreeecho"
+	"github.com/cogpy/echo9llama/core/deeptreeecho"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
