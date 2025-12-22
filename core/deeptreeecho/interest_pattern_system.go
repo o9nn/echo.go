@@ -377,3 +377,26 @@ func (ips *InterestPatternSystem) RestoreInterests(interests map[string]float64)
 		}
 	}
 }
+
+// GetInterestLevel returns the interest level for a specific topic
+func (ips *InterestPatternSystem) GetInterestLevel(topic string) float64 {
+	ips.mu.RLock()
+	defer ips.mu.RUnlock()
+	
+	// Normalize topic to lowercase with underscores
+	normalizedTopic := strings.ToLower(strings.ReplaceAll(topic, " ", "_"))
+	
+	if interest, exists := ips.interests[normalizedTopic]; exists {
+		return interest.Strength
+	}
+	
+	// If exact match not found, try partial matching
+	for knownTopic, interest := range ips.interests {
+		if strings.Contains(normalizedTopic, knownTopic) || strings.Contains(knownTopic, normalizedTopic) {
+			return interest.Strength * 0.8  // Slightly reduced for partial match
+		}
+	}
+	
+	// Default baseline interest for unknown topics
+	return 0.3
+}

@@ -5,8 +5,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/EchoCog/echo9llama/core/echobeats"
-	"github.com/EchoCog/echo9llama/core/llm"
+	"github.com/cogpy/echo9llama/core/echobeats"
+	"github.com/cogpy/echo9llama/core/llm"
 )
 
 // System4Triad wraps the System4TriadEngine with progressive integration.

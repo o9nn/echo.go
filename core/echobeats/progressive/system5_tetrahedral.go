@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echo9llama/core/consciousness"
-	"github.com/EchoCog/echo9llama/core/llm"
+	"github.com/cogpy/echo9llama/core/consciousness"
+	"github.com/cogpy/echo9llama/core/llm"
 )
 
 // System5Tetrahedral implements the nested concurrency with tetrahedral structure.

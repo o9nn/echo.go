@@ -684,8 +684,13 @@ func splitLines(s string) []string {
 func trimBullet(s string) string {
 	// Remove leading whitespace, bullets, dashes
 	start := 0
-	for start < len(s) && (s[start] == ' ' || s[start] == '-' || s[start] == '*' || s[start] == '•') {
-		start++
+	for start < len(s) {
+		r := rune(s[start])
+		if r == ' ' || r == '-' || r == '*' || r == '•' {
+			start++
+		} else {
+			break
+		}
 	}
 	return s[start:]
 }

@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echo9llama/core/consciousness"
-	"github.com/EchoCog/echo9llama/core/llm"
+	"github.com/cogpy/echo9llama/core/consciousness"
+	"github.com/cogpy/echo9llama/core/llm"
 )
 
 // System3Dyads implements the orthogonal dyadic pair structure.

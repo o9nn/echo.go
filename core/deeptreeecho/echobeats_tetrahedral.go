@@ -342,19 +342,20 @@ func (sched *EchobeatsTetrahedralScheduler) handleEvent(event CognitiveEvent) {
 	fmt.Printf("📨 Event: %s from %s\n", event.Type, event.Source)
 	
 	switch event.Type {
-	case EventGoal:
-		if goal, ok := event.Data.(*CognitiveGoal); ok {
-			sched.addGoal(goal)
+	case EventGoalCreated:
+		if goalData, ok := event.Data["goal"]; ok {
+			// Handle goal creation
+			_ = goalData
 		}
-	case EventInterest:
+	case EventInterestDetected:
 		// Handle interest event
-	case EventKnowledgeGap:
+	case EventKnowledgeGapDetected:
 		// Generate learning goal
-	case EventWakeTransition:
+	case EventWakeInitiated:
 		fmt.Println("☀️  Wake transition - activating all triads")
 		sched.activateAllTriads()
-	case EventDreamTransition:
-		fmt.Println("🌙 Dream transition - consolidating knowledge")
+	case EventRestInitiated:
+		fmt.Println("🌙 Rest transition - consolidating knowledge")
 		// Trigger knowledge consolidation
 	}
 }
@@ -634,10 +635,10 @@ func (sched *EchobeatsTetrahedralScheduler) salienceSimulationTetrahedral(stepNu
 // AddGoal adds a goal to the goal queue
 func (sched *EchobeatsTetrahedralScheduler) AddGoal(goal *CognitiveGoal) {
 	sched.eventQueue <- CognitiveEvent{
-		Type:      EventGoal,
+		Type:      EventGoalCreated,
 		Source:    "external",
-		Data:      goal,
-		Priority:  goal.Priority,
+		Data:      map[string]interface{}{"goal": goal},
+		Priority:  int(goal.Priority),
 		Timestamp: time.Now(),
 	}
 }

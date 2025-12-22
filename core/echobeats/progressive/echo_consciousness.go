@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echo9llama/core/llm"
+	"github.com/cogpy/echo9llama/core/llm"
 )
 
 // EchoConsciousness is the main container for the progressive consciousness system.

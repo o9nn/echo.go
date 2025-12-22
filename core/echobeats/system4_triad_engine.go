@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echo9llama/core/consciousness"
-	"github.com/EchoCog/echo9llama/core/llm"
+	"github.com/cogpy/echo9llama/core/consciousness"
+	"github.com/cogpy/echo9llama/core/llm"
 )
 
 // System4TriadEngine implements the 3 concurrent consciousness threads

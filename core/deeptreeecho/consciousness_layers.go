@@ -220,11 +220,13 @@ func newReflectiveLayer() *ReflectiveConsciousnessLayer {
 func newMetaLayer() *MetaCognitiveLayer {
 	return &MetaCognitiveLayer{
 		selfModel: SelfModel{
-			Identity:     "Deep Tree Echo",
-			Capabilities: []string{"reasoning", "learning", "reflection"},
-			Limitations:  []string{"limited context", "no physical embodiment"},
-			CurrentState: "active",
-			Confidence:   0.7,
+			Identity: "Deep Tree Echo",
+			CoreValues: []string{"wisdom", "growth", "understanding"},
+			CurrentGoals: []string{"reasoning", "learning", "reflection"},
+			Strengths: []string{"pattern recognition", "integration"},
+			GrowthAreas: []string{"limited context", "continuous learning"},
+			WisdomPrinciples: []string{"cultivate understanding", "embrace growth"},
+			LastUpdated: time.Now(),
 		},
 		awarenessLevel:   0.5,
 		activeStrategies: make([]Strategy, 0),

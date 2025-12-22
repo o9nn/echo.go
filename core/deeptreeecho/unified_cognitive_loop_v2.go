@@ -64,7 +64,7 @@ func NewUnifiedCognitiveLoopV2(llmProvider llm.LLMProvider) *UnifiedCognitiveLoo
 		ctx:                ctx,
 		cancel:             cancel,
 		llmProvider:        llmProvider,
-		consciousnessState: StateInitializing,
+		consciousnessState: StateAwake,
 		cognitiveLoad:      0.0,
 		wisdomLevel:        0.0,
 		awarenessLevel:     0.5,

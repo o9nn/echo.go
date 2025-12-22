@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/EchoCog/echo9llama/core/llm"
+	"github.com/cogpy/echo9llama/core/llm"
 )
 
 // JanClient communicates with a janecho-server instance.

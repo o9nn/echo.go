@@ -70,7 +70,7 @@ const (
 // type GoalStatus string
 // 
 // const (
-// 	StatusActive    GoalStatus = "active"
+// 	GoalActive    GoalStatus = "active"
 // 	StatusPaused    GoalStatus = "paused"
 // 	StatusCompleted GoalStatus = "completed"
 // 	StatusAbandoned GoalStatus = "abandoned"
@@ -277,7 +277,7 @@ func (gg *GoalGenerator) parseGoal(response string, interests []string, gaps []K
 		Type:             goalType,
 		Priority:         priority,
 		CreatedAt:        time.Now(),
-		Status:           StatusActive,
+		Status:           GoalActive,
 		Progress:         0.0,
 		SubGoals:         make([]string, 0),
 		RelatedInterests: interests,
@@ -362,7 +362,7 @@ func (gg *GoalGenerator) countActiveGoals() int {
 	
 	count := 0
 	for _, goal := range gg.recentGoals {
-		if goal.Status == StatusActive {
+		if goal.Status == GoalActive {
 			count++
 		}
 	}
@@ -392,7 +392,7 @@ func (gg *GoalGenerator) GetActiveGoals() []Goal {
 	
 	active := make([]Goal, 0)
 	for _, goal := range gg.recentGoals {
-		if goal.Status == StatusActive {
+		if goal.Status == GoalActive {
 			active = append(active, goal)
 		}
 	}

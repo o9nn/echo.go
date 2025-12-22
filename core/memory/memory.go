@@ -4,7 +4,7 @@ package memory
 import (
 	"context"
 
-	"github.com/EchoCog/echo9llama/core/consciousness"
+	"github.com/cogpy/echo9llama/core/consciousness"
 )
 
 // CognitiveMemory defines the interface for a persistent, searchable memory system.

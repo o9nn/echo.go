@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -333,21 +334,19 @@ func isNonRetryableError(err error) bool {
 	errStr := err.Error()
 	
 	// Don't retry on authentication errors
-	if containsString(errStr, "401") || containsString(errStr, "403") {
+	if containsSubstring(errStr, "401") || containsSubstring(errStr, "403") {
 		return true
 	}
 	
 	// Don't retry on invalid request errors
-	if containsString(errStr, "400") || containsString(errStr, "422") {
+	if containsSubstring(errStr, "400") || containsSubstring(errStr, "422") {
 		return true
 	}
 	
 	return false
 }
 
-// containsString checks if a string contains a substring
-// func containsString(s, substr string) bool {
-// 	return len(s) >= len(substr) && (s == substr || len(s) > len(substr) && 
-// 		(s[:len(substr)] == substr || s[len(s)-len(substr):] == substr || 
-// 		bytes.Contains([]byte(s), []byte(substr))))
-// }
+// containsSubstring checks if a string contains a substring
+func containsSubstring(s, substr string) bool {
+	return strings.Contains(s, substr)
+}

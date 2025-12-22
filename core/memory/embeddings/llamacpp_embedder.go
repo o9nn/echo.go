@@ -5,8 +5,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/EchoCog/echo9llama/core/llm/providers/llamacpp"
-	"github.com/EchoCog/echo9llama/core/memory"
+	"github.com/cogpy/echo9llama/core/llm/providers/llamacpp"
+	"github.com/cogpy/echo9llama/core/memory"
 )
 
 // LlamaCppEmbedder implements the memory.EmbeddingProvider interface using llama.cpp.

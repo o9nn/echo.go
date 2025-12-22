@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/EchoCog/echo9llama/core/llm"
-	llamacpp "github.com/EchoCog/echo9llama/llama"
+	"github.com/cogpy/echo9llama/core/llm"
+	llamacpp "github.com/cogpy/echo9llama/llama"
 )
 
 // LlamaCppProvider implements the llm.LLMProvider interface using llama.cpp.
