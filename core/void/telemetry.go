@@ -307,7 +307,7 @@ type Channel struct {
 	BufferSize int
 
 	// State
-	Open         bool
+	IsOpen       bool
 	MessageCount int64
 
 	// Synchronization
@@ -333,7 +333,7 @@ func NewChannel(id string, name string, from string, to string, bufferSize int) 
 		To:           to,
 		Buffer:       make(chan *Message, bufferSize),
 		BufferSize:   bufferSize,
-		Open:         false,
+		IsOpen:       false,
 		MessageCount: 0,
 	}
 }
@@ -343,11 +343,11 @@ func (ch *Channel) Open() error {
 	ch.mu.Lock()
 	defer ch.mu.Unlock()
 
-	if ch.Open {
+	if ch.IsOpen {
 		return fmt.Errorf("channel %s already open", ch.ID)
 	}
 
-	ch.Open = true
+	ch.IsOpen = true
 	return nil
 }
 
@@ -356,11 +356,11 @@ func (ch *Channel) Close() error {
 	ch.mu.Lock()
 	defer ch.mu.Unlock()
 
-	if !ch.Open {
+	if !ch.IsOpen {
 		return fmt.Errorf("channel %s already closed", ch.ID)
 	}
 
-	ch.Open = false
+	ch.IsOpen = false
 	close(ch.Buffer)
 	return nil
 }
@@ -370,7 +370,7 @@ func (ch *Channel) Send(msg *Message) error {
 	ch.mu.RLock()
 	defer ch.mu.RUnlock()
 
-	if !ch.Open {
+	if !ch.IsOpen {
 		return fmt.Errorf("channel %s is closed", ch.ID)
 	}
 
@@ -388,7 +388,7 @@ func (ch *Channel) Receive() (*Message, error) {
 	ch.mu.RLock()
 	defer ch.mu.RUnlock()
 
-	if !ch.Open {
+	if !ch.IsOpen {
 		return nil, fmt.Errorf("channel %s is closed", ch.ID)
 	}
 
@@ -416,7 +416,7 @@ type Pipe struct {
 	StreamSize int
 
 	// State
-	Open      bool
+	IsOpen    bool
 	DataCount int64
 
 	// Synchronization
@@ -442,7 +442,7 @@ func NewPipe(id string, name string, source string, sink string, direction PipeD
 		Sink:       sink,
 		Stream:     make(chan interface{}, streamSize),
 		StreamSize: streamSize,
-		Open:       false,
+		IsOpen:     false,
 		DataCount:  0,
 	}
 }
@@ -452,11 +452,11 @@ func (p *Pipe) Open() error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
-	if p.Open {
+	if p.IsOpen {
 		return fmt.Errorf("pipe %s already open", p.ID)
 	}
 
-	p.Open = true
+	p.IsOpen = true
 	return nil
 }
 
@@ -465,11 +465,11 @@ func (p *Pipe) Close() error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
-	if !p.Open {
+	if !p.IsOpen {
 		return fmt.Errorf("pipe %s already closed", p.ID)
 	}
 
-	p.Open = false
+	p.IsOpen = false
 	close(p.Stream)
 	return nil
 }
@@ -479,7 +479,7 @@ func (p *Pipe) Write(data interface{}) error {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
-	if !p.Open {
+	if !p.IsOpen {
 		return fmt.Errorf("pipe %s is closed", p.ID)
 	}
 
@@ -497,7 +497,7 @@ func (p *Pipe) Read() (interface{}, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
-	if !p.Open {
+	if !p.IsOpen {
 		return nil, fmt.Errorf("pipe %s is closed", p.ID)
 	}
 

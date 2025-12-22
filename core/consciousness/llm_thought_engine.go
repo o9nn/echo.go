@@ -14,7 +14,7 @@ import (
 type LLMThoughtEngine struct {
 	mu              sync.RWMutex
 	llmManager      *llm.ProviderManager
-	thoughtHistory  []Thought
+	thoughtHistory  []LLMThought
 	maxHistory      int
 	identityContext string
 	currentFocus    string
@@ -22,8 +22,8 @@ type LLMThoughtEngine struct {
 	recentTopics    []string
 }
 
-// Thought represents a generated thought
-type Thought struct {
+// LLMThought represents a generated thought from LLM
+type LLMThought struct {
 	ID        string
 	Type      ThoughtType
 	Content   string
@@ -93,7 +93,7 @@ func (lte *LLMThoughtEngine) GenerateAutonomousThought(ctx context.Context, thou
 	content = strings.TrimSpace(content)
 	
 	// Create thought
-	thought := &Thought{
+	thought := &LLMThought{
 		ID:        fmt.Sprintf("thought_%d", time.Now().UnixNano()),
 		Type:      thoughtType,
 		Content:   content,
@@ -148,7 +148,7 @@ Your internal thought (1-2 sentences):`, input, recentContext)
 	
 	content = strings.TrimSpace(content)
 	
-	thought := &Thought{
+	thought := &LLMThought{
 		ID:        fmt.Sprintf("thought_%d", time.Now().UnixNano()),
 		Type:      ThoughtReflection,
 		Content:   content,

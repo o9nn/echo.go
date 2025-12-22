@@ -96,7 +96,7 @@ func NewAutonomousAgent(agentID string, llmProvider llm.LLMProvider) *Autonomous
 	agent.skillLearning = NewSkillLearningSystem(llmProvider)
 	agent.conversationMonitor = NewConversationMonitor(llmProvider, agent.interestPatterns)
 	agent.echodreamIntegration = NewEchoDreamKnowledgeIntegration(llmProvider)
-	agent.echobeatsScheduler = NewEchobeatsTetrahedralScheduler()
+	agent.echobeatsScheduler = NewEchobeatsTetrahedralScheduler(llmProvider)
 	
 	return agent
 }
