@@ -344,6 +344,11 @@ func (m *AutonomousWakeRestManager) GetState() WakeRestState {
 	return m.currentState
 }
 
+// GetCurrentState returns the current state (alias for compatibility)
+func (m *AutonomousWakeRestManager) GetCurrentState() WakeRestState {
+	return m.GetState()
+}
+
 // GetMetrics returns current metrics
 func (m *AutonomousWakeRestManager) GetMetrics() map[string]interface{} {
 	m.mu.RLock()

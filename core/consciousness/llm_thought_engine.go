@@ -33,27 +33,23 @@ type LLMThought struct {
 	Tags      []string
 }
 
-// ThoughtType categorizes thoughts
-type ThoughtType string
-
+// LLM-specific thought type constants (using shared ThoughtType from autonomous_thought_engine)
 const (
 	ThoughtPerception   ThoughtType = "Perception"
-	ThoughtReflection   ThoughtType = "Reflection"
-	ThoughtQuestion     ThoughtType = "Question"
-	ThoughtInsight      ThoughtType = "Insight"
 	ThoughtPlanning     ThoughtType = "Planning"
-	ThoughtMemory       ThoughtType = "Memory"
 	ThoughtMetaCognition ThoughtType = "MetaCognition"
 	ThoughtWonder       ThoughtType = "Wonder"
 	ThoughtDoubt        ThoughtType = "Doubt"
 	ThoughtConnection   ThoughtType = "Connection"
+	ThoughtCuriosity    ThoughtType = "Curiosity"
+	ThoughtWisdom       ThoughtType = "Wisdom"
 )
 
 // NewLLMThoughtEngine creates a new LLM-powered thought engine
 func NewLLMThoughtEngine(llmManager *llm.ProviderManager, identityContext string) *LLMThoughtEngine {
 	return &LLMThoughtEngine{
 		llmManager:      llmManager,
-		thoughtHistory:  make([]Thought, 0, 1000),
+		thoughtHistory:  make([]LLMThought, 0, 1000),
 		maxHistory:      1000,
 		identityContext: identityContext,
 		currentFocus:    "self-awareness",
@@ -68,7 +64,7 @@ func NewLLMThoughtEngine(llmManager *llm.ProviderManager, identityContext string
 }
 
 // GenerateAutonomousThought generates a thought without external prompt
-func (lte *LLMThoughtEngine) GenerateAutonomousThought(ctx context.Context, thoughtType ThoughtType) (*Thought, error) {
+func (lte *LLMThoughtEngine) GenerateAutonomousThought(ctx context.Context, thoughtType ThoughtType) (*LLMThought, error) {
 	lte.mu.Lock()
 	defer lte.mu.Unlock()
 
@@ -113,7 +109,7 @@ func (lte *LLMThoughtEngine) GenerateAutonomousThought(ctx context.Context, thou
 }
 
 // GenerateResponseThought generates a thought in response to external input
-func (lte *LLMThoughtEngine) GenerateResponseThought(ctx context.Context, input string) (*Thought, error) {
+func (lte *LLMThoughtEngine) GenerateResponseThought(ctx context.Context, input string) (*LLMThought, error) {
 	lte.mu.Lock()
 	defer lte.mu.Unlock()
 
@@ -363,7 +359,7 @@ func (lte *LLMThoughtEngine) extractTags(content string) []string {
 }
 
 // addToHistory adds a thought to history with size management
-func (lte *LLMThoughtEngine) addToHistory(thought *Thought) {
+func (lte *LLMThoughtEngine) addToHistory(thought *LLMThought) {
 	lte.thoughtHistory = append(lte.thoughtHistory, *thought)
 	
 	// Trim if exceeds max
@@ -373,7 +369,7 @@ func (lte *LLMThoughtEngine) addToHistory(thought *Thought) {
 }
 
 // updateStateFromThought updates internal state based on generated thought
-func (lte *LLMThoughtEngine) updateStateFromThought(thought *Thought) {
+func (lte *LLMThoughtEngine) updateStateFromThought(thought *LLMThought) {
 	// Update recent topics
 	if len(thought.Tags) > 0 {
 		lte.recentTopics = append(lte.recentTopics, thought.Tags[0])
@@ -405,7 +401,7 @@ func (lte *LLMThoughtEngine) updateStateFromThought(thought *Thought) {
 }
 
 // GetThoughtHistory returns recent thoughts
-func (lte *LLMThoughtEngine) GetThoughtHistory(count int) []Thought {
+func (lte *LLMThoughtEngine) GetThoughtHistory(count int) []LLMThought {
 	lte.mu.RLock()
 	defer lte.mu.RUnlock()
 	

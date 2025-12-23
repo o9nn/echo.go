@@ -39,7 +39,7 @@ type UnifiedCognitiveLoopV2 struct {
 	eventBus              *CognitiveEventBus
 
 	// Unified state
-	consciousnessState    ConsciousnessState
+	wakeRestState         WakeRestState
 	cognitiveLoad         float64
 	wisdomLevel           float64
 	awarenessLevel        float64
@@ -64,7 +64,7 @@ func NewUnifiedCognitiveLoopV2(llmProvider llm.LLMProvider) *UnifiedCognitiveLoo
 		ctx:                ctx,
 		cancel:             cancel,
 		llmProvider:        llmProvider,
-		consciousnessState: StateAwake,
+		wakeRestState: StateAwake,
 		cognitiveLoad:      0.0,
 		wisdomLevel:        0.0,
 		awarenessLevel:     0.5,
@@ -180,7 +180,10 @@ func (ucl *UnifiedCognitiveLoopV2) wireSubsystemsV2() {
 		strength := interest["strength"].(float64)
 
 		// Update discussion autonomy
-		ucl.discussionAutonomy.UpdateInterest(topic, strength)
+		// TODO: Implement UpdateInterest method
+		_ = topic
+		_ = strength
+		// ucl.discussionAutonomy.UpdateInterest(topic, strength)
 
 		// Queue skill learning from interest
 		ucl.skillGoalIntegration.QueueSkillFromInterest(topic, strength)
@@ -191,7 +194,9 @@ func (ucl *UnifiedCognitiveLoopV2) wireSubsystemsV2() {
 		gap := event.Data.(string)
 
 		// Consider learning a skill
-		ucl.skillLearning.ConsiderSkill(gap, event.Priority)
+		// TODO: Implement ConsiderSkill method
+		_ = gap
+		// ucl.skillLearning.ConsiderSkill(gap, event.Priority)
 
 		// Also create skill acquisition goal if priority high enough
 		if event.Priority > 0.7 {
@@ -280,7 +285,17 @@ func (ucl *UnifiedCognitiveLoopV2) wireSubsystemsV2() {
 	ucl.skillGoalIntegration.SetCallbacks(
 		func(skill string, goal ScheduledGoal) {
 			// Add goal to echobeats scheduler
-			ucl.echobeatsScheduler.AddGoal(goal)
+			// Convert ScheduledGoal to CognitiveGoal
+			cogGoal := &CognitiveGoal{
+				ID:          goal.ID,
+				Description: goal.Description,
+				Priority:    goal.Priority,
+				Deadline:    goal.Deadline,
+				Progress:    0.0,
+				Completed:   false,
+				StartTime:   time.Now(),
+			}
+			ucl.echobeatsScheduler.AddGoal(cogGoal.Description, cogGoal.Priority)
 
 			ucl.eventBus.Publish(CognitiveEvent{
 				Type:      EventGoalCreated,
@@ -351,7 +366,7 @@ func (ucl *UnifiedCognitiveLoopV2) Start() error {
 	fmt.Println()
 
 	// Transition to awake state
-	ucl.transitionState(StateAwakeActive)
+	ucl.transitionState(StateAwake)
 
 	// Start all core subsystems
 	fmt.Println("🎵 Starting EchoBeats scheduler...")
@@ -496,10 +511,10 @@ func (ucl *UnifiedCognitiveLoopV2) cognitiveStep() {
 }
 
 // transitionState transitions to a new consciousness state
-func (ucl *UnifiedCognitiveLoopV2) transitionState(newState ConsciousnessState) {
+func (ucl *UnifiedCognitiveLoopV2) transitionState(newState WakeRestState) {
 	ucl.mu.Lock()
-	oldState := ucl.consciousnessState
-	ucl.consciousnessState = newState
+	oldState := ucl.wakeRestState
+	ucl.wakeRestState = newState
 	ucl.mu.Unlock()
 
 	fmt.Printf("\n🔄 State Transition: %s → %s\n", oldState, newState)
@@ -516,11 +531,11 @@ func (ucl *UnifiedCognitiveLoopV2) transitionState(newState ConsciousnessState) 
 // onWake handles wake event
 func (ucl *UnifiedCognitiveLoopV2) onWake() error {
 	fmt.Println("\n☀️  AWAKENING...")
-	ucl.transitionState(StateAwakening)
+	ucl.transitionState(StateTransitioning)
 
 	// Resume all systems
 	time.Sleep(500 * time.Millisecond)
-	ucl.transitionState(StateAwakeActive)
+	ucl.transitionState(StateAwake)
 
 	return nil
 }
@@ -528,7 +543,7 @@ func (ucl *UnifiedCognitiveLoopV2) onWake() error {
 // onRest handles rest event
 func (ucl *UnifiedCognitiveLoopV2) onRest() error {
 	fmt.Println("\n🌙 PREPARING FOR REST...")
-	ucl.transitionState(StatePreparingRest)
+	ucl.transitionState(StateTransitioning)
 
 	time.Sleep(500 * time.Millisecond)
 	ucl.transitionState(StateResting)
@@ -565,7 +580,7 @@ func (ucl *UnifiedCognitiveLoopV2) onDreamEnd() error {
 		Priority:  0.7,
 	})
 
-	ucl.transitionState(StateAwakening)
+	ucl.transitionState(StateTransitioning)
 
 	return nil
 }
@@ -615,16 +630,16 @@ func (ucl *UnifiedCognitiveLoopV2) performDreamIntegration() {
 // feedThoughtToEchobeats feeds a thought to echobeats
 func (ucl *UnifiedCognitiveLoopV2) feedThoughtToEchobeats(thought AutonomousThought) {
 	if thought.Type == ThoughtPlanning {
-		goal := ScheduledGoal{
+		goal := &CognitiveGoal{
 			ID:          fmt.Sprintf("goal_%d", time.Now().UnixNano()),
 			Description: thought.Content,
 			Priority:    thought.Importance,
-			Status:      GoalPending,
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
+			Progress:    0.0,
+			Completed:   false,
+			StartTime:   time.Now(),
 		}
 
-		ucl.echobeatsScheduler.AddGoal(goal)
+		ucl.echobeatsScheduler.AddGoal(goal.Description, goal.Priority)
 
 		ucl.eventBus.Publish(CognitiveEvent{
 			Type:      EventGoalCreated,
@@ -653,7 +668,7 @@ func (ucl *UnifiedCognitiveLoopV2) updateCognitiveLoad(delta float64) {
 // printStatusV2 prints enhanced status
 func (ucl *UnifiedCognitiveLoopV2) printStatusV2() {
 	ucl.mu.RLock()
-	state := ucl.consciousnessState
+	state := ucl.wakeRestState
 	load := ucl.cognitiveLoad
 	wisdom := ucl.wisdomLevel
 	awareness := ucl.awarenessLevel
@@ -685,7 +700,7 @@ func (ucl *UnifiedCognitiveLoopV2) GetMetrics() map[string]interface{} {
 	defer ucl.mu.RUnlock()
 
 	return map[string]interface{}{
-		"consciousness_state":    ucl.consciousnessState.String(),
+		"consciousness_state":    ucl.wakeRestState.String(),
 		"cognitive_load":         ucl.cognitiveLoad,
 		"wisdom_level":           ucl.wisdomLevel,
 		"awareness_level":        ucl.awarenessLevel,

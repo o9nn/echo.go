@@ -54,6 +54,7 @@ const (
 	
 	// Interest and attention events
 	EventInterestDetected      CognitiveEventType = "interest_detected"
+	EventInterestEmerged       CognitiveEventType = "interest_emerged"
 	EventAttentionShift        CognitiveEventType = "attention_shift"
 	EventTopicEmergence        CognitiveEventType = "topic_emergence"
 	
@@ -66,6 +67,11 @@ const (
 	EventPhaseTransition       CognitiveEventType = "phase_transition"
 	EventCycleCompleted        CognitiveEventType = "cycle_completed"
 	EventTriadSynchronized     CognitiveEventType = "triad_synchronized"
+	EventEmergenceDetected     CognitiveEventType = "emergence_detected"
+	
+	// Knowledge and wisdom events
+	EventKnowledgeGapIdentified CognitiveEventType = "knowledge_gap_identified"
+	EventWisdomGained          CognitiveEventType = "wisdom_gained"
 )
 
 // CognitiveEvent represents a single event in the cognitive system
@@ -73,8 +79,8 @@ type CognitiveEvent struct {
 	Type      CognitiveEventType
 	Timestamp time.Time
 	Source    string
-	Data      map[string]interface{}
-	Priority  int // 0 = normal, higher = more important
+	Data      interface{} // Can be any type - map, struct, string, etc.
+	Priority  float64 // 0.0 = normal, higher = more important
 }
 
 // NewCognitiveEvent creates a new cognitive event
@@ -89,7 +95,7 @@ func NewCognitiveEvent(eventType CognitiveEventType, source string, data map[str
 }
 
 // NewPriorityCognitiveEvent creates a new cognitive event with priority
-func NewPriorityCognitiveEvent(eventType CognitiveEventType, source string, data map[string]interface{}, priority int) CognitiveEvent {
+func NewPriorityCognitiveEvent(eventType CognitiveEventType, source string, data map[string]interface{}, priority float64) CognitiveEvent {
 	return CognitiveEvent{
 		Type:      eventType,
 		Timestamp: time.Now(),

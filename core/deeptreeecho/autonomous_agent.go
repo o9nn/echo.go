@@ -3,6 +3,7 @@ package deeptreeecho
 import (
 	"context"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -111,9 +112,9 @@ func (agent *AutonomousAgent) Start() error {
 	agent.running = true
 	agent.mu.Unlock()
 	
-	fmt.Println("\n" + "="*80)
+	fmt.Println("\n" + strings.Repeat("=", 80))
 	fmt.Println("🌊 Deep Tree Echo - Autonomous Agent Starting")
-	fmt.Println("="*80)
+	fmt.Println(strings.Repeat("=", 80))
 	fmt.Printf("Agent ID: %s\n", agent.agentID)
 	fmt.Printf("Birth Time: %s\n", agent.birthTime.Format(time.RFC3339))
 	fmt.Println()
@@ -174,7 +175,7 @@ func (agent *AutonomousAgent) Start() error {
 	fmt.Println("   Goal-directed behavior enabled")
 	fmt.Println("   Interest-driven exploration active")
 	fmt.Println("   Wake/rest cycles autonomous")
-	fmt.Println("="*80 + "\n")
+	fmt.Println(strings.Repeat("=", 80) + "\n")
 	
 	return nil
 }

@@ -343,9 +343,11 @@ func (sched *EchobeatsTetrahedralScheduler) handleEvent(event CognitiveEvent) {
 	
 	switch event.Type {
 	case EventGoalCreated:
-		if goalData, ok := event.Data["goal"]; ok {
-			// Handle goal creation
-			_ = goalData
+		if dataMap, ok := event.Data.(map[string]interface{}); ok {
+			if goalData, ok := dataMap["goal"]; ok {
+				// Handle goal creation
+				_ = goalData
+			}
 		}
 	case EventInterestDetected:
 		// Handle interest event
@@ -638,7 +640,7 @@ func (sched *EchobeatsTetrahedralScheduler) AddGoal(goal *CognitiveGoal) {
 		Type:      EventGoalCreated,
 		Source:    "external",
 		Data:      map[string]interface{}{"goal": goal},
-		Priority:  int(goal.Priority),
+		Priority:  float64(goal.Priority),
 		Timestamp: time.Now(),
 	}
 }
