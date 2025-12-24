@@ -21,6 +21,9 @@ type InteractiveIntrospection struct {
 	stateIntegration  *PersistentStateIntegration
 	llmProvider       llm.LLMProvider
 
+	// Sys6 integration
+	sys6Integration   *Sys6Integration
+
 	// Command registry
 	commands map[string]IntrospectionCommand
 
@@ -56,6 +59,11 @@ func NewInteractiveIntrospection(
 	}
 
 	ii.registerCommands()
+
+	// Initialize sys6 integration
+	ii.sys6Integration = NewSys6Integration(llmProvider)
+	ii.sys6Integration.IntegrateWithEchobeats(echobeats)
+
 	return ii
 }
 
@@ -194,6 +202,63 @@ func (ii *InteractiveIntrospection) registerCommands() {
 		Description: "Clear the screen",
 		Usage:       "/clear",
 		Handler:     ii.cmdClear,
+	})
+
+	// Sys6 commands
+	ii.registerCommand(IntrospectionCommand{
+		Name:        "sys6",
+		Aliases:     []string{"s6"},
+		Description: "Show sys6 operad status",
+		Usage:       "/sys6",
+		Handler:     ii.cmdSys6,
+	})
+
+	ii.registerCommand(IntrospectionCommand{
+		Name:        "clock",
+		Aliases:     []string{"clk"},
+		Description: "Show Clock30 (μ) status",
+		Usage:       "/clock",
+		Handler:     ii.cmdClock,
+	})
+
+	ii.registerCommand(IntrospectionCommand{
+		Name:        "c8",
+		Aliases:     []string{"cubic"},
+		Description: "Show C₈ cubic concurrency status",
+		Usage:       "/c8",
+		Handler:     ii.cmdC8,
+	})
+
+	ii.registerCommand(IntrospectionCommand{
+		Name:        "k9",
+		Aliases:     []string{"triadic"},
+		Description: "Show K₉ triadic convolution status",
+		Usage:       "/k9",
+		Handler:     ii.cmdK9,
+	})
+
+	ii.registerCommand(IntrospectionCommand{
+		Name:        "phi",
+		Aliases:     []string{"fold"},
+		Description: "Show φ delay fold status",
+		Usage:       "/phi",
+		Handler:     ii.cmdPhi,
+	})
+
+	ii.registerCommand(IntrospectionCommand{
+		Name:        "stages",
+		Aliases:     []string{"sigma"},
+		Description: "Show σ stage scheduler status",
+		Usage:       "/stages",
+		Handler:     ii.cmdStages,
+	})
+
+	ii.registerCommand(IntrospectionCommand{
+		Name:        "sync",
+		Aliases:     []string{},
+		Description: "Show sys6 ↔ echobeats sync status",
+		Usage:       "/sync",
+		Handler:     ii.cmdSync,
 	})
 }
 
@@ -705,7 +770,105 @@ func truncateStringII(s string, maxLen int) string {
 	return s[:maxLen-3] + "..."
 }
 
+// Sys6 command handlers
+
+func (ii *InteractiveIntrospection) cmdSys6(args []string) string {
+	if ii.sys6Integration == nil {
+		return "⚠️  Sys6 integration not available."
+	}
+	cmds := ii.sys6Integration.GetSys6IntrospectionCommands()
+	if handler, ok := cmds["/sys6"]; ok {
+		return handler(args)
+	}
+	return "⚠️  Sys6 status command not found."
+}
+
+func (ii *InteractiveIntrospection) cmdClock(args []string) string {
+	if ii.sys6Integration == nil {
+		return "⚠️  Sys6 integration not available."
+	}
+	cmds := ii.sys6Integration.GetSys6IntrospectionCommands()
+	if handler, ok := cmds["/clock"]; ok {
+		return handler(args)
+	}
+	return "⚠️  Clock command not found."
+}
+
+func (ii *InteractiveIntrospection) cmdC8(args []string) string {
+	if ii.sys6Integration == nil {
+		return "⚠️  Sys6 integration not available."
+	}
+	cmds := ii.sys6Integration.GetSys6IntrospectionCommands()
+	if handler, ok := cmds["/c8"]; ok {
+		return handler(args)
+	}
+	return "⚠️  C8 command not found."
+}
+
+func (ii *InteractiveIntrospection) cmdK9(args []string) string {
+	if ii.sys6Integration == nil {
+		return "⚠️  Sys6 integration not available."
+	}
+	cmds := ii.sys6Integration.GetSys6IntrospectionCommands()
+	if handler, ok := cmds["/k9"]; ok {
+		return handler(args)
+	}
+	return "⚠️  K9 command not found."
+}
+
+func (ii *InteractiveIntrospection) cmdPhi(args []string) string {
+	if ii.sys6Integration == nil {
+		return "⚠️  Sys6 integration not available."
+	}
+	cmds := ii.sys6Integration.GetSys6IntrospectionCommands()
+	if handler, ok := cmds["/phi"]; ok {
+		return handler(args)
+	}
+	return "⚠️  Phi command not found."
+}
+
+func (ii *InteractiveIntrospection) cmdStages(args []string) string {
+	if ii.sys6Integration == nil {
+		return "⚠️  Sys6 integration not available."
+	}
+	cmds := ii.sys6Integration.GetSys6IntrospectionCommands()
+	if handler, ok := cmds["/stages"]; ok {
+		return handler(args)
+	}
+	return "⚠️  Stages command not found."
+}
+
+func (ii *InteractiveIntrospection) cmdSync(args []string) string {
+	if ii.sys6Integration == nil {
+		return "⚠️  Sys6 integration not available."
+	}
+	cmds := ii.sys6Integration.GetSys6IntrospectionCommands()
+	if handler, ok := cmds["/sync"]; ok {
+		return handler(args)
+	}
+	return "⚠️  Sync command not found."
+}
+
+// StartSys6 starts the sys6 integration
+func (ii *InteractiveIntrospection) StartSys6() error {
+	if ii.sys6Integration == nil {
+		return fmt.Errorf("sys6 integration not initialized")
+	}
+	return ii.sys6Integration.Start()
+}
+
+// StopSys6 stops the sys6 integration
+func (ii *InteractiveIntrospection) StopSys6() error {
+	if ii.sys6Integration == nil {
+		return fmt.Errorf("sys6 integration not initialized")
+	}
+	return ii.sys6Integration.Stop()
+}
+
 // Stop stops the interactive session
 func (ii *InteractiveIntrospection) Stop() {
 	ii.running = false
+	if ii.sys6Integration != nil {
+		_ = ii.sys6Integration.Stop()
+	}
 }

@@ -16,7 +16,7 @@ import (
 
 const (
 	appName    = "Deep Tree Echo"
-	appVersion = "0.8.0"
+	appVersion = "0.10.0"
 )
 
 // Command-line flags
