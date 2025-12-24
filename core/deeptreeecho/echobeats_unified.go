@@ -28,6 +28,9 @@ type EchobeatsUnified struct {
 	currentStep int
 	stepHandlers [12]UnifiedStepHandler
 
+	// Comprehensive step handlers with LLM integration
+	cognitiveHandlers *CognitiveStepHandlers
+
 	// Phase coordination (3 phases, 4 steps apart)
 	// Steps grouped into triads: {1,5,9}, {2,6,10}, {3,7,11}, {4,8,12}
 	phaseTriads [4][]int
@@ -168,7 +171,10 @@ func NewEchobeatsUnified(llmProvider llm.LLMProvider) *EchobeatsUnified {
 	// Initialize three concurrent engines (phased 4 steps apart)
 	eu.initializeEngines()
 
-	// Initialize step handlers
+	// Create comprehensive cognitive step handlers
+	eu.cognitiveHandlers = NewCognitiveStepHandlers(llmProvider)
+
+	// Initialize step handlers with comprehensive implementations
 	eu.initializeStepHandlers()
 
 	// Create the goal scheduler
@@ -212,27 +218,51 @@ func (eu *EchobeatsUnified) initializeEngines() {
 	}
 }
 
-// initializeStepHandlers sets up the 12 step handlers
+// initializeStepHandlers sets up the 12 step handlers with comprehensive LLM-powered implementations
 func (eu *EchobeatsUnified) initializeStepHandlers() {
 	// Step 1: Relevance Realization (orienting present commitment)
-	eu.stepHandlers[0] = eu.stepRelevanceRealization
+	eu.stepHandlers[0] = func(ctx context.Context, state *UnifiedCognitiveState, engines [3]*CognitiveEngine) (*StepResultU, error) {
+		return eu.cognitiveHandlers.HandleRelevanceRealization(ctx, state, engines, 1)
+	}
 
 	// Steps 2-6: Actual Affordance Interaction (conditioning past performance)
-	eu.stepHandlers[1] = eu.stepAffordanceDetection
-	eu.stepHandlers[2] = eu.stepAffordanceEvaluation
-	eu.stepHandlers[3] = eu.stepAffordanceSelection
-	eu.stepHandlers[4] = eu.stepAffordanceEngagement
-	eu.stepHandlers[5] = eu.stepAffordanceConsolidation
+	eu.stepHandlers[1] = func(ctx context.Context, state *UnifiedCognitiveState, engines [3]*CognitiveEngine) (*StepResultU, error) {
+		return eu.cognitiveHandlers.HandleAffordanceDetection(ctx, state, engines)
+	}
+	eu.stepHandlers[2] = func(ctx context.Context, state *UnifiedCognitiveState, engines [3]*CognitiveEngine) (*StepResultU, error) {
+		return eu.cognitiveHandlers.HandleAffordanceEvaluation(ctx, state, engines)
+	}
+	eu.stepHandlers[3] = func(ctx context.Context, state *UnifiedCognitiveState, engines [3]*CognitiveEngine) (*StepResultU, error) {
+		return eu.cognitiveHandlers.HandleAffordanceSelection(ctx, state, engines)
+	}
+	eu.stepHandlers[4] = func(ctx context.Context, state *UnifiedCognitiveState, engines [3]*CognitiveEngine) (*StepResultU, error) {
+		return eu.cognitiveHandlers.HandleAffordanceEngagement(ctx, state, engines)
+	}
+	eu.stepHandlers[5] = func(ctx context.Context, state *UnifiedCognitiveState, engines [3]*CognitiveEngine) (*StepResultU, error) {
+		return eu.cognitiveHandlers.HandleAffordanceConsolidation(ctx, state, engines)
+	}
 
 	// Step 7: Relevance Realization (orienting present commitment)
-	eu.stepHandlers[6] = eu.stepRelevanceRealization
+	eu.stepHandlers[6] = func(ctx context.Context, state *UnifiedCognitiveState, engines [3]*CognitiveEngine) (*StepResultU, error) {
+		return eu.cognitiveHandlers.HandleRelevanceRealization(ctx, state, engines, 7)
+	}
 
 	// Steps 8-12: Virtual Salience Simulation (anticipating future potential)
-	eu.stepHandlers[7] = eu.stepSalienceGeneration
-	eu.stepHandlers[8] = eu.stepSalienceExploration
-	eu.stepHandlers[9] = eu.stepSalienceEvaluation
-	eu.stepHandlers[10] = eu.stepSalienceIntegration
-	eu.stepHandlers[11] = eu.stepCycleConsolidation
+	eu.stepHandlers[7] = func(ctx context.Context, state *UnifiedCognitiveState, engines [3]*CognitiveEngine) (*StepResultU, error) {
+		return eu.cognitiveHandlers.HandleSalienceGeneration(ctx, state, engines)
+	}
+	eu.stepHandlers[8] = func(ctx context.Context, state *UnifiedCognitiveState, engines [3]*CognitiveEngine) (*StepResultU, error) {
+		return eu.cognitiveHandlers.HandleSalienceExploration(ctx, state, engines)
+	}
+	eu.stepHandlers[9] = func(ctx context.Context, state *UnifiedCognitiveState, engines [3]*CognitiveEngine) (*StepResultU, error) {
+		return eu.cognitiveHandlers.HandleSalienceEvaluation(ctx, state, engines)
+	}
+	eu.stepHandlers[10] = func(ctx context.Context, state *UnifiedCognitiveState, engines [3]*CognitiveEngine) (*StepResultU, error) {
+		return eu.cognitiveHandlers.HandleSalienceIntegration(ctx, state, engines)
+	}
+	eu.stepHandlers[11] = func(ctx context.Context, state *UnifiedCognitiveState, engines [3]*CognitiveEngine) (*StepResultU, error) {
+		return eu.cognitiveHandlers.HandleCycleConsolidation(ctx, state, engines)
+	}
 }
 
 // Start begins the unified cognitive loop

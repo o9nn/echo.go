@@ -263,12 +263,19 @@ func runInteractive(llmProvider llm.LLMProvider) {
 	// Create the unified cognitive loop
 	cognitiveLoop := deeptreeecho.NewUnifiedCognitiveLoopV2(llmProvider)
 
+	// Create the echobeats unified system
+	echobeats := deeptreeecho.NewEchobeatsUnified(llmProvider)
+
 	// Create persistent state integration
 	stateIntegration := deeptreeecho.NewPersistentStateIntegration(*stateDir)
 
 	// Integrate components
 	if err := stateIntegration.IntegrateWithCognitiveLoop(cognitiveLoop); err != nil {
 		fmt.Printf("⚠️  Failed to integrate cognitive loop: %v\n", err)
+	}
+
+	if err := stateIntegration.IntegrateWithEchobeats(echobeats); err != nil {
+		fmt.Printf("⚠️  Failed to integrate echobeats: %v\n", err)
 	}
 
 	// Start systems
@@ -282,41 +289,17 @@ func runInteractive(llmProvider llm.LLMProvider) {
 		os.Exit(1)
 	}
 
-	fmt.Println("✅ Deep Tree Echo is ready for interaction!")
-	fmt.Println("   Type your message and press Enter.")
-	fmt.Println("   Type 'quit' or 'exit' to stop.")
-	fmt.Println()
+	// Create and run the interactive introspection system
+	introspection := deeptreeecho.NewInteractiveIntrospection(
+		cognitiveLoop,
+		echobeats,
+		stateIntegration,
+		llmProvider,
+	)
 
-	// Simple interactive loop
-	reader := os.Stdin
-	buf := make([]byte, 4096)
-
-	for {
-		fmt.Print("You: ")
-		n, err := reader.Read(buf)
-		if err != nil {
-			break
-		}
-
-		input := string(buf[:n])
-		input = input[:len(input)-1] // Remove newline
-
-		if input == "quit" || input == "exit" {
-			break
-		}
-
-		if input == "" {
-			continue
-		}
-
-		// Process input through cognitive loop
-		response, err := cognitiveLoop.ProcessExternalInput(input)
-		if err != nil {
-			fmt.Printf("❌ Error: %v\n", err)
-			continue
-		}
-
-		fmt.Printf("Echo: %s\n\n", response)
+	// Run the interactive loop
+	if err := introspection.Run(); err != nil {
+		fmt.Printf("❌ Interactive session error: %v\n", err)
 	}
 
 	// Shutdown
