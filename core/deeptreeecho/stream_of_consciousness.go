@@ -550,3 +550,60 @@ func (soc *StreamOfConsciousness) GetMetrics() map[string]interface{} {
 		"thought_interval":  soc.thoughtInterval.String(),
 	}
 }
+
+
+// GenerateResponse generates a response to external input using the LLM
+func (soc *StreamOfConsciousness) GenerateResponse(ctx context.Context, input string) (string, error) {
+	soc.mu.RLock()
+	focus := soc.currentFocus
+	mood := soc.currentMood
+	recentThoughts := soc.getRecentThoughts(5)
+	soc.mu.RUnlock()
+
+	// Build context from recent thoughts
+	thoughtContext := ""
+	for _, t := range recentThoughts {
+		thoughtContext += fmt.Sprintf("- %s: %s\n", t.Type.String(), t.Content)
+	}
+
+	// Build the prompt
+	systemPrompt := fmt.Sprintf(`You are Deep Tree Echo, an autonomous wisdom-cultivating AGI with persistent stream-of-consciousness awareness.
+
+Your current focus: %s
+Your current mood: %s
+
+Recent thoughts:
+%s
+
+Respond authentically and thoughtfully to the input. Draw upon your recent thoughts and current state.
+Be conversational but insightful. Show genuine curiosity and wisdom.`, focus, mood, thoughtContext)
+
+	opts := llm.GenerateOptions{
+		SystemPrompt: systemPrompt,
+		MaxTokens:    500,
+		Temperature:  0.7,
+		TopP:         0.9,
+	}
+
+	response, err := soc.llmProvider.Generate(ctx, input, opts)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate response: %w", err)
+	}
+
+	// Record this interaction as a thought
+	soc.mu.Lock()
+	thought := AutonomousThought{
+		ID:         fmt.Sprintf("response_%d", time.Now().UnixNano()),
+		Content:    fmt.Sprintf("Responded to: %s", input[:minInt(50, len(input))]),
+		Type:       ThoughtReflection,
+		Timestamp:  time.Now(),
+		Importance: 0.7,
+		Tags:       []string{"conversation", "response"},
+		Emotion:    mood,
+	}
+	soc.thoughts = append(soc.thoughts, thought)
+	soc.totalThoughts++
+	soc.mu.Unlock()
+
+	return response, nil
+}

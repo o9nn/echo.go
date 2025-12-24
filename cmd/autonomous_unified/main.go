@@ -27,14 +27,13 @@ func main() {
 	
 	if anthropicKey != "" {
 		fmt.Println("✓ Using Anthropic Claude API")
-		llmProvider = llm.NewAnthropicProvider("")
+		llmProvider = llm.NewAnthropicProvider("claude-3-5-sonnet-20241022")
 		providerName = "Anthropic"
 	} else if openrouterKey != "" {
 		fmt.Println("✓ Using OpenRouter API")
-		// OpenRouter provider needs to be implemented or use a different approach
-		fmt.Println("⚠️  OpenRouter provider not yet integrated. Using mock provider.")
-		llmProvider = &MockLLMProvider{}
-		providerName = "Mock"
+		// Use the adapter for OpenRouter
+		llmProvider = deeptreeecho.NewOpenRouterProviderAdapter(openrouterKey, "anthropic/claude-3-haiku")
+		providerName = "OpenRouter"
 	} else {
 		fmt.Println("⚠️  No API keys found. Using mock provider.")
 		llmProvider = &MockLLMProvider{}

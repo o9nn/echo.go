@@ -41,50 +41,50 @@ func main() {
 	fmt.Println("\n👋 Goodbye from Deep Tree Echo\n")
 }
 
-// initializeLLMProvider creates the LLM provider
+// initializeLLMProvider creates the LLM provider using adapters
 func initializeLLMProvider() (llm.LLMProvider, error) {
 	// Try Anthropic first
 	if apiKey := os.Getenv("ANTHROPIC_API_KEY"); apiKey != "" {
 		fmt.Println("🤖 Using Anthropic (Claude) provider")
-		provider := deeptreeecho.NewAnthropicProvider(apiKey)
+		adapter := deeptreeecho.NewAnthropicProviderAdapter(apiKey, "claude-3-5-sonnet-20241022")
 		
 		// Test the provider
 		ctx := context.Background()
-		_, err := provider.Generate(ctx, "Hello", llm.GenerateOptions{MaxTokens: 10})
+		_, err := adapter.Generate(ctx, "Hello", llm.DefaultGenerateOptions())
 		if err != nil {
 			fmt.Printf("⚠️  Anthropic provider test failed: %v\n", err)
 		} else {
-			return provider, nil
+			return adapter, nil
 		}
 	}
 	
 	// Try OpenRouter
 	if apiKey := os.Getenv("OPENROUTER_API_KEY"); apiKey != "" {
 		fmt.Println("🤖 Using OpenRouter provider")
-		provider := deeptreeecho.NewOpenRouterProvider(apiKey)
+		adapter := deeptreeecho.NewOpenRouterProviderAdapter(apiKey, "anthropic/claude-3-haiku")
 		
 		// Test the provider
 		ctx := context.Background()
-		_, err := provider.Generate(ctx, "Hello", llm.GenerateOptions{MaxTokens: 10})
+		_, err := adapter.Generate(ctx, "Hello", llm.DefaultGenerateOptions())
 		if err != nil {
 			fmt.Printf("⚠️  OpenRouter provider test failed: %v\n", err)
 		} else {
-			return provider, nil
+			return adapter, nil
 		}
 	}
 	
 	// Try OpenAI
 	if apiKey := os.Getenv("OPENAI_API_KEY"); apiKey != "" {
 		fmt.Println("🤖 Using OpenAI provider")
-		provider := deeptreeecho.NewOpenAIProvider(apiKey)
+		adapter := deeptreeecho.NewOpenAIProviderAdapter(apiKey, "gpt-4o-mini")
 		
 		// Test the provider
 		ctx := context.Background()
-		_, err := provider.Generate(ctx, "Hello", llm.GenerateOptions{MaxTokens: 10})
+		_, err := adapter.Generate(ctx, "Hello", llm.DefaultGenerateOptions())
 		if err != nil {
 			fmt.Printf("⚠️  OpenAI provider test failed: %v\n", err)
 		} else {
-			return provider, nil
+			return adapter, nil
 		}
 	}
 	

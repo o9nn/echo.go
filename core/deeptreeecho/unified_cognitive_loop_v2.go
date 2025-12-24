@@ -738,3 +738,42 @@ func (ucl *UnifiedCognitiveLoopV2) GetWisdomPrinciples() []WisdomPrinciple {
 func (ucl *UnifiedCognitiveLoopV2) GetSelfModel() *SelfModel {
 	return ucl.heartbeat.GetSelfModel()
 }
+
+// ProcessExternalInput processes external input and returns a response
+func (ucl *UnifiedCognitiveLoopV2) ProcessExternalInput(input string) (string, error) {
+	// Process through conversation monitor
+	conversationID := fmt.Sprintf("external_%d", time.Now().UnixNano())
+	ucl.ProcessExternalMessage(conversationID, "external_user", input)
+
+	// Generate a response using stream of consciousness
+	response, err := ucl.streamOfConsciousness.GenerateResponse(ucl.ctx, input)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate response: %w", err)
+	}
+
+	// Track the interaction
+	ucl.mu.Lock()
+	ucl.conversationsEngaged++
+	ucl.mu.Unlock()
+
+	return response, nil
+}
+
+// GetState returns the current state as a map
+func (ucl *UnifiedCognitiveLoopV2) GetState() map[string]interface{} {
+	ucl.mu.RLock()
+	defer ucl.mu.RUnlock()
+
+	return map[string]interface{}{
+		"wake_rest_state":       ucl.wakeRestState.String(),
+		"cognitive_load":        ucl.cognitiveLoad,
+		"wisdom_level":          ucl.wisdomLevel,
+		"awareness_level":       ucl.awarenessLevel,
+		"total_cycles":          ucl.totalCycles,
+		"total_events":          ucl.totalEvents,
+		"wisdom_gained":         ucl.wisdomGained,
+		"insights_gained":       ucl.insightsGained,
+		"conversations_engaged": ucl.conversationsEngaged,
+		"running":               ucl.running,
+	}
+}
