@@ -6,7 +6,7 @@ import (
 )
 
 func TestNewSelfAssessment(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	cognition := NewEmbodiedCognition("TestCognition")
 
 	sa := NewSelfAssessment(identity, cognition)
@@ -33,7 +33,7 @@ func TestNewSelfAssessment(t *testing.T) {
 }
 
 func TestLoadIdentityKernel(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	cognition := NewEmbodiedCognition("TestCognition")
 	sa := NewSelfAssessment(identity, cognition)
 
@@ -48,7 +48,7 @@ func TestLoadIdentityKernel(t *testing.T) {
 }
 
 func TestPerformAssessment(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	cognition := NewEmbodiedCognition("TestCognition")
 	sa := NewSelfAssessment(identity, cognition)
 
@@ -77,7 +77,7 @@ func TestPerformAssessment(t *testing.T) {
 }
 
 func TestCalculateCoherenceMetrics(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	cognition := NewEmbodiedCognition("TestCognition")
 	sa := NewSelfAssessment(identity, cognition)
 
@@ -106,7 +106,7 @@ func TestCalculateCoherenceMetrics(t *testing.T) {
 }
 
 func TestCalculateIdentityScore(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	identity.Essence = "Deep Tree Echo: Self-evolving cognitive architecture"
 
 	// Add some directive patterns
@@ -132,7 +132,7 @@ func TestCalculateIdentityScore(t *testing.T) {
 }
 
 func TestCalculateRepoScore(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 
 	// Add some repo embeddings
 	identity.Embeddings.RepoEmbeddings["core/deeptreeecho"] = make([]float64, 768)
@@ -149,7 +149,7 @@ func TestCalculateRepoScore(t *testing.T) {
 }
 
 func TestCalculatePatternScore(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 
 	// Add some patterns
 	identity.Patterns["pattern1"] = &Pattern{
@@ -179,7 +179,7 @@ func TestCalculatePatternScore(t *testing.T) {
 }
 
 func TestCalculateMemoryScore(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	identity.Memory.Coherence = 0.8
 
 	// Add some memory nodes
@@ -204,7 +204,7 @@ func TestCalculateMemoryScore(t *testing.T) {
 }
 
 func TestCalculateOperationalScore(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	identity.RecursiveDepth = 5
 
 	cognition := NewEmbodiedCognition("TestCognition")
@@ -218,7 +218,7 @@ func TestCalculateOperationalScore(t *testing.T) {
 }
 
 func TestCalculateReflectionScore(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	cognition := NewEmbodiedCognition("TestCognition")
 	sa := NewSelfAssessment(identity, cognition)
 
@@ -230,7 +230,7 @@ func TestCalculateReflectionScore(t *testing.T) {
 }
 
 func TestAssessIdentityAlignment(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	cognition := NewEmbodiedCognition("TestCognition")
 	sa := NewSelfAssessment(identity, cognition)
 
@@ -249,7 +249,7 @@ func TestAssessIdentityAlignment(t *testing.T) {
 }
 
 func TestAssessRepositoryCoherence(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	cognition := NewEmbodiedCognition("TestCognition")
 	sa := NewSelfAssessment(identity, cognition)
 
@@ -268,7 +268,7 @@ func TestAssessRepositoryCoherence(t *testing.T) {
 }
 
 func TestAssessCognitivePatterns(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 
 	// Add some patterns
 	identity.Patterns["test_pattern"] = &Pattern{
@@ -295,7 +295,7 @@ func TestAssessCognitivePatterns(t *testing.T) {
 }
 
 func TestAssessMemorySystem(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	cognition := NewEmbodiedCognition("TestCognition")
 	sa := NewSelfAssessment(identity, cognition)
 
@@ -314,7 +314,7 @@ func TestAssessMemorySystem(t *testing.T) {
 }
 
 func TestGetLatestAssessment(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	cognition := NewEmbodiedCognition("TestCognition")
 	sa := NewSelfAssessment(identity, cognition)
 
@@ -330,7 +330,7 @@ func TestGetLatestAssessment(t *testing.T) {
 }
 
 func TestGetMetrics(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	cognition := NewEmbodiedCognition("TestCognition")
 	sa := NewSelfAssessment(identity, cognition)
 
@@ -346,7 +346,7 @@ func TestGetMetrics(t *testing.T) {
 }
 
 func TestExportAssessment(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	cognition := NewEmbodiedCognition("TestCognition")
 	sa := NewSelfAssessment(identity, cognition)
 
@@ -369,7 +369,7 @@ func TestExportAssessment(t *testing.T) {
 }
 
 func TestGenerateSummary(t *testing.T) {
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	cognition := NewEmbodiedCognition("TestCognition")
 	sa := NewSelfAssessment(identity, cognition)
 
@@ -380,7 +380,7 @@ func TestGenerateSummary(t *testing.T) {
 	}
 
 	// Summary should contain key information
-	if !containsAny(assessment.Summary, []string{"Overall Coherence", "Component Scores"}) {
+	if !testContainsAny(assessment.Summary, []string{"Overall Coherence", "Component Scores"}) {
 		t.Error("Summary missing key information")
 	}
 }
@@ -467,7 +467,7 @@ Deep Tree Echo: Self-evolving cognitive architecture combining ESN, P-systems, a
 	os.Chdir("/tmp")
 	defer os.Chdir(oldWd)
 
-	identity := NewIdentity("TestIdentity")
+	identity := NewIdentity("TestIdentity", []string{})
 	cognition := NewEmbodiedCognition("TestCognition")
 	sa := NewSelfAssessment(identity, cognition)
 
@@ -476,7 +476,7 @@ Deep Tree Echo: Self-evolving cognitive architecture combining ESN, P-systems, a
 	}
 
 	// Verify parsing
-	if !containsAny(sa.IdentityKernel.CoreEssence, []string{"Deep Tree Echo", "cognitive architecture"}) {
+	if !testContainsAny(sa.IdentityKernel.CoreEssence, []string{"Deep Tree Echo", "cognitive architecture"}) {
 		t.Errorf("Core essence not properly parsed: %s", sa.IdentityKernel.CoreEssence)
 	}
 
@@ -496,20 +496,20 @@ func isValidJSON(s string) bool {
 	return json.Unmarshal([]byte(s), &js) == nil
 }
 
-func containsAny(s string, substrs []string) bool {
+func testContainsAny(s string, substrs []string) bool {
 	for _, substr := range substrs {
-		if containsString(s, substr) {
+		if testContainsSubstring(s, substr) {
 			return true
 		}
 	}
 	return false
 }
 
-func containsString(s, substr string) bool {
-	return len(s) >= len(substr) && (s == substr || len(s) > len(substr) && hasSubstring(s, substr))
+func testContainsSubstring(s, substr string) bool {
+	return len(s) >= len(substr) && (s == substr || len(s) > len(substr) && testHasSubstring(s, substr))
 }
 
-func hasSubstring(s, substr string) bool {
+func testHasSubstring(s, substr string) bool {
 	for i := 0; i <= len(s)-len(substr); i++ {
 		if s[i:i+len(substr)] == substr {
 			return true
