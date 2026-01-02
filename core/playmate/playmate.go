@@ -66,6 +66,7 @@ type Discussion struct {
 	Depth        int               `json:"depth"` // How deep the discussion went
 	Insights     []string          `json:"insights"`
 	Active       bool              `json:"active"`
+	LastEngaged time.Time `json:"last_engaged"`
 }
 
 // DiscussionMessage represents a single message in a discussion
@@ -649,4 +650,76 @@ func mergeKeywords(existing, new []string) []string {
 		}
 	}
 	return existing
+}
+
+
+// LearnSkill adds or improves a skill
+func (p *Playmate) LearnSkill(name, description string) *Skill {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	id := fmt.Sprintf("skill_%s", name)
+	if existing, ok := p.Skills[id]; ok {
+		existing.Proficiency = min(1.0, existing.Proficiency+0.05)
+		existing.PracticeCount++
+		existing.LastPracticed = time.Now()
+		p.dirty = true
+		return existing
+	}
+
+	newSkill := &Skill{
+		ID:          id,
+		Name:        name,
+		Description: description,
+		Proficiency: 0.1,
+		PracticeCount: 1,
+		LastPracticed: time.Now(),
+		Milestones:  make([]string, 0),
+	}
+	p.Skills[id] = newSkill
+	p.dirty = true
+	return newSkill
+}
+
+// SendMessage adds a message to a discussion
+func (p *Playmate) SendMessage(discussionID, from, content string) (*DiscussionMessage, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	discussion, ok := p.Discussions[discussionID]
+	if !ok {
+		return nil, fmt.Errorf("discussion not found: %s", discussionID)
+	}
+
+	if !discussion.Active {
+		return nil, fmt.Errorf("discussion is not active: %s", discussionID)
+	}
+
+	msg := DiscussionMessage{
+		ID:        fmt.Sprintf("msg_%d", time.Now().UnixNano()),
+		From:      from,
+		Content:   content,
+		Timestamp: time.Now(),
+		Sentiment: 0, // Placeholder for sentiment analysis
+	}
+
+	discussion.Messages = append(discussion.Messages, msg)
+	discussion.LastEngaged = time.Now()
+	p.dirty = true
+
+	return &msg, nil
+}
+
+// GetActiveDiscussions returns all active discussions
+func (p *Playmate) GetActiveDiscussions() []*Discussion {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+
+	active := make([]*Discussion, 0)
+	for _, d := range p.Discussions {
+		if d.Active {
+			active = append(active, d)
+		}
+	}
+	return active
 }

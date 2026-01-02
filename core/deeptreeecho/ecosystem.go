@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/o9nn/echo.go/core/mcpserver"
-	"github.com/o9nn/echo.go/core/playmate"
-	"github.com/o9nn/echo.go/core/vectormem"
+	"github.com/cogpy/echo9llama/core/mcpserver"
+	"github.com/cogpy/echo9llama/core/playmate"
+	"github.com/cogpy/echo9llama/core/vectormem"
 )
 
 // EcosystemState represents the overall ecosystem state
