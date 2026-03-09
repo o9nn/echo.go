@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cogpy/echo9llama/api"
+	"github.com/o9nn/echo.go/api"
 )
 
 // TODO - this would ideally be in the llm package, but that would require some refactoring of interfaces in the server

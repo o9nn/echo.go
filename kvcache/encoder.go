@@ -3,8 +3,8 @@ package kvcache
 import (
 	"fmt"
 
-	"github.com/cogpy/echo9llama/ml"
-	"github.com/cogpy/echo9llama/model/input"
+	"github.com/o9nn/echo.go/ml"
+	"github.com/o9nn/echo.go/model/input"
 )
 
 // Encoder cache stores K and V tensors that are position independent

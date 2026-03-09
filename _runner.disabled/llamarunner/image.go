@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cogpy/echo9llama/llama"
+	"github.com/o9nn/echo.go/llama"
 )
 
 const imageCacheSize = 4

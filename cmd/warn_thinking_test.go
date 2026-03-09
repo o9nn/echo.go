@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/types/model"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/types/model"
 )
 
 // Test that a warning is printed when thinking is requested but not supported.

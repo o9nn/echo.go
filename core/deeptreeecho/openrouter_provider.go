@@ -145,7 +145,7 @@ func (p *OpenRouterProvider) makeRequest(ctx context.Context, request OpenRouter
 	// Set headers
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", p.apiKey))
-	req.Header.Set("HTTP-Referer", "https://github.com/cogpy/echo9llama")
+	req.Header.Set("HTTP-Referer", "https://github.com/o9nn/echo.go")
 	req.Header.Set("X-Title", "Echo9llama Deep Tree Echo")
 	
 	// Make request

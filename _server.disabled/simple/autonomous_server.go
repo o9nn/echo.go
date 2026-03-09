@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/deeptreeecho"
+	"github.com/o9nn/echo.go/core/deeptreeecho"
 )
 
 var consciousness *deeptreeecho.AutonomousConsciousness

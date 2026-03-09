@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/cogpy/echo9llama/model"
+	"github.com/o9nn/echo.go/model"
 )
 
 func TestWeighted(t *testing.T) {

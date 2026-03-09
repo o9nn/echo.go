@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/cogpy/echo9llama/core/llm"
+	"github.com/o9nn/echo.go/core/llm"
 )
 
 // EvolutionSystem is the main entry point for the Deep Tree Echo evolution system

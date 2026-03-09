@@ -3,8 +3,8 @@ package ollamarunner
 import (
 	"errors"
 
-	"github.com/cogpy/echo9llama/ml"
-	"github.com/cogpy/echo9llama/model/input"
+	"github.com/o9nn/echo.go/ml"
+	"github.com/o9nn/echo.go/model/input"
 )
 
 // Tensors can't be used across multiple compute graphs. This is a problem

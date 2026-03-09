@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/cogpy/echo9llama/api"
+	"github.com/o9nn/echo.go/api"
 )
 
 // Engine implements the core orchestration functionality

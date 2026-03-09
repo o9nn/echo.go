@@ -6,9 +6,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cogpy/echo9llama/core/deeptreeecho"
-	"github.com/cogpy/echo9llama/core/playmate"
-	"github.com/cogpy/echo9llama/core/vectormem"
+	"github.com/o9nn/echo.go/core/deeptreeecho"
+	"github.com/o9nn/echo.go/core/playmate"
+	"github.com/o9nn/echo.go/core/vectormem"
 )
 
 // EcosystemWebServer integrates the web server with the Deep Tree Echo ecosystem

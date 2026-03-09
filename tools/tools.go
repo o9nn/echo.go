@@ -6,7 +6,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/cogpy/echo9llama/api"
+	"github.com/o9nn/echo.go/api"
 )
 
 type toolsState int

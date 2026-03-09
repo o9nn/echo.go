@@ -38,10 +38,10 @@ import (
 	"sync"
 	"unsafe"
 
-	_ "github.com/cogpy/echo9llama/llama/llama.cpp/common"
-	_ "github.com/cogpy/echo9llama/llama/llama.cpp/src"
-	_ "github.com/cogpy/echo9llama/llama/llama.cpp/tools/mtmd"
-	ggml "github.com/cogpy/echo9llama/ml/backend/ggml/ggml/src"
+	_ "github.com/o9nn/echo.go/llama/llama.cpp/common"
+	_ "github.com/o9nn/echo.go/llama/llama.cpp/src"
+	_ "github.com/o9nn/echo.go/llama/llama.cpp/tools/mtmd"
+	ggml "github.com/o9nn/echo.go/ml/backend/ggml/ggml/src"
 )
 
 func init() {

@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/persistence"
+	"github.com/o9nn/echo.go/core/persistence"
 	"github.com/dgraph-io/dgo/v230/protos/api"
 	"github.com/google/uuid"
 )

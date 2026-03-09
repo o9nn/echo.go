@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"github.com/cogpy/echo9llama/core/deeptreeecho"
-	"github.com/cogpy/echo9llama/core/webserver"
+	"github.com/o9nn/echo.go/core/deeptreeecho"
+	"github.com/o9nn/echo.go/core/webserver"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/websocket"
 )

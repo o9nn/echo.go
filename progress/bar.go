@@ -8,7 +8,7 @@ import (
 
 	"golang.org/x/term"
 
-	"github.com/cogpy/echo9llama/format"
+	"github.com/o9nn/echo.go/format"
 )
 
 type Bar struct {

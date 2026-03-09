@@ -7,10 +7,10 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/cogpy/echo9llama/envconfig"
-	"github.com/cogpy/echo9llama/fs/ggml"
-	"github.com/cogpy/echo9llama/logutil"
-	"github.com/cogpy/echo9llama/ml"
+	"github.com/o9nn/echo.go/envconfig"
+	"github.com/o9nn/echo.go/fs/ggml"
+	"github.com/o9nn/echo.go/logutil"
+	"github.com/o9nn/echo.go/ml"
 )
 
 func TestMain(m *testing.M) {

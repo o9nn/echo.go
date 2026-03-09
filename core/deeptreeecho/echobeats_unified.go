@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/llm"
+	"github.com/o9nn/echo.go/core/llm"
 )
 
 // EchobeatsUnified is the unified cognitive orchestration system that combines

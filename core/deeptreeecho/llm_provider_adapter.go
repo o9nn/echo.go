@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/cogpy/echo9llama/core/llm"
+	"github.com/o9nn/echo.go/core/llm"
 )
 
 // LLMProviderAdapter adapts deeptreeecho providers to the llm.LLMProvider interface

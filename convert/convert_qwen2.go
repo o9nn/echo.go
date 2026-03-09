@@ -1,6 +1,6 @@
 package convert
 
-import "github.com/cogpy/echo9llama/fs/ggml"
+import "github.com/o9nn/echo.go/fs/ggml"
 
 type qwen2Model struct {
 	ModelParameters

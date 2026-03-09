@@ -6,11 +6,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/consciousness"
-	"github.com/cogpy/echo9llama/core/echodream"
-	"github.com/cogpy/echo9llama/core/goals"
-	"github.com/cogpy/echo9llama/core/llm"
-	"github.com/cogpy/echo9llama/core/memory"
+	"github.com/o9nn/echo.go/core/consciousness"
+	"github.com/o9nn/echo.go/core/echodream"
+	"github.com/o9nn/echo.go/core/goals"
+	"github.com/o9nn/echo.go/core/llm"
+	"github.com/o9nn/echo.go/core/memory"
 )
 
 // AutonomousConsciousness implements fully autonomous wisdom-cultivating AGI

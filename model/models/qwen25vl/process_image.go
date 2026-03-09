@@ -5,8 +5,8 @@ import (
 	"image"
 	"math"
 
-	"github.com/cogpy/echo9llama/fs"
-	"github.com/cogpy/echo9llama/model/imageproc"
+	"github.com/o9nn/echo.go/fs"
+	"github.com/o9nn/echo.go/model/imageproc"
 )
 
 // ImageProcessor contains configuration for the Qwen 2.5 VL image processing

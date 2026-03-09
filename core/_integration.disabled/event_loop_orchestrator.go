@@ -6,10 +6,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/consciousness"
-	"github.com/cogpy/echo9llama/core/echobeats"
-	"github.com/cogpy/echo9llama/core/echodream"
-	"github.com/cogpy/echo9llama/core/goals"
+	"github.com/o9nn/echo.go/core/consciousness"
+	"github.com/o9nn/echo.go/core/echobeats"
+	"github.com/o9nn/echo.go/core/echodream"
+	"github.com/o9nn/echo.go/core/goals"
 	"github.com/google/uuid"
 )
 

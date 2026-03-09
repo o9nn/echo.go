@@ -9,13 +9,13 @@ import (
 	"syscall"
 	"time"
 	
-	"github.com/cogpy/echo9llama/core/consciousness"
-	"github.com/cogpy/echo9llama/core/deeptreeecho"
-	"github.com/cogpy/echo9llama/core/echobeats"
-	"github.com/cogpy/echo9llama/core/echodream"
-	"github.com/cogpy/echo9llama/core/echoself"
-	"github.com/cogpy/echo9llama/core/llm"
-	"github.com/cogpy/echo9llama/core/wisdom"
+	"github.com/o9nn/echo.go/core/consciousness"
+	"github.com/o9nn/echo.go/core/deeptreeecho"
+	"github.com/o9nn/echo.go/core/echobeats"
+	"github.com/o9nn/echo.go/core/echodream"
+	"github.com/o9nn/echo.go/core/echoself"
+	"github.com/o9nn/echo.go/core/llm"
+	"github.com/o9nn/echo.go/core/wisdom"
 )
 
 // AutonomousAgent is the master coordinator for Deep Tree Echo

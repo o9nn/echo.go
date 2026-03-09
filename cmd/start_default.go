@@ -6,7 +6,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/cogpy/echo9llama/api"
+	"github.com/o9nn/echo.go/api"
 )
 
 func startApp(ctx context.Context, client *api.Client) error {

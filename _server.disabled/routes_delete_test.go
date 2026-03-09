@@ -9,8 +9,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/types/model"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/types/model"
 )
 
 func TestDelete(t *testing.T) {

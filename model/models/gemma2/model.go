@@ -3,14 +3,14 @@ package gemma2
 import (
 	"math"
 
-	"github.com/cogpy/echo9llama/fs"
-	"github.com/cogpy/echo9llama/kvcache"
-	"github.com/cogpy/echo9llama/ml"
-	"github.com/cogpy/echo9llama/ml/nn"
-	"github.com/cogpy/echo9llama/ml/nn/fast"
-	"github.com/cogpy/echo9llama/ml/nn/rope"
-	"github.com/cogpy/echo9llama/model"
-	"github.com/cogpy/echo9llama/model/input"
+	"github.com/o9nn/echo.go/fs"
+	"github.com/o9nn/echo.go/kvcache"
+	"github.com/o9nn/echo.go/ml"
+	"github.com/o9nn/echo.go/ml/nn"
+	"github.com/o9nn/echo.go/ml/nn/fast"
+	"github.com/o9nn/echo.go/ml/nn/rope"
+	"github.com/o9nn/echo.go/model"
+	"github.com/o9nn/echo.go/model/input"
 )
 
 type Options struct {

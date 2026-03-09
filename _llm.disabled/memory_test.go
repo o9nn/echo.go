@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/discover"
-	"github.com/cogpy/echo9llama/fs/ggml"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/discover"
+	"github.com/o9nn/echo.go/fs/ggml"
 )
 
 func TestEstimateGPULayers(t *testing.T) {

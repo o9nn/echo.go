@@ -11,8 +11,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/orchestration"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/orchestration"
 )
 
 func main() {

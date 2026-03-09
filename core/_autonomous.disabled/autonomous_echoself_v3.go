@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 	
-	"github.com/cogpy/echo9llama/core/deeptreeecho"
-	"github.com/cogpy/echo9llama/core/echoself"
-	"github.com/cogpy/echo9llama/core/persistence"
+	"github.com/o9nn/echo.go/core/deeptreeecho"
+	"github.com/o9nn/echo.go/core/echoself"
+	"github.com/o9nn/echo.go/core/persistence"
 )
 
 // AutonomousEchoselfV3 represents the fully integrated autonomous system

@@ -6,8 +6,8 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/template"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/template"
 )
 
 func TestChatPrompt(t *testing.T) {

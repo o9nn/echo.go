@@ -11,8 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/deeptreeecho"
-	"github.com/cogpy/echo9llama/core/webserver"
+	"github.com/o9nn/echo.go/core/deeptreeecho"
+	"github.com/o9nn/echo.go/core/webserver"
 )
 
 func main() {

@@ -1,4 +1,4 @@
-module github.com/cogpy/echo9llama
+module github.com/o9nn/echo.go
 
 // Deep Tree Echo - compatible with Go 1.21+
 go 1.24.0

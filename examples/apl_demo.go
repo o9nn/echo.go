@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/cogpy/echo9llama/lang/apl"
+	"github.com/o9nn/echo.go/lang/apl"
 )
 
 func main() {

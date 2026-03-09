@@ -18,8 +18,8 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/cogpy/echo9llama/server/internal/cache/blob"
-	"github.com/cogpy/echo9llama/server/internal/testutil"
+	"github.com/o9nn/echo.go/server/internal/cache/blob"
+	"github.com/o9nn/echo.go/server/internal/testutil"
 )
 
 func ExampleRegistry_cancelOnFirstError() {

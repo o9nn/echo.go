@@ -3,9 +3,9 @@ package gemma3
 import (
 	"math"
 
-	"github.com/cogpy/echo9llama/fs"
-	"github.com/cogpy/echo9llama/ml"
-	"github.com/cogpy/echo9llama/ml/nn"
+	"github.com/o9nn/echo.go/fs"
+	"github.com/o9nn/echo.go/ml"
+	"github.com/o9nn/echo.go/ml/nn"
 )
 
 var batchSize int = 1

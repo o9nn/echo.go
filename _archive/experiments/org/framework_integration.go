@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/deeptreeecho"
+	"github.com/o9nn/echo.go/core/deeptreeecho"
 )
 
 // GlobalIdentityFramework holds the singleton instance

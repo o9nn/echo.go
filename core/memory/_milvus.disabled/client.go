@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/consciousness"
-	"github.com/cogpy/echo9llama/core/memory"
+	"github.com/o9nn/echo.go/core/consciousness"
+	"github.com/o9nn/echo.go/core/memory"
 	"github.com/milvus-io/milvus-sdk-go/v2/client"
 	"github.com/milvus-io/milvus-sdk-go/v2/entity"
 )

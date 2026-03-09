@@ -7,8 +7,8 @@ import (
 
 	"golang.org/x/image/draw"
 
-	"github.com/cogpy/echo9llama/fs"
-	"github.com/cogpy/echo9llama/model/imageproc"
+	"github.com/o9nn/echo.go/fs"
+	"github.com/o9nn/echo.go/model/imageproc"
 )
 
 type supportedAspectRatio struct {

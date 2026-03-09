@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/llm"
+	"github.com/o9nn/echo.go/core/llm"
 )
 
 // UnifiedAutonomousEchoself is the top-level autonomous agent that wraps

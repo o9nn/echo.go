@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/relevance"
+	"github.com/o9nn/echo.go/core/relevance"
 )
 
 func main() {

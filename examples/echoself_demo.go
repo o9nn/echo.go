@@ -10,8 +10,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/orchestration"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/orchestration"
 )
 
 // EchoselfIntegrationDemo demonstrates the enhanced orchestration capabilities

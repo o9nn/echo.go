@@ -14,8 +14,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/spf13/cobra"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/types/model"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/types/model"
 )
 
 func TestShowInfo(t *testing.T) {

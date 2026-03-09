@@ -10,7 +10,7 @@ import (
         "strings"
         "time"
 
-        "github.com/cogpy/echo9llama/core/deeptreeecho"
+        "github.com/o9nn/echo.go/core/deeptreeecho"
 )
 
 // AppStorageProvider implements ModelProvider for Replit App Storage

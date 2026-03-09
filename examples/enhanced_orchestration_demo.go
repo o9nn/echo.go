@@ -9,8 +9,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/orchestration"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/orchestration"
 )
 
 // EnhancedOrchestrationDemo demonstrates the new advanced features

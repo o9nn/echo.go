@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cogpy/echo9llama/server/internal/internal/stringsx"
+	"github.com/o9nn/echo.go/server/internal/internal/stringsx"
 )
 
 const MaxNameLength = 350 + 1 + 80 + 1 + 80 + 1 + 80 // <host>/<namespace>/<model>:<tag>

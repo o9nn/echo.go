@@ -12,7 +12,7 @@ import "C"
 import (
 	"unsafe"
 
-	fsggml "github.com/cogpy/echo9llama/fs/ggml"
+	fsggml "github.com/o9nn/echo.go/fs/ggml"
 )
 
 // convertToF32 converts (dequantizes) the raw data to F32 so we can then quantize it

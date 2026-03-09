@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cogpy/echo9llama/api"
+	"github.com/o9nn/echo.go/api"
 )
 
 func TestConvertFromSafetensors(t *testing.T) {

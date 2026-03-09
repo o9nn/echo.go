@@ -8,11 +8,11 @@ import (
 	"log"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/consciousness"
-	"github.com/cogpy/echo9llama/core/emergence"
-	"github.com/cogpy/echo9llama/core/meta"
-	"github.com/cogpy/echo9llama/core/quantum"
-	"github.com/cogpy/echo9llama/lang/apl"
+	"github.com/o9nn/echo.go/core/consciousness"
+	"github.com/o9nn/echo.go/core/emergence"
+	"github.com/o9nn/echo.go/core/meta"
+	"github.com/o9nn/echo.go/core/quantum"
+	"github.com/o9nn/echo.go/lang/apl"
 )
 
 func main() {

@@ -10,8 +10,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/deeptreeecho"
-	"github.com/cogpy/echo9llama/core/llm"
+	"github.com/o9nn/echo.go/core/deeptreeecho"
+	"github.com/o9nn/echo.go/core/llm"
 )
 
 const (

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/llm"
+	"github.com/o9nn/echo.go/core/llm"
 )
 
 // IdentityGoalGenerator creates goals aligned with Deep Tree Echo identity

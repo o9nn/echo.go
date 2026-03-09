@@ -6,8 +6,8 @@ import (
 	"math/rand/v2"
 	"slices"
 
-	"github.com/cogpy/echo9llama/llama"
-	"github.com/cogpy/echo9llama/model"
+	"github.com/o9nn/echo.go/llama"
+	"github.com/o9nn/echo.go/model"
 )
 
 // token represents information about a single token during sampling
@@ -126,7 +126,7 @@ func (s *Sampler) sample(tokens []token) (token, error) {
 	return tokens[idx], nil
 }
 
-// TODO(parthsareen): update sampler interface to use json unmarshal https://github.com/cogpy/echo9llama/issues/9278
+// TODO(parthsareen): update sampler interface to use json unmarshal https://github.com/o9nn/echo.go/issues/9278
 func NewSampler(temperature float32, topK int, topP float32, minP float32, seed int, grammar *GrammarSampler) Sampler {
 	var rng *rand.Rand
 	if seed != -1 {

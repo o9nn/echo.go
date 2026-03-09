@@ -1,11 +1,11 @@
 package gemma3n
 
 import (
-	"github.com/cogpy/echo9llama/fs"
-	"github.com/cogpy/echo9llama/kvcache"
-	"github.com/cogpy/echo9llama/ml"
-	"github.com/cogpy/echo9llama/model"
-	"github.com/cogpy/echo9llama/model/input"
+	"github.com/o9nn/echo.go/fs"
+	"github.com/o9nn/echo.go/kvcache"
+	"github.com/o9nn/echo.go/ml"
+	"github.com/o9nn/echo.go/model"
+	"github.com/o9nn/echo.go/model/input"
 )
 
 type Model struct {

@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/consciousness"
-	"github.com/cogpy/echo9llama/core/llm"
+	"github.com/o9nn/echo.go/core/consciousness"
+	"github.com/o9nn/echo.go/core/llm"
 )
 
 // System2Bootstrap implements the perception-action event loop.

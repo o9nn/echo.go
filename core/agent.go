@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/llm"
+	"github.com/o9nn/echo.go/core/llm"
 )
 
 // AutonomousAgent represents the main autonomous agent

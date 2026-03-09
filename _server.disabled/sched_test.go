@@ -11,12 +11,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/app/lifecycle"
-	"github.com/cogpy/echo9llama/discover"
-	"github.com/cogpy/echo9llama/format"
-	"github.com/cogpy/echo9llama/fs/ggml"
-	"github.com/cogpy/echo9llama/llm"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/app/lifecycle"
+	"github.com/o9nn/echo.go/discover"
+	"github.com/o9nn/echo.go/format"
+	"github.com/o9nn/echo.go/fs/ggml"
+	"github.com/o9nn/echo.go/llm"
 )
 
 func TestMain(m *testing.M) {

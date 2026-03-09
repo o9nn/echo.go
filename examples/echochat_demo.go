@@ -9,8 +9,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/orchestration"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/orchestration"
 )
 
 // EchoChatDemo demonstrates the shell integration capabilities

@@ -7,12 +7,12 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/cogpy/echo9llama/fs"
-	fsggml "github.com/cogpy/echo9llama/fs/ggml"
-	"github.com/cogpy/echo9llama/ml"
-	"github.com/cogpy/echo9llama/ml/backend/ggml"
-	"github.com/cogpy/echo9llama/ml/nn"
-	"github.com/cogpy/echo9llama/model/input"
+	"github.com/o9nn/echo.go/fs"
+	fsggml "github.com/o9nn/echo.go/fs/ggml"
+	"github.com/o9nn/echo.go/ml"
+	"github.com/o9nn/echo.go/ml/backend/ggml"
+	"github.com/o9nn/echo.go/ml/nn"
+	"github.com/o9nn/echo.go/model/input"
 )
 
 func TestParseTags(t *testing.T) {

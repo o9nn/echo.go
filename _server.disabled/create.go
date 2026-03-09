@@ -19,14 +19,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/convert"
-	"github.com/cogpy/echo9llama/envconfig"
-	"github.com/cogpy/echo9llama/format"
-	"github.com/cogpy/echo9llama/fs/ggml"
-	"github.com/cogpy/echo9llama/template"
-	"github.com/cogpy/echo9llama/types/errtypes"
-	"github.com/cogpy/echo9llama/types/model"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/convert"
+	"github.com/o9nn/echo.go/envconfig"
+	"github.com/o9nn/echo.go/format"
+	"github.com/o9nn/echo.go/fs/ggml"
+	"github.com/o9nn/echo.go/template"
+	"github.com/o9nn/echo.go/types/errtypes"
+	"github.com/o9nn/echo.go/types/model"
 )
 
 var (

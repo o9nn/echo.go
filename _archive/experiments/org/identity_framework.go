@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/deeptreeecho"
+	"github.com/o9nn/echo.go/core/deeptreeecho"
 )
 
 // OrganizationalIdentityFramework represents the comprehensive identity system

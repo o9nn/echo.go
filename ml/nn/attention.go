@@ -3,8 +3,8 @@ package nn
 import (
 	"fmt"
 
-	"github.com/cogpy/echo9llama/kvcache"
-	"github.com/cogpy/echo9llama/ml"
+	"github.com/o9nn/echo.go/kvcache"
+	"github.com/o9nn/echo.go/ml"
 )
 
 // Attention implements scaled dot-product attention for transformer models:

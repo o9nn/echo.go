@@ -12,8 +12,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/deeptreeecho"
-	"github.com/cogpy/echo9llama/core/echobeats"
+	"github.com/o9nn/echo.go/core/deeptreeecho"
+	"github.com/o9nn/echo.go/core/echobeats"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )

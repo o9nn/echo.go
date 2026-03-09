@@ -21,14 +21,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/envconfig"
-	"github.com/cogpy/echo9llama/fs/gguf"
-	"github.com/cogpy/echo9llama/parser"
-	"github.com/cogpy/echo9llama/template"
-	"github.com/cogpy/echo9llama/thinking"
-	"github.com/cogpy/echo9llama/types/model"
-	"github.com/cogpy/echo9llama/version"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/envconfig"
+	"github.com/o9nn/echo.go/fs/gguf"
+	"github.com/o9nn/echo.go/parser"
+	"github.com/o9nn/echo.go/template"
+	"github.com/o9nn/echo.go/thinking"
+	"github.com/o9nn/echo.go/types/model"
+	"github.com/o9nn/echo.go/version"
 )
 
 var (

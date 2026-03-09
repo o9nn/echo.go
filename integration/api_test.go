@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cogpy/echo9llama/api"
+	"github.com/o9nn/echo.go/api"
 )
 
 func TestAPIGenerate(t *testing.T) {

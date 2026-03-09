@@ -10,8 +10,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/deeptreeecho"
-	"github.com/cogpy/echo9llama/core/hgql"
+	"github.com/o9nn/echo.go/core/deeptreeecho"
+	"github.com/o9nn/echo.go/core/hgql"
 )
 
 func main() {

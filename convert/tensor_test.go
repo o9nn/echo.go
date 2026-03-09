@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/cogpy/echo9llama/fs/ggml"
+	"github.com/o9nn/echo.go/fs/ggml"
 	"github.com/pdevine/tensor"
 )
 

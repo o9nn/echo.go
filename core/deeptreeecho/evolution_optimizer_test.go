@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/llm"
+	"github.com/o9nn/echo.go/core/llm"
 )
 
 // MockLLMProvider for testing

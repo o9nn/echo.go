@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cogpy/echo9llama/api"
+	"github.com/o9nn/echo.go/api"
 )
 
 // First run of this scenario on a target system will take a long time to download

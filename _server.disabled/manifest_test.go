@@ -7,7 +7,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/cogpy/echo9llama/types/model"
+	"github.com/o9nn/echo.go/types/model"
 )
 
 func createManifest(t *testing.T, path, name string) {

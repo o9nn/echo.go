@@ -19,8 +19,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cogpy/echo9llama/auth"
-	"github.com/cogpy/echo9llama/version"
+	"github.com/o9nn/echo.go/auth"
+	"github.com/o9nn/echo.go/version"
 )
 
 var (

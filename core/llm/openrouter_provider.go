@@ -131,7 +131,7 @@ func (orp *OpenRouterProvider) Generate(ctx context.Context, prompt string, opts
 	
 	httpReq.Header.Set("Content-Type", "application/json")
 	httpReq.Header.Set("Authorization", "Bearer "+orp.apiKey)
-	httpReq.Header.Set("HTTP-Referer", "https://github.com/cogpy/echo9llama")
+	httpReq.Header.Set("HTTP-Referer", "https://github.com/o9nn/echo.go")
 	httpReq.Header.Set("X-Title", "Echo9llama Deep Tree Echo")
 	
 	// Send request
@@ -223,7 +223,7 @@ func (orp *OpenRouterProvider) StreamGenerate(ctx context.Context, prompt string
 	
 	httpReq.Header.Set("Content-Type", "application/json")
 	httpReq.Header.Set("Authorization", "Bearer "+orp.apiKey)
-	httpReq.Header.Set("HTTP-Referer", "https://github.com/cogpy/echo9llama")
+	httpReq.Header.Set("HTTP-Referer", "https://github.com/o9nn/echo.go")
 	httpReq.Header.Set("X-Title", "Echo9llama Deep Tree Echo")
 	
 	// Start streaming in goroutine

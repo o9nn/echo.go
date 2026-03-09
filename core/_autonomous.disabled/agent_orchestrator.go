@@ -6,11 +6,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/consciousness"
-	"github.com/cogpy/echo9llama/core/deeptreeecho"
-	"github.com/cogpy/echo9llama/core/echobeats"
-	"github.com/cogpy/echo9llama/core/echodream"
-	"github.com/cogpy/echo9llama/core/memory"
+	"github.com/o9nn/echo.go/core/consciousness"
+	"github.com/o9nn/echo.go/core/deeptreeecho"
+	"github.com/o9nn/echo.go/core/echobeats"
+	"github.com/o9nn/echo.go/core/echodream"
+	"github.com/o9nn/echo.go/core/memory"
 )
 
 // AgentOrchestrator is the master controller for autonomous Deep Tree Echo operation

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/cogpy/echo9llama/core/llm"
+	"github.com/o9nn/echo.go/core/llm"
 )
 
 // LocalModelProvider provides an abstraction layer for local model execution.

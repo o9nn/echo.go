@@ -8,10 +8,10 @@ import (
 	"log"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/improvement"
-	"github.com/cogpy/echo9llama/core/memory"
-	"github.com/cogpy/echo9llama/core/temporal"
-	"github.com/cogpy/echo9llama/lang/apl"
+	"github.com/o9nn/echo.go/core/improvement"
+	"github.com/o9nn/echo.go/core/memory"
+	"github.com/o9nn/echo.go/core/temporal"
+	"github.com/o9nn/echo.go/lang/apl"
 )
 
 func main() {

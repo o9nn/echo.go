@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 	
-	"github.com/cogpy/echo9llama/core/llm"
+	"github.com/o9nn/echo.go/core/llm"
 )
 
 // LLMStepHandler implements LLM-powered cognitive processing for each step

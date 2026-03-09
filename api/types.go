@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cogpy/echo9llama/envconfig"
-	"github.com/cogpy/echo9llama/types/model"
+	"github.com/o9nn/echo.go/envconfig"
+	"github.com/o9nn/echo.go/types/model"
 )
 
 // StatusError is an error with an HTTP status code and message.

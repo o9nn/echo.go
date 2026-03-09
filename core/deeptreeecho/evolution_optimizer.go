@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/llm"
+	"github.com/o9nn/echo.go/core/llm"
 )
 
 // EvolutionOptimizer orchestrates the evolutionary optimization of Deep Tree Echo

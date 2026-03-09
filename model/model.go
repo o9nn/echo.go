@@ -16,13 +16,13 @@ import (
 	_ "golang.org/x/image/tiff"
 	_ "golang.org/x/image/webp"
 
-	"github.com/cogpy/echo9llama/fs"
-	fsggml "github.com/cogpy/echo9llama/fs/ggml"
-	"github.com/cogpy/echo9llama/kvcache"
-	"github.com/cogpy/echo9llama/logutil"
-	"github.com/cogpy/echo9llama/ml"
-	_ "github.com/cogpy/echo9llama/ml/backend"
-	"github.com/cogpy/echo9llama/model/input"
+	"github.com/o9nn/echo.go/fs"
+	fsggml "github.com/o9nn/echo.go/fs/ggml"
+	"github.com/o9nn/echo.go/kvcache"
+	"github.com/o9nn/echo.go/logutil"
+	"github.com/o9nn/echo.go/ml"
+	_ "github.com/o9nn/echo.go/ml/backend"
+	"github.com/o9nn/echo.go/model/input"
 )
 
 var ErrNoVisionModel = errors.New("this model is missing data required for image input")

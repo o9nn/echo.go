@@ -16,8 +16,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/types/model"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/types/model"
 )
 
 var finishReasonToolCalls = "tool_calls"
@@ -125,7 +125,7 @@ type ChatCompletionChunk struct {
 	Usage             *Usage        `json:"usage,omitempty"`
 }
 
-// TODO (https://github.com/cogpy/echo9llama/issues/5259): support []string, []int and [][]int
+// TODO (https://github.com/o9nn/echo.go/issues/5259): support []string, []int and [][]int
 type CompletionRequest struct {
 	Model            string         `json:"model"`
 	Prompt           string         `json:"prompt"`

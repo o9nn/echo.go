@@ -13,8 +13,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/format"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/format"
 )
 
 func TestMultiModelConcurrency(t *testing.T) {

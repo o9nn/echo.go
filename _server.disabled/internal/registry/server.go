@@ -16,9 +16,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cogpy/echo9llama/server/internal/cache/blob"
-	"github.com/cogpy/echo9llama/server/internal/client/ollama"
-	"github.com/cogpy/echo9llama/server/internal/internal/backoff"
+	"github.com/o9nn/echo.go/server/internal/cache/blob"
+	"github.com/o9nn/echo.go/server/internal/client/ollama"
+	"github.com/o9nn/echo.go/server/internal/internal/backoff"
 )
 
 // Local implements an http.Handler for handling local Ollama API model

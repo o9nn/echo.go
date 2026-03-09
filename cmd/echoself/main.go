@@ -6,9 +6,9 @@ import (
 	"log"
 	"os"
 	
-	"github.com/cogpy/echo9llama/core"
-	"github.com/cogpy/echo9llama/core/deeptreeecho"
-	"github.com/cogpy/echo9llama/core/llm"
+	"github.com/o9nn/echo.go/core"
+	"github.com/o9nn/echo.go/core/deeptreeecho"
+	"github.com/o9nn/echo.go/core/llm"
 )
 
 func main() {

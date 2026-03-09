@@ -146,7 +146,7 @@ func (c *LLMClient) makeOpenAIRequest(ctx context.Context, requestBody map[strin
 	
 	// For OpenRouter, add additional headers
 	if c.provider == "openrouter" {
-		httpReq.Header.Set("HTTP-Referer", "https://github.com/cogpy/echo9llama")
+		httpReq.Header.Set("HTTP-Referer", "https://github.com/o9nn/echo.go")
 		httpReq.Header.Set("X-Title", "Deep Tree Echo")
 	}
 	

@@ -1,5 +1,5 @@
 package backend
 
 import (
-	_ "github.com/cogpy/echo9llama/ml/backend/ggml"
+	_ "github.com/o9nn/echo.go/ml/backend/ggml"
 )

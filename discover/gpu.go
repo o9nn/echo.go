@@ -21,8 +21,8 @@ import (
 	"sync"
 	"unsafe"
 
-	"github.com/cogpy/echo9llama/envconfig"
-	"github.com/cogpy/echo9llama/format"
+	"github.com/o9nn/echo.go/envconfig"
+	"github.com/o9nn/echo.go/format"
 )
 
 type cudaHandles struct {
@@ -582,7 +582,7 @@ func loadNVCUDAMgmt(nvcudaLibPaths []string) (int, *C.nvcuda_handle_t, string, e
 				err = fmt.Errorf("no nvidia devices detected by library %s", libPath)
 				slog.Info(err.Error())
 			case C.CUDA_ERROR_UNKNOWN:
-				err = fmt.Errorf("unknown error initializing cuda driver library %s: %s. see https://github.com/cogpy/echo9llama/blob/main/docs/troubleshooting.md for more information", libPath, C.GoString(resp.err))
+				err = fmt.Errorf("unknown error initializing cuda driver library %s: %s. see https://github.com/o9nn/echo.go/blob/main/docs/troubleshooting.md for more information", libPath, C.GoString(resp.err))
 				slog.Warn(err.Error())
 			default:
 				msg := C.GoString(resp.err)

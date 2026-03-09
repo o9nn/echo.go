@@ -13,8 +13,8 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/fs/ggml"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/fs/ggml"
 )
 
 func TestNamed(t *testing.T) {

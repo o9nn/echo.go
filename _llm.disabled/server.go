@@ -25,14 +25,14 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
-	"github.com/cogpy/echo9llama/api"
-	"github.com/cogpy/echo9llama/discover"
-	"github.com/cogpy/echo9llama/envconfig"
-	"github.com/cogpy/echo9llama/format"
-	"github.com/cogpy/echo9llama/fs/ggml"
-	"github.com/cogpy/echo9llama/llama"
-	"github.com/cogpy/echo9llama/logutil"
-	"github.com/cogpy/echo9llama/model"
+	"github.com/o9nn/echo.go/api"
+	"github.com/o9nn/echo.go/discover"
+	"github.com/o9nn/echo.go/envconfig"
+	"github.com/o9nn/echo.go/format"
+	"github.com/o9nn/echo.go/fs/ggml"
+	"github.com/o9nn/echo.go/llama"
+	"github.com/o9nn/echo.go/logutil"
+	"github.com/o9nn/echo.go/model"
 )
 
 type filteredEnv []string

@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cogpy/echo9llama/core/memory"
-	"github.com/cogpy/echo9llama/core/persistence"
+	"github.com/o9nn/echo.go/core/memory"
+	"github.com/o9nn/echo.go/core/persistence"
 	"github.com/dgraph-io/dgo/v230/protos/api"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"

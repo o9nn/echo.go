@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 	
-	dte "github.com/cogpy/echo9llama/core/deeptreeecho"
+	dte "github.com/o9nn/echo.go/core/deeptreeecho"
 )
 
 // EchoCogSystem integrates OpenCog with Deep Tree Echo

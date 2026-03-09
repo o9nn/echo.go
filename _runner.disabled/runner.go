@@ -1,8 +1,8 @@
 package runner
 
 import (
-	"github.com/cogpy/echo9llama/runner/llamarunner"
-	"github.com/cogpy/echo9llama/runner/ollamarunner"
+	"github.com/o9nn/echo.go/runner/llamarunner"
+	"github.com/o9nn/echo.go/runner/ollamarunner"
 )
 
 func Execute(args []string) error {

@@ -1,7 +1,7 @@
 package nn
 
 import (
-	"github.com/cogpy/echo9llama/ml"
+	"github.com/o9nn/echo.go/ml"
 )
 
 type LayerNorm struct {

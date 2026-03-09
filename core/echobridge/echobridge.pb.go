@@ -1481,7 +1481,7 @@ const file_echobridge_proto_rawDesc = "" +
 	"\fStreamEvents\x12\x1e.echobridge.EventStreamRequest\x1a\x1a.echobridge.CognitiveEvent0\x01\x12:\n" +
 	"\fRegisterGoal\x12\x10.echobridge.Goal\x1a\x18.echobridge.GoalResponse\x12H\n" +
 	"\x12UpdateGoalProgress\x12\x18.echobridge.GoalProgress\x1a\x18.echobridge.GoalResponse\x12?\n" +
-	"\x0eGetActiveGoals\x12\x17.echobridge.GoalRequest\x1a\x14.echobridge.GoalListB-Z+github.com/cogpy/echo9llama/core/echobridgeb\x06proto3"
+	"\x0eGetActiveGoals\x12\x17.echobridge.GoalRequest\x1a\x14.echobridge.GoalListB-Z+github.com/o9nn/echo.go/core/echobridgeb\x06proto3"
 
 var (
 	file_echobridge_proto_rawDescOnce sync.Once

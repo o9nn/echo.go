@@ -12,7 +12,7 @@ import (
 	"time"
 	"sync"
 
-	pb "github.com/cogpy/echo9llama/core/echobridge"
+	pb "github.com/o9nn/echo.go/core/echobridge"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )

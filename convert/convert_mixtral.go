@@ -3,7 +3,7 @@ package convert
 import (
 	"fmt"
 
-	"github.com/cogpy/echo9llama/fs/ggml"
+	"github.com/o9nn/echo.go/fs/ggml"
 )
 
 type mixtralModel struct {
