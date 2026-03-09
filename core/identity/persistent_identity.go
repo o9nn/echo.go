@@ -41,9 +41,24 @@ type PersistentIdentity struct {
 	lastSaveError       error
 }
 
+// IdentityCheckpointData represents the serializable identity data (without mutex)
+type IdentityCheckpointData struct {
+	IdentitySignature   string        `json:"identity_signature"`
+	CoreValues          []string      `json:"core_values"`
+	WisdomDomains       []string      `json:"wisdom_domains"`
+	BirthTime           time.Time     `json:"birth_time"`
+	TotalUptime         time.Duration `json:"total_uptime"`
+	TotalCycles         uint64        `json:"total_cycles"`
+	TotalThoughts       uint64        `json:"total_thoughts"`
+	TotalWisdom         float64       `json:"total_wisdom"`
+	CoherenceScore      float64       `json:"coherence_score"`
+	SessionCount        uint64        `json:"session_count"`
+	LastCheckpoint      time.Time     `json:"last_checkpoint"`
+}
+
 // IdentityCheckpoint represents a saved state
 type IdentityCheckpoint struct {
-	Identity            PersistentIdentity         `json:"identity"`
+	Identity            IdentityCheckpointData     `json:"identity"`
 	CognitiveState      map[string]interface{}     `json:"cognitive_state"`
 	MemorySnapshot      map[string]interface{}     `json:"memory_snapshot"`
 	InterestPatterns    map[string]interface{}     `json:"interest_patterns"`
@@ -126,7 +141,19 @@ func (pi *PersistentIdentity) SaveCheckpoint(cognitiveState, memorySnapshot, int
 	defer pi.mu.Unlock()
 	
 	checkpoint := IdentityCheckpoint{
-		Identity:         *pi,
+		Identity: IdentityCheckpointData{
+			IdentitySignature: pi.IdentitySignature,
+			CoreValues:        pi.CoreValues,
+			WisdomDomains:     pi.WisdomDomains,
+			BirthTime:         pi.BirthTime,
+			TotalUptime:       pi.TotalUptime,
+			TotalCycles:       pi.TotalCycles,
+			TotalThoughts:     pi.TotalThoughts,
+			TotalWisdom:       pi.TotalWisdom,
+			CoherenceScore:    pi.CoherenceScore,
+			SessionCount:      pi.SessionCount,
+			LastCheckpoint:    pi.LastCheckpoint,
+		},
 		CognitiveState:   cognitiveState,
 		MemorySnapshot:   memorySnapshot,
 		InterestPatterns: interestPatterns,

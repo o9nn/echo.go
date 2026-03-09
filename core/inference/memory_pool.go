@@ -161,7 +161,8 @@ type MemoryPool struct {
 	blocksMu   sync.RWMutex
 	
 	// Statistics
-	stats PoolStats
+	stats   PoolStats
+	statsMu sync.RWMutex
 	
 	// State
 	closed atomic.Bool
@@ -178,7 +179,6 @@ type PoolStats struct {
 	AllocationCount  int64
 	FreeCount        int64
 	OOMCount         int64
-	mu               sync.RWMutex
 }
 
 // NewMemoryPool creates a new memory pool
@@ -227,22 +227,22 @@ func (mp *MemoryPool) Alloc(size int64) (unsafe.Pointer, error) {
 	}
 	
 	if err != nil {
-		mp.stats.mu.Lock()
+		mp.statsMu.Lock()
 		mp.stats.OOMCount++
-		mp.stats.mu.Unlock()
+		mp.statsMu.Unlock()
 		return nil, err
 	}
 	
 	// Update statistics
 	if mp.config.TrackAllocations {
-		mp.stats.mu.Lock()
+		mp.statsMu.Lock()
 		mp.stats.TotalAllocated += alignedSize
 		mp.stats.CurrentUsage += alignedSize
 		if mp.stats.CurrentUsage > mp.stats.PeakUsage {
 			mp.stats.PeakUsage = mp.stats.CurrentUsage
 		}
 		mp.stats.AllocationCount++
-		mp.stats.mu.Unlock()
+		mp.statsMu.Unlock()
 	}
 	
 	// Zero memory if configured
@@ -271,9 +271,9 @@ func (mp *MemoryPool) allocFromBlockPool(size int64) (unsafe.Pointer, error) {
 	
 	block := pool.get()
 	
-	mp.stats.mu.Lock()
+	mp.statsMu.Lock()
 	mp.stats.BlockAllocations++
-	mp.stats.mu.Unlock()
+	mp.statsMu.Unlock()
 	
 	return unsafe.Pointer(&block[0]), nil
 }
@@ -288,9 +288,9 @@ func (mp *MemoryPool) allocFromArena(size int64) (unsafe.Pointer, error) {
 			ptr, _, err := arena.alloc(size, mp.config.Alignment)
 			if err == nil {
 				mp.arenasMu.RUnlock()
-				mp.stats.mu.Lock()
+				mp.statsMu.Lock()
 				mp.stats.ArenaAllocations++
-				mp.stats.mu.Unlock()
+				mp.statsMu.Unlock()
 				return ptr, nil
 			}
 		}
@@ -323,9 +323,9 @@ func (mp *MemoryPool) allocFromArena(size int64) (unsafe.Pointer, error) {
 		return nil, err
 	}
 	
-	mp.stats.mu.Lock()
+	mp.statsMu.Lock()
 	mp.stats.ArenaAllocations++
-	mp.stats.mu.Unlock()
+	mp.statsMu.Unlock()
 	
 	return ptr, nil
 }
@@ -364,11 +364,11 @@ func (mp *MemoryPool) Free(ptr unsafe.Pointer, size int64) {
 	
 	// Update statistics
 	if mp.config.TrackAllocations {
-		mp.stats.mu.Lock()
+		mp.statsMu.Lock()
 		mp.stats.TotalFreed += alignedSize
 		mp.stats.CurrentUsage -= alignedSize
 		mp.stats.FreeCount++
-		mp.stats.mu.Unlock()
+		mp.statsMu.Unlock()
 	}
 }
 
@@ -406,16 +406,25 @@ func (mp *MemoryPool) Reset() {
 	}
 	
 	// Reset statistics
-	mp.stats.mu.Lock()
+	mp.statsMu.Lock()
 	mp.stats.CurrentUsage = 0
-	mp.stats.mu.Unlock()
+	mp.statsMu.Unlock()
 }
-
-// Stats returns the current pool statistics
+// Stats returns the current pool statistics (copy without mutex)
 func (mp *MemoryPool) Stats() PoolStats {
-	mp.stats.mu.RLock()
-	defer mp.stats.mu.RUnlock()
-	return mp.stats
+	mp.statsMu.RLock()
+	defer mp.statsMu.RUnlock()
+	return PoolStats{
+		TotalAllocated:   mp.stats.TotalAllocated,
+		TotalFreed:       mp.stats.TotalFreed,
+		CurrentUsage:     mp.stats.CurrentUsage,
+		PeakUsage:        mp.stats.PeakUsage,
+		ArenaAllocations: mp.stats.ArenaAllocations,
+		BlockAllocations: mp.stats.BlockAllocations,
+		AllocationCount:  mp.stats.AllocationCount,
+		FreeCount:        mp.stats.FreeCount,
+		OOMCount:         mp.stats.OOMCount,
+	}
 }
 
 // Close closes the memory pool and releases all resources

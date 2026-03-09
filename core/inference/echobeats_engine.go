@@ -452,12 +452,18 @@ func (e *EchobeatsEngine) WaitForStreamResponse(ctx context.Context, streamID St
 		return nil, ctx.Err()
 	}
 }
-
-// GetMetrics returns the current engine metrics
+// GetMetrics returns the current engine metrics (copy without mutex)
 func (e *EchobeatsEngine) GetMetrics() EngineMetrics {
 	e.metrics.mu.RLock()
 	defer e.metrics.mu.RUnlock()
-	return *e.metrics
+	return EngineMetrics{
+		TotalInferences: e.metrics.TotalInferences,
+		TotalTokens:     e.metrics.TotalTokens,
+		TotalLatencyMs:  e.metrics.TotalLatencyMs,
+		StreamInfers:    e.metrics.StreamInfers,
+		StreamTokens:    e.metrics.StreamTokens,
+		StepLatencies:   e.metrics.StepLatencies,
+	}
 }
 
 // GetState returns the current engine state

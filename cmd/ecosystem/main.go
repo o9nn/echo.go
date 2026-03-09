@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/o9nn/echo.go/core/deeptreeecho"
+	"github.com/cogpy/echo9llama/core/deeptreeecho"
 )
 
 func main() {

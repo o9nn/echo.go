@@ -461,12 +461,26 @@ func (pe *ProductionEngine) ListSnapshots() []SnapshotInfo {
 // =============================================================================
 // METRICS
 // =============================================================================
-
-// GetMetrics returns current metrics
+// GetMetrics returns current metrics (copy without mutex)
 func (pe *ProductionEngine) GetMetrics() ProductionMetrics {
 	pe.metrics.mu.RLock()
 	defer pe.metrics.mu.RUnlock()
-	return *pe.metrics
+	m := pe.metrics
+	return ProductionMetrics{
+		TotalRequests:        m.TotalRequests,
+		SuccessfulRequests:   m.SuccessfulRequests,
+		FailedRequests:       m.FailedRequests,
+		TotalTokensGenerated: m.TotalTokensGenerated,
+		TotalTokensPrompt:    m.TotalTokensPrompt,
+		TotalLatencyMs:       m.TotalLatencyMs,
+		MinLatencyMs:         m.MinLatencyMs,
+		MaxLatencyMs:         m.MaxLatencyMs,
+		TokensPerSecond:      m.TokensPerSecond,
+		RequestsPerSecond:    m.RequestsPerSecond,
+		MemoryUsedBytes:      m.MemoryUsedBytes,
+		GPUMemoryUsedBytes:   m.GPUMemoryUsedBytes,
+		StreamMetrics:        m.StreamMetrics,
+	}
 }
 
 // GetEngineMetrics returns echobeats engine metrics

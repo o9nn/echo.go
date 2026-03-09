@@ -824,9 +824,17 @@ func (pp *Sys6PayloadProcessor) runK9Worker(phaseID int) {
 	}
 }
 
-// GetMetrics returns current processor metrics
+// GetMetrics returns current processor metrics (copy without mutex)
 func (pp *Sys6PayloadProcessor) GetMetrics() ProcessorMetrics {
 	pp.metrics.mu.RLock()
 	defer pp.metrics.mu.RUnlock()
-	return *pp.metrics
+	return ProcessorMetrics{
+		TokensProcessed: pp.metrics.TokensProcessed,
+		GraphsProcessed: pp.metrics.GraphsProcessed,
+		TotalLatency:    pp.metrics.TotalLatency,
+		AverageLatency:  pp.metrics.AverageLatency,
+		ErrorCount:      pp.metrics.ErrorCount,
+		C8Utilization:   pp.metrics.C8Utilization,
+		K9Utilization:   pp.metrics.K9Utilization,
+	}
 }

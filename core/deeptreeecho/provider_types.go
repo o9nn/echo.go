@@ -48,15 +48,71 @@ type ProviderInfo struct {
 	Capabilities []string
 }
 
+// MemoryNode represents a node in the identity memory graph
+type MemoryNode struct {
+	ID       string
+	Content  string
+	Strength float64
+}
+
+// MemoryEdge represents an edge in the identity memory graph
+type MemoryEdge struct {
+	From   string
+	To     string
+	Weight float64
+}
+
+// IdentityMemory represents the identity's memory graph
+type IdentityMemory struct {
+	Coherence float64
+	Nodes     map[string]*MemoryNode
+	Edges     []*MemoryEdge
+	Patterns  []string
+}
+
+// IdentityReservoir represents the echo state reservoir in identity
+type IdentityReservoir struct {
+	Nodes      []float64
+	SpectralRadius float64
+}
+
+// IdentityEmotionalState represents the emotional state
+type IdentityEmotionalState struct {
+	Valence   float64
+	Arousal   float64
+	Dominance float64
+}
+
+// IdentitySpatialContext represents spatial awareness
+type IdentitySpatialContext struct {
+	Location string
+	Context  string
+}
+
+// IdentityEmbeddings represents vector embeddings
+type IdentityEmbeddings struct {
+	RepoEmbeddings map[string][]float64
+	Dimensions     int
+}
+
 // Identity represents the core identity of an echo agent
 type Identity struct {
-	ID          string
-	Name        string
-	CoreValues  []string
-	Traits      map[string]float64
-	Memories    []string
-	CreatedAt   int64
-	UpdatedAt   int64
+	ID             string
+	Name           string
+	Essence        string
+	CoreValues     []string
+	Patterns       map[string]*Pattern
+	Traits         map[string]float64
+	Memories       []string
+	Coherence      float64
+	RecursiveDepth int
+	Memory         *IdentityMemory
+	Reservoir      *IdentityReservoir
+	EmotionalState *IdentityEmotionalState
+	SpatialContext *IdentitySpatialContext
+	Embeddings     *IdentityEmbeddings
+	CreatedAt      int64
+	UpdatedAt      int64
 }
 
 // NewIdentity creates a new identity with the given name and values
@@ -64,9 +120,19 @@ func NewIdentity(name string, coreValues []string) *Identity {
 	return &Identity{
 		ID:         generateID("identity"),
 		Name:       name,
+		Essence:    "Deep Tree Echo",
 		CoreValues: coreValues,
+		Patterns:   make(map[string]*Pattern),
 		Traits:     make(map[string]float64),
 		Memories:   make([]string, 0),
+		Memory: &IdentityMemory{
+			Nodes:    make(map[string]*MemoryNode),
+			Edges:    make([]*MemoryEdge, 0),
+			Patterns: make([]string, 0),
+		},
+		Embeddings: &IdentityEmbeddings{
+			RepoEmbeddings: make(map[string][]float64),
+		},
 		CreatedAt:  currentTimestamp(),
 		UpdatedAt:  currentTimestamp(),
 	}

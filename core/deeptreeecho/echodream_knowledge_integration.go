@@ -69,6 +69,7 @@ type EpisodicMemory struct {
 // Pattern represents an extracted pattern from experiences
 type Pattern struct {
 	ID          string
+	Type        string
 	Description string
 	Frequency   int
 	Strength    float64
