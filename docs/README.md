@@ -19,6 +19,11 @@
 - [Orchestration](orchestration.md)
 - [FAQ](faq.md)
 
+## Deep Tree Echo
+
+- [**Deep Tree Echo Guide**](deep_tree_echo.md) - Comprehensive feature documentation, API reference, and usage examples
+- [Self-Assessment Guide](guides/SELF_ASSESSMENT_README.md) - Identity coherence and introspection commands
+
 ## Core Architecture
 
 - [Cognitive Operations Spec](COGNITIVE_OPERATIONS_SPEC.md)
