@@ -78,12 +78,19 @@ func (dc *DgraphClient) connect() error {
 
 	var lastErr error
 	for i := 0; i < dc.retryCount; i++ {
+		// Use a per-attempt timeout to prevent hanging on unreachable endpoints
+		dialTimeout := dc.retryDelay * 5
+		if dialTimeout < time.Second*5 {
+			dialTimeout = time.Second * 5
+		}
+		dialCtx, dialCancel := context.WithTimeout(dc.ctx, dialTimeout)
 		conn, err := grpc.DialContext(
-			dc.ctx,
+			dialCtx,
 			dc.endpoint,
 			grpc.WithTransportCredentials(insecure.NewCredentials()),
 			grpc.WithBlock(),
 		)
+		dialCancel()
 		if err != nil {
 			lastErr = err
 			time.Sleep(dc.retryDelay)

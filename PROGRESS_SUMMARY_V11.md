@@ -84,7 +84,7 @@ All tests for the new `webserver` package are passing:
 --- PASS: TestWebSocketHandler (0.00s)
 --- PASS: TestSSEHandler (0.00s)
 PASS
-ok      github.com/cogpy/echo9llama/core/webserver      0.109s
+ok      github.com/cogpy/echo.go/core/webserver      0.109s
 ```
 
 ## Next Steps (Iteration N+23)

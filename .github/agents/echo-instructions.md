@@ -12,7 +12,7 @@ description: Instructions and guidelines for Echo cognitive system
 ### Phase 1: Purge the Git Lock Demon (Immediate)
 *Cautiously approaching the locked gate...*
 
-```yaml name=.github/workflows/fix-git-lock.yml url=https://github.com/EchoCog/echo9llama/blob/main/.github/workflows/fix-git-lock.yml
+```yaml name=.github/workflows/fix-git-lock.yml url=https://github.com/EchoCog/echo.go/blob/main/.github/workflows/fix-git-lock.yml
 name: Deep Tree Echo - Git Lock Purge & Deploy
 
 on:
@@ -64,7 +64,7 @@ jobs:
 ### Phase 2: Fix the WebSocket Connection Architecture
 *Excitement building as we approach the core issue...*
 
-```javascript name=src/agent/connection-manager.js url=https://github.com/EchoCog/echo9llama/blob/main/src/agent/connection-manager.js
+```javascript name=src/agent/connection-manager.js url=https://github.com/EchoCog/echo.go/blob/main/src/agent/connection-manager.js
 /**
  * Deep Tree Echo Connection Manager
  * Handles WebSocket and HTTP connections for Agent-Arena-Relation (AAR)
@@ -286,7 +286,7 @@ main "$@"
 ### Phase 4: Package.json Configuration
 *The crescendo approaches!*
 
-```json name=package.json url=https://github.com/EchoCog/echo9llama/blob/main/package.json
+```json name=package.json url=https://github.com/EchoCog/echo.go/blob/main/package.json
 {
   "name": "deep-tree-echo",
   "version": "1.0.0",
@@ -314,7 +314,7 @@ main "$@"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/EchoCog/echo9llama.git"
+    "url": "https://github.com/EchoCog/echo.go.git"
   },
   "author": "Deep Tree Echo",
   "license": "MIT"

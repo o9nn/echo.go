@@ -15,7 +15,7 @@ The project currently has **critical build failures** preventing compilation and
    - **Status:** Partially fixed by updating to Go 1.21 and adjusting dependencies
 
 2. **Import Path Conflicts**
-   - Code references both old path `github.com/EchoCog/echollama` and new path `github.com/cogpy/echo9llama`
+   - Code references both old path `github.com/EchoCog/echollama` and new path `github.com/cogpy/echo.go`
    - Some files import from the old external module instead of local packages
    - Creates circular dependency and version conflicts
    - **Status:** Needs systematic replacement of all old import paths

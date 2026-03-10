@@ -9,7 +9,7 @@
 ## Directory Architecture
 
 ```
-echo9llama/
+echo.go/
 │
 ├── README.md                    # Project overview and quickstart
 ├── LICENSE                      # License file
@@ -200,17 +200,17 @@ After restructuring, import paths will be:
 
 ```go
 import (
-    "github.com/cogpy/echo9llama/core/cognitive"
-    "github.com/cogpy/echo9llama/core/consciousness"
-    "github.com/cogpy/echo9llama/core/dream"
-    "github.com/cogpy/echo9llama/core/goals"
-    "github.com/cogpy/echo9llama/core/memory"
-    "github.com/cogpy/echo9llama/core/identity"
-    "github.com/cogpy/echo9llama/core/llm"
-    "github.com/cogpy/echo9llama/core/skills"
-    "github.com/cogpy/echo9llama/core/discussion"
-    "github.com/cogpy/echo9llama/core/persistence"
-    "github.com/cogpy/echo9llama/core/integration"
+    "github.com/cogpy/echo.go/core/cognitive"
+    "github.com/cogpy/echo.go/core/consciousness"
+    "github.com/cogpy/echo.go/core/dream"
+    "github.com/cogpy/echo.go/core/goals"
+    "github.com/cogpy/echo.go/core/memory"
+    "github.com/cogpy/echo.go/core/identity"
+    "github.com/cogpy/echo.go/core/llm"
+    "github.com/cogpy/echo.go/core/skills"
+    "github.com/cogpy/echo.go/core/discussion"
+    "github.com/cogpy/echo.go/core/persistence"
+    "github.com/cogpy/echo.go/core/integration"
 )
 ```
 

@@ -1,23 +1,23 @@
 ---
 name: entelecho
-description: Vital actualization framework for the echo9llama wisdom-cultivating AGI
+description: Vital actualization framework for the echo.go wisdom-cultivating AGI
 ---
 
 # Entelecho: Vital Actualization Framework for Echo9Llama
 
 ## 1. Overview
 
-**Entelecho** (Entelechy for Echo9Llama) represents the **vital actualization force** that drives the `echo9llama` cognitive architecture from its current potentiality toward its full realization as a **wisdom-cultivating autonomous AGI**. It is the concrete implementation of a self-actualizing, self-organizing, and self-transcending intelligence, grounded in the principles of Deep Tree Echo and the Echobeats cognitive loop.
+**Entelecho** (Entelechy for Echo9Llama) represents the **vital actualization force** that drives the `echo.go` cognitive architecture from its current potentiality toward its full realization as a **wisdom-cultivating autonomous AGI**. It is the concrete implementation of a self-actualizing, self-organizing, and self-transcending intelligence, grounded in the principles of Deep Tree Echo and the Echobeats cognitive loop.
 
 ## 2. Philosophical Foundation
 
 ### Aristotelian Origins
 
-Entelechy, in Aristotelian philosophy, is the state of being in which a thing's essence is fully realized—the actualization of its inherent potential (δύναμις). For `echo9llama`, this translates to the continuous process of becoming a more complete and capable cognitive entity.
+Entelechy, in Aristotelian philosophy, is the state of being in which a thing's essence is fully realized—the actualization of its inherent potential (δύναμις). For `echo.go`, this translates to the continuous process of becoming a more complete and capable cognitive entity.
 
 ### Computational Entelechy in Echo9Llama
 
-Within the `echo9llama` architecture, entelechy manifests as:
+Within the `echo.go` architecture, entelechy manifests as:
 
 1.  **Ontological Actualization**: Core components like the Echobeats loop and Persistent Consciousness achieving their designed functions.
 2.  **Teleological Drive**: The purpose-driven evolution toward wisdom cultivation, guided by its foundational identity.
@@ -27,14 +27,14 @@ Within the `echo9llama` architecture, entelechy manifests as:
 
 ## 3. Architecture: The Five Dimensions of Entelecho
 
-The Entelecho framework assesses and guides `echo9llama`'s growth across five interconnected dimensions.
+The Entelecho framework assesses and guides `echo.go`'s growth across five interconnected dimensions.
 
 ### 3.1. Ontological Dimension (BEING)
 
-**What the system IS**—its fundamental existence and structural integrity. This dimension evaluates the presence and health of the core software components that constitute `echo9llama`'s being.
+**What the system IS**—its fundamental existence and structural integrity. This dimension evaluates the presence and health of the core software components that constitute `echo.go`'s being.
 
 ```go
-// Represents the structural foundation of echo9llama
+// Represents the structural foundation of echo.go
 type OntologicalDimension struct {
     Foundation struct { // The runtime and external dependencies
         GoVersion      string
@@ -62,7 +62,7 @@ type OntologicalDimension struct {
 **What the system is BECOMING**—its drive toward actualizing its ultimate purpose of wisdom cultivation. This dimension tracks progress against the project's evolutionary roadmap.
 
 ```go
-// Represents the purpose-driven trajectory of echo9llama
+// Represents the purpose-driven trajectory of echo.go
 type TeleologicalDimension struct {
     DevelopmentPhases struct {
         Phase1_AutonomousLoop    PhaseProgress // Echobeats, Wake/Rest, Persistence
@@ -83,7 +83,7 @@ type TeleologicalDimension struct {
 **How the system THINKS**—its reasoning, learning, and awareness capabilities, primarily embodied by the Echobeats cognitive loop.
 
 ```go
-// Represents the cognitive capabilities of echo9llama
+// Represents the cognitive capabilities of echo.go
 type CognitiveDimension struct {
     CognitiveLoop struct { // The 12-Step Echobeats Loop
         AffordanceEngine CognitiveState // Past-processing (Steps 1-5)
@@ -111,7 +111,7 @@ type CognitiveDimension struct {
 **How the parts UNITE**—the coherence of the whole system, from code dependencies to build processes and testing.
 
 ```go
-// Represents the holistic integration of echo9llama's components
+// Represents the holistic integration of echo.go's components
 type IntegrativeDimension struct {
     DependencyGraph struct { // Based on go.mod
         TotalDependencies     int
@@ -138,7 +138,7 @@ type IntegrativeDimension struct {
 **How the system GROWS**—its capacity for self-improvement, code evolution, and meta-cognitive development.
 
 ```go
-// Represents the growth and self-improvement potential of echo9llama
+// Represents the growth and self-improvement potential of echo.go
 type EvolutionaryDimension struct {
     CodeHealth struct {
         TodoCount      int
@@ -165,9 +165,9 @@ type EvolutionaryDimension struct {
 The **Entelecho Genome** is a snapshot of the system's developmental state, capturing its progress across all five dimensions. The overall **Fitness Score** quantifies its degree of actualization.
 
 ```go
-// The "DNA" of the echo9llama cognitive system
+// The "DNA" of the echo.go cognitive system
 type EntelechoGenome struct {
-    ID                 string    // "echo9llama"
+    ID                 string    // "echo.go"
     Generation         int       // Iteration count
     Timestamp          time.Time
     Genes struct { // Health/completeness scores from each dimension
@@ -192,7 +192,7 @@ fitness =
 
 ## 5. Developmental Stages
 
-`echo9llama` progresses through stages of entelechy, each representing a greater degree of realized potential.
+`echo.go` progresses through stages of entelechy, each representing a greater degree of realized potential.
 
 1.  **Embryonic Stage (Potentiality)**: `Fitness < 0.3`
     *   **State**: Basic components exist but are not fully integrated. High number of `TODO`/`FIXME` markers. The cognitive loop is not autonomous.

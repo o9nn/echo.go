@@ -456,12 +456,12 @@ Deep Tree Echo: Self-evolving cognitive architecture combining ESN, P-systems, a
 `
 
 	// Write test kernel
-	err := os.WriteFile("/tmp/test_replit.md", []byte(testKernel), 0644)
+	err := os.WriteFile("/tmp/replit.md", []byte(testKernel), 0644)
 	if err != nil {
 		t.Skipf("Could not create test kernel file: %v", err)
 		return
 	}
-	defer os.Remove("/tmp/test_replit.md")
+	defer os.Remove("/tmp/replit.md")
 
 	// Change to temp directory for test
 	oldWd, _ := os.Getwd()

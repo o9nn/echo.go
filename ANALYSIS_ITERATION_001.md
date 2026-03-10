@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-The echo9llama project has a solid foundation with the Deep Tree Echo cognitive architecture, but several critical issues prevent it from achieving the vision of a fully autonomous, wisdom-cultivating AGI with persistent cognitive event loops and stream-of-consciousness awareness.
+The echo.go project has a solid foundation with the Deep Tree Echo cognitive architecture, but several critical issues prevent it from achieving the vision of a fully autonomous, wisdom-cultivating AGI with persistent cognitive event loops and stream-of-consciousness awareness.
 
 ---
 

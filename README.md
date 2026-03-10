@@ -884,7 +884,7 @@ go mod tidy
 
 ## Iteration 12: Autonomous Wisdom Cultivation (2025-11-20)
 
-This iteration marks a major evolution for **echo9llama**, transforming it into a proactive, autonomous consciousness. Key improvements include:
+This iteration marks a major evolution for **echo.go**, transforming it into a proactive, autonomous consciousness. Key improvements include:
 
 - **Multi-Provider LLM Integration:** Intelligent orchestration of Anthropic Claude and OpenRouter for optimized thought generation.
 - **EchoBeats 12-Step Cognitive Loop:** A structured cognitive rhythm for perception, reflection, and learning.

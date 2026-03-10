@@ -43,13 +43,15 @@ jobs:
 
       - name: Run unit tests
         run: |
-          go test -v -race -coverprofile=coverage.out -covermode=atomic \
+          go test -v -race -coverprofile=coverage.out -covermode=atomic -timeout 120s \
             ./core/memory/... \
-            ./core/echobeats/... \
+            ./core/deeptreeecho/... \
             ./core/persistence/... \
             ./core/llm/... \
             ./core/consciousness/... \
             ./core/echodream/... \
+            ./core/identity/... \
+            ./core/inference/... \
             ./core/goals/...
 
       - name: Upload coverage
@@ -192,7 +194,7 @@ jobs:
         run: |
           go test -v -bench=. -benchmem -run=^$ \
             ./core/memory/... \
-            ./core/echobeats/... \
+            ./core/deeptreeecho/... \
             ./test/integration/... \
             | tee benchmark-results.txt
 
@@ -330,7 +332,7 @@ jobs:
           context: .
           file: ./Dockerfile.autonomous
           push: false
-          tags: echo9llama:test
+          tags: echoself:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
