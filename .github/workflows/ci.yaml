@@ -53,7 +53,10 @@ jobs:
             ./core/echodream/... \
             ./core/identity/... \
             ./core/inference \
-            ./core/goals/...
+            ./core/goals/... \
+            ./core/metahuman/... \
+            ./core/live2d/... \
+            ./core/webserver/...
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
@@ -88,7 +91,7 @@ jobs:
             -p 5080:5080 -p 6080:6080 -p 8080:8080 -p 9080:9080 \
             dgraph/dgraph:latest dgraph zero
           sleep 10
-          docker exec -d dgraph dgraph alpha --zero localhost:5080
+          docker exec -d dgraph dgraph alpha --zero localhost:5080 --security whitelist=0.0.0.0/0
           timeout 60 bash -c 'until curl -s http://localhost:8080/health; do sleep 2; done'
 
       - name: Run integration tests
@@ -133,7 +136,7 @@ jobs:
             -p 5080:5080 -p 6080:6080 -p 8080:8080 -p 9080:9080 \
             dgraph/dgraph:latest dgraph zero
           sleep 10
-          docker exec -d dgraph-e2e dgraph alpha --zero localhost:5080
+          docker exec -d dgraph-e2e dgraph alpha --zero localhost:5080 --security whitelist=0.0.0.0/0
           timeout 60 bash -c 'until curl -s http://localhost:8080/health; do sleep 2; done'
 
       - name: Build autonomous server
@@ -180,6 +183,7 @@ jobs:
           go test -v -bench=. -benchmem -run=^$ \
             ./core/memory/... \
             ./core/deeptreeecho/... \
+            ./core/metahuman/... \
             ./test/integration/... \
             | tee benchmark-results.txt
 
@@ -209,7 +213,7 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: latest
-          args: --timeout 10m0s -v
+          args: --timeout 10m0s -v --skip-dirs=core/inference/llama,core/inference/ggml,core/_echobeats.disabled,core/_autonomous.disabled,core/_integration.disabled,core/_opencog.disabled,core/_hgql.disabled
 
   go-mod-tidy:
     name: Go Mod Tidy
