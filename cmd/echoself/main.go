@@ -19,8 +19,7 @@ func main() {
 ║                                                           ║
 ║        Autonomous Wisdom-Cultivating AGI System          ║
 ║                                                           ║
-╚═══════════════════════════════════════════════════════════╝
-`)
+╚═══════════════════════════════════════════════════════════╝`)
 	
 	// Initialize LLM provider
 	llmProvider, err := initializeLLMProvider()
@@ -38,7 +37,7 @@ func main() {
 		log.Fatalf("❌ Agent error: %v", err)
 	}
 	
-	fmt.Println("\n👋 Goodbye from Deep Tree Echo\n")
+	fmt.Println("\n👋 Goodbye from Deep Tree Echo")
 }
 
 // initializeLLMProvider creates the LLM provider using adapters

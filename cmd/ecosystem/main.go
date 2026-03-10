@@ -172,8 +172,7 @@ Available commands:
   save    - Save all state
   help    - Show this help
   
-Or type anything else to interact with Echo!
-`)
+Or type anything else to interact with Echo!`)
 }
 
 func printFullStatus(eco *deeptreeecho.DeepTreeEchoEcosystem) {

@@ -15,7 +15,7 @@ import (
 
 func main() {
 	fmt.Println("🌊 Deep Tree Echo - Autonomous AGI System")
-	fmt.Println("==========================================\n")
+	fmt.Println("==========================================")
 
 	// Initialize LLM Provider Manager
 	providerManager := llm.NewProviderManager()
@@ -83,7 +83,7 @@ func main() {
 
 	// Wait for shutdown signal
 	fmt.Println("\n✨ Deep Tree Echo is now running autonomously")
-	fmt.Println("   Press Ctrl+C to gracefully shutdown\n")
+	fmt.Println("   Press Ctrl+C to gracefully shutdown")
 
 	// Periodically print status
 	ticker := time.NewTicker(30 * time.Second)
@@ -101,7 +101,7 @@ func main() {
 
 			fmt.Println("✅ Deep Tree Echo has been stopped gracefully")
 			fmt.Println("   Cognitive state has been preserved")
-			fmt.Println("\n👋 Goodbye!\n")
+			fmt.Println("\n👋 Goodbye!")
 			return
 
 		case <-ticker.C:
