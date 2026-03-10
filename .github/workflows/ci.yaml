@@ -69,27 +69,6 @@ jobs:
     name: Integration Tests
     runs-on: ubuntu-latest
     needs: unit-tests
-    services:
-      dgraph-zero:
-        image: dgraph/dgraph:latest
-        ports:
-          - 5080:5080
-          - 6080:6080
-        options: >-
-          --health-cmd "curl -f http://localhost:6080/health || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      dgraph-alpha:
-        image: dgraph/dgraph:latest
-        ports:
-          - 8080:8080
-          - 9080:9080
-        options: >-
-          --health-cmd "curl -f http://localhost:8080/health || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     env:
       DGRAPH_ENDPOINT: localhost:9080
     steps:
@@ -102,8 +81,13 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
           cache: true
 
-      - name: Wait for Dgraph
+      - name: Start Dgraph
         run: |
+          docker run -d --name dgraph \
+            -p 5080:5080 -p 6080:6080 -p 8080:8080 -p 9080:9080 \
+            dgraph/dgraph:latest dgraph zero &
+          sleep 5
+          docker exec -d dgraph dgraph alpha --zero localhost:5080
           timeout 60 bash -c 'until curl -s http://localhost:8080/health; do sleep 2; done'
 
       - name: Run integration tests
@@ -126,17 +110,6 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: integration-tests
-    services:
-      dgraph-zero:
-        image: dgraph/dgraph:latest
-        ports:
-          - 5080:5080
-          - 6080:6080
-      dgraph-alpha:
-        image: dgraph/dgraph:latest
-        ports:
-          - 8080:8080
-          - 9080:9080
     env:
       DGRAPH_ENDPOINT: localhost:9080
       ECHOSELF_BASE_URL: http://localhost:8081
@@ -151,6 +124,15 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
           cache: true
+
+      - name: Start Dgraph
+        run: |
+          docker run -d --name dgraph-e2e \
+            -p 5080:5080 -p 6080:6080 -p 8080:8080 -p 9080:9080 \
+            dgraph/dgraph:latest dgraph zero &
+          sleep 5
+          docker exec -d dgraph-e2e dgraph alpha --zero localhost:5080
+          timeout 60 bash -c 'until curl -s http://localhost:8080/health; do sleep 2; done'
 
       - name: Build autonomous server
         run: |

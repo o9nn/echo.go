@@ -1,10 +1,5 @@
 run:
   timeout: 5m
-  skip-dirs:
-    - core/inference/llama
-    - core/inference/ggml
-    - _archive
-    - _disabled
 linters:
   enable:
     - asasalint
@@ -36,6 +31,13 @@ linters-settings:
     checks:
       - all
       - -SA1019 # omit Deprecated check
+issues:
+  exclude-dirs:
+    - core/inference/llama
+    - core/inference/ggml
+    - _archive
+    - _disabled
+    - examples
 severity:
   default-severity: error
   rules:
