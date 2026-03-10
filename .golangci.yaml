@@ -35,9 +35,16 @@ issues:
   exclude-dirs:
     - core/inference/llama
     - core/inference/ggml
+    - core/_echobeats.disabled
+    - core/_autonomous.disabled
+    - core/_integration.disabled
+    - core/_opencog.disabled
+    - core/_hgql.disabled
     - _archive
     - _disabled
     - examples
+    - Source
+    - dev-tools
 severity:
   default-severity: error
   rules:

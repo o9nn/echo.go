@@ -15,6 +15,7 @@
 package metahuman
 
 import (
+	"fmt"
 	"math"
 	"sync"
 )
@@ -185,6 +186,38 @@ func clamp(v, min, max float64) float64 {
 		return max
 	}
 	return v
+}
+
+// ActionUnitCodes maps ActionUnit constants to their FACS code strings (e.g., AU6 → "AU6").
+var ActionUnitCodes = map[ActionUnit]string{
+	AU1:  "AU1",
+	AU2:  "AU2",
+	AU4:  "AU4",
+	AU5:  "AU5",
+	AU6:  "AU6",
+	AU7:  "AU7",
+	AU9:  "AU9",
+	AU10: "AU10",
+	AU12: "AU12",
+	AU14: "AU14",
+	AU15: "AU15",
+	AU17: "AU17",
+	AU20: "AU20",
+	AU23: "AU23",
+	AU25: "AU25",
+	AU26: "AU26",
+	AU28: "AU28",
+	AU43: "AU43",
+	AU45: "AU45",
+	AU46: "AU46",
+}
+
+// ActionUnitCode returns the FACS code string for an ActionUnit (e.g., "AU6").
+func ActionUnitCode(au ActionUnit) string {
+	if code, ok := ActionUnitCodes[au]; ok {
+		return code
+	}
+	return fmt.Sprintf("AU%d", au)
 }
 
 // Ensure math is used
