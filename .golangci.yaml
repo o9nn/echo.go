@@ -1,5 +1,10 @@
 run:
   timeout: 5m
+  skip-dirs:
+    - core/inference/llama
+    - core/inference/ggml
+    - _archive
+    - _disabled
 linters:
   enable:
     - asasalint

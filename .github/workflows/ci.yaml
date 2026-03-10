@@ -43,6 +43,7 @@ jobs:
 
       - name: Run unit tests
         run: |
+          # Note: ./core/inference/llama requires CGO with llama.cpp libs, excluded from CI
           go test -v -race -coverprofile=coverage.out -covermode=atomic -timeout 120s \
             ./core/memory/... \
             ./core/deeptreeecho/... \
@@ -51,7 +52,7 @@ jobs:
             ./core/consciousness/... \
             ./core/echodream/... \
             ./core/identity/... \
-            ./core/inference/... \
+            ./core/inference \
             ./core/goals/...
 
       - name: Upload coverage
@@ -264,12 +265,13 @@ jobs:
       - name: Run govulncheck
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@latest
-          govulncheck ./...
+          # Exclude core/inference/llama (requires CGO with llama.cpp native libs)
+          govulncheck $(go list ./... | grep -v 'inference/llama' | grep -v 'inference/ggml')
 
       - name: Run gosec
         uses: securego/gosec@master
         with:
-          args: '-no-fail -fmt sarif -out results.sarif ./...'
+          args: '-no-fail -fmt sarif -out results.sarif -exclude-dir=core/inference/llama -exclude-dir=core/inference/ggml -exclude-dir=_archive ./...'
 
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v3
