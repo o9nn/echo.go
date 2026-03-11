@@ -93,7 +93,7 @@ EchOllama integrates Deep Tree Echo, an advanced cognitive architecture that bri
 - **App Storage Provider**: Large model management and cloud storage
 - **Hybrid Processing**: Seamless switching between local and cloud providers
 
-Visit the [Deep Tree Echo documentation](dte.md) for detailed architecture information.
+Visit the [Deep Tree Echo documentation](docs/deep_tree_echo.md) for detailed architecture information.
 
 ### 🔍 Self-Assessment and Introspection
 
@@ -124,7 +124,7 @@ The self-assessment system validates:
 - **Operational Schema**: Implementation of core modules
 - **Reflection Protocol**: Adherence to self-reflection practices
 
-See [SELF_ASSESSMENT_README.md](SELF_ASSESSMENT_README.md) for complete documentation.
+See [SELF_ASSESSMENT_README.md](docs/guides/SELF_ASSESSMENT_README.md) for complete documentation.
 
 ### 🚧 Development Status
 
@@ -855,7 +855,7 @@ response = echo.generate_with_cognition(
 
 ### Resources
 
-- **Documentation**: [Deep Tree Echo Guide](dte.md)
+- **Documentation**: [Deep Tree Echo Guide](docs/deep_tree_echo.md)
 - **API Reference**: [Enhanced API Documentation](docs/api.md)
 - **Examples**: [Cognitive Integration Examples](examples/)
 - **Web Dashboard**: Visit `http://localhost:5000` when server is running

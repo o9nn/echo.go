@@ -15,7 +15,153 @@
 - [List Running Models](#list-running-models)
 - [Version](#version)
 
-## Conventions
+## Deep Tree Echo Endpoints
+
+EchOllama extends the standard Ollama API with Deep Tree Echo cognitive endpoints available on `http://localhost:5000`.
+
+- [Get Cognitive Status](#get-cognitive-status)
+- [Deep Cognitive Processing](#deep-cognitive-processing)
+- [Update Emotional State](#update-emotional-state)
+- [Create Resonance Pattern](#create-resonance-pattern)
+- [Store Memory](#store-memory)
+- [Recall Memory](#recall-memory)
+- [Cognitive Space Movement](#cognitive-space-movement)
+
+For comprehensive documentation including request/response schemas, configuration options, and usage examples, see the [Deep Tree Echo Guide](deep_tree_echo.md).
+
+### Get Cognitive Status
+
+```
+GET /api/echo/status
+```
+
+Returns the current state of the Deep Tree Echo cognitive system.
+
+#### Example
+
+```shell
+curl http://localhost:5000/api/echo/status
+```
+
+### Deep Cognitive Processing
+
+```
+POST /api/echo/think
+```
+
+Processes a prompt through the full Deep Tree Echo cognitive stack.
+
+#### Parameters
+
+- `prompt`: (required) The thought or question to process
+- `depth`: Processing depth — `shallow`, `normal`, or `deep` (default: `normal`)
+- `include_reflection`: Whether to include meta-cognitive reflection (default: `false`)
+
+#### Example
+
+```shell
+curl -X POST http://localhost:5000/api/echo/think \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Reflect on the nature of consciousness", "depth": "deep"}'
+```
+
+### Update Emotional State
+
+```
+POST /api/echo/feel
+```
+
+Updates the emotional state, influencing all subsequent cognitive processing.
+
+#### Parameters
+
+- `emotion`: (required) Emotion name (e.g., `curious`, `contemplative`, `engaged`, `calm`)
+- `intensity`: (required) Intensity value from `0.0` to `1.0`
+
+#### Example
+
+```shell
+curl -X POST http://localhost:5000/api/echo/feel \
+  -H "Content-Type: application/json" \
+  -d '{"emotion": "curious", "intensity": 0.8}'
+```
+
+### Create Resonance Pattern
+
+```
+POST /api/echo/resonate
+```
+
+Creates a resonance pattern in the cognitive space.
+
+#### Example
+
+```shell
+curl -X POST http://localhost:5000/api/echo/resonate \
+  -H "Content-Type: application/json" \
+  -d '{"pattern": "learning", "frequency": 0.6}'
+```
+
+### Store Memory
+
+```
+POST /api/echo/remember
+```
+
+Stores a memory in the Deep Tree Echo hypergraph memory system.
+
+#### Parameters
+
+- `key`: (required) Unique identifier for the memory
+- `value`: (required) Content to remember
+- `tags`: (optional) Array of semantic tags for hyperedge linking
+- `importance`: (optional) Importance score from `0.0` to `1.0` (default: `0.5`)
+
+#### Example
+
+```shell
+curl -X POST http://localhost:5000/api/echo/remember \
+  -H "Content-Type: application/json" \
+  -d '{"key": "key_insight", "value": "Deep Tree Echo learns continuously", "importance": 0.9}'
+```
+
+### Recall Memory
+
+```
+GET /api/echo/recall/:key
+```
+
+Retrieves a stored memory by key, including associated memories.
+
+#### Example
+
+```shell
+curl http://localhost:5000/api/echo/recall/key_insight
+```
+
+### Cognitive Space Movement
+
+```
+POST /api/echo/move
+```
+
+Moves Deep Tree Echo's position in the 3D cognitive space.
+
+#### Parameters
+
+- `x`: (required) X-axis coordinate
+- `y`: (required) Y-axis coordinate
+- `z`: (required) Z-axis coordinate (cognitive depth)
+
+#### Example
+
+```shell
+curl -X POST http://localhost:5000/api/echo/move \
+  -H "Content-Type: application/json" \
+  -d '{"x": 10, "y": 5, "z": 3}'
+```
+
+
 
 ### Model names
 
