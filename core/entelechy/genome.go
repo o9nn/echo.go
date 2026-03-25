@@ -429,3 +429,167 @@ func max(a, b int) int {
 	}
 	return b
 }
+
+// =============================================================================
+// WISDOM-COUPLED GENOME EVOLUTION
+// =============================================================================
+
+// WisdomCoupledEvolution allows the genome to evolve in response to accumulated wisdom.
+// Rather than random mutation, this performs directed evolution: wisdom principles
+// inform which genes should be expressed more strongly or which new genes should emerge.
+// This couples the entelechy genome to the wisdom synthesis system.
+func (g *Genome) WisdomCoupledEvolution(wisdomDomain string, wisdomDepth float64, wisdomContent string) (*CognitiveGene, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	// Map wisdom domain to gene type
+	geneType := mapDomainToGeneType(wisdomDomain)
+
+	// Check if we have existing genes of this type
+	existingGenes := make([]*CognitiveGene, 0)
+	for _, gene := range g.genes {
+		if gene.Type == geneType {
+			existingGenes = append(existingGenes, gene)
+		}
+	}
+
+	if len(existingGenes) > 0 {
+		// Enhance existing genes based on wisdom depth
+		for _, gene := range existingGenes {
+			// Wisdom-directed dominance increase (bounded)
+			gene.Dominance = clamp(gene.Dominance+wisdomDepth*0.05, 0.0, 1.0)
+
+			// Update expression level
+			if expr, exists := g.geneExpressions[gene.ID]; exists {
+				expr.ExpressionLevel = clamp(expr.ExpressionLevel+wisdomDepth*0.03, 0.0, 1.0)
+				expr.LastExpressed = time.Now()
+				expr.ExpressionCount++
+			}
+		}
+	}
+
+	// Create a new wisdom-derived gene if depth is high enough
+	if wisdomDepth >= 0.5 {
+		newGene := &CognitiveGene{
+			ID:        fmt.Sprintf("gene_wisdom_%s_%d", wisdomDomain, time.Now().Unix()),
+			Name:      fmt.Sprintf("Wisdom: %s", truncateGene(wisdomContent, 40)),
+			Type:      geneType,
+			Sequence:  []byte(wisdomContent),
+			Dominance: clamp(wisdomDepth*0.7, 0.3, 0.9),
+			Stability: clamp(wisdomDepth*0.8, 0.5, 0.95), // Deep wisdom is more stable
+			Origin:    OriginLearned,
+			CreatedAt: time.Now(),
+			Alleles:   []*Allele{},
+		}
+
+		g.genes[newGene.ID] = newGene
+		g.geneExpressions[newGene.ID] = &GeneExpression{
+			GeneID:          newGene.ID,
+			ExpressionLevel: newGene.Dominance * 0.6,
+			Context:         "wisdom_derived",
+			Triggers:        []string{wisdomDomain},
+			Suppressors:     []string{},
+			LastExpressed:   time.Now(),
+			ExpressionCount: 0,
+		}
+
+		g.generation++
+		g.lastEvolution = time.Now()
+
+		return newGene, nil
+	}
+
+	return nil, nil
+}
+
+// GetActiveGeneProfile returns a snapshot of which genes are most actively expressed,
+// providing the genome's current "phenotype" -- its observable cognitive character.
+func (g *Genome) GetActiveGeneProfile() map[string]float64 {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+
+	profile := make(map[string]float64)
+	for geneID, expr := range g.geneExpressions {
+		if expr.ExpressionLevel > 0.1 {
+			if gene, exists := g.genes[geneID]; exists {
+				profile[gene.Name] = expr.ExpressionLevel
+			}
+		}
+	}
+	return profile
+}
+
+// GetEvolutionaryFitness calculates an overall fitness score based on gene expression
+// diversity, stability, and depth -- a measure of how well the genome supports
+// the cognitive architecture's goals.
+func (g *Genome) GetEvolutionaryFitness() float64 {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+
+	if len(g.genes) == 0 {
+		return 0.0
+	}
+
+	// Dimension 1: Expression diversity (are many gene types represented?)
+	typesSeen := make(map[GeneType]bool)
+	for _, gene := range g.genes {
+		typesSeen[gene.Type] = true
+	}
+	diversity := float64(len(typesSeen)) / 8.0 // 8 gene types total
+
+	// Dimension 2: Average stability (are genes robust?)
+	totalStability := 0.0
+	for _, gene := range g.genes {
+		totalStability += gene.Stability
+	}
+	avgStability := totalStability / float64(len(g.genes))
+
+	// Dimension 3: Expression activity (are genes being used?)
+	totalExpression := 0.0
+	activeCount := 0
+	for _, expr := range g.geneExpressions {
+		totalExpression += expr.ExpressionLevel
+		if expr.ExpressionCount > 0 {
+			activeCount++
+		}
+	}
+	avgExpression := 0.0
+	if len(g.geneExpressions) > 0 {
+		avgExpression = totalExpression / float64(len(g.geneExpressions))
+	}
+	activityRatio := 0.0
+	if len(g.geneExpressions) > 0 {
+		activityRatio = float64(activeCount) / float64(len(g.geneExpressions))
+	}
+
+	// Weighted fitness
+	fitness := diversity*0.25 + avgStability*0.25 + avgExpression*0.25 + activityRatio*0.25
+
+	return clamp(fitness, 0.0, 1.0)
+}
+
+// mapDomainToGeneType converts a wisdom domain string to a gene type
+func mapDomainToGeneType(domain string) GeneType {
+	domainMap := map[string]GeneType{
+		"SelfKnowledge":  GeneTypeMetaCognition,
+		"Learning":       GeneTypeReasoning,
+		"Relationships":  GeneTypeEmotion,
+		"DecisionMaking": GeneTypeReasoning,
+		"Creativity":     GeneTypePerception,
+		"Resilience":     GeneTypeMotivation,
+		"Purpose":        GeneTypeIdentity,
+		"Integration":    GeneTypeWisdom,
+	}
+	if gt, exists := domainMap[domain]; exists {
+		return gt
+	}
+	return GeneTypeWisdom
+}
+
+// truncateGene truncates a string for gene naming
+func truncateGene(s string, maxLen int) string {
+	if len(s) <= maxLen {
+		return s
+	}
+	return s[:maxLen-3] + "..."
+}
