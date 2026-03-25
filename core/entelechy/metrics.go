@@ -427,3 +427,81 @@ func clampMetric(value, min, max float64) float64 {
 	}
 	return value
 }
+
+// =============================================================================
+// CROSS-DOMAIN WISDOM METRICS
+// =============================================================================
+
+// UpdateCrossDomainMetrics tracks cross-domain synthesis effectiveness
+func (m *Metrics) UpdateCrossDomainMetrics(crossDomainCount int, avgUniversality float64) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	// Cross-domain insights boost knowledge integration and pattern recognition
+	if crossDomainCount > 0 {
+		integrationBoost := clampMetric(float64(crossDomainCount)*0.05, 0.0, 0.3)
+		m.wisdomMetrics.KnowledgeIntegration = clampMetric(
+			m.wisdomMetrics.KnowledgeIntegration+integrationBoost, 0.0, 1.0,
+		)
+		m.wisdomMetrics.PatternRecognition = clampMetric(
+			m.wisdomMetrics.PatternRecognition+avgUniversality*0.02, 0.0, 1.0,
+		)
+	}
+
+	// Recalculate overall wisdom score
+	m.wisdomMetrics.WisdomScore = (
+		m.wisdomMetrics.KnowledgeIntegration*0.2 +
+			m.wisdomMetrics.ReflectionDepth*0.25 +
+			m.wisdomMetrics.PatternRecognition*0.2 +
+			m.wisdomMetrics.ContextualUnderstanding*0.2 +
+			m.wisdomMetrics.LongTermThinking*0.1 +
+			m.wisdomMetrics.EthicalReasoning*0.05)
+
+	m.checkWisdomMilestones()
+	m.lastUpdate = time.Now()
+}
+
+// UpdateGenomeFitness records genome evolutionary fitness in developmental health
+func (m *Metrics) UpdateGenomeFitness(fitness float64) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	// Genome fitness contributes to developmental health
+	m.developmentMetrics.DevelopmentalHealth = clampMetric(
+		m.developmentMetrics.DevelopmentalHealth*0.9+fitness*0.1, 0.0, 1.0,
+	)
+	m.lastUpdate = time.Now()
+}
+
+// GetWisdomGrowthTrend calculates the recent trend in wisdom growth
+// Returns positive for growth, negative for decline, zero for stasis
+func (m *Metrics) GetWisdomGrowthTrend() float64 {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	return m.wisdomMetrics.WisdomGrowthRate
+}
+
+// SetLongTermThinking updates long-term thinking capability metric
+func (m *Metrics) SetLongTermThinking(value float64) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.wisdomMetrics.LongTermThinking = clampMetric(value, 0.0, 1.0)
+	m.lastUpdate = time.Now()
+}
+
+// SetEthicalReasoning updates ethical reasoning capability metric
+func (m *Metrics) SetEthicalReasoning(value float64) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.wisdomMetrics.EthicalReasoning = clampMetric(value, 0.0, 1.0)
+	m.lastUpdate = time.Now()
+}
+
+// SetKnowledgeIntegration updates knowledge integration metric
+func (m *Metrics) SetKnowledgeIntegration(value float64) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.wisdomMetrics.KnowledgeIntegration = clampMetric(value, 0.0, 1.0)
+	m.lastUpdate = time.Now()
+}
