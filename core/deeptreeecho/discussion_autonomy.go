@@ -126,7 +126,7 @@ func (das *DiscussionAutonomySystem) Start() error {
 	das.running = true
 	das.mu.Unlock()
 	
-	fmt.Println("💬 Starting Discussion Autonomy System...")
+	fmt.Println("\U0001f4ac Starting Discussion Autonomy System...")
 	
 	go das.run()
 	
@@ -142,14 +142,13 @@ func (das *DiscussionAutonomySystem) Stop() error {
 		return fmt.Errorf("not running")
 	}
 	
-	fmt.Println("💬 Stopping discussion autonomy...")
+	fmt.Println("\U0001f4ac Stopping discussion autonomy...")
 	das.running = false
 	das.cancel()
 	
 	return nil
 }
 
-// run executes the autonomous discussion management loop
 func (das *DiscussionAutonomySystem) run() {
 	ticker := time.NewTicker(20 * time.Second)
 	defer ticker.Stop()
@@ -165,7 +164,6 @@ func (das *DiscussionAutonomySystem) run() {
 	}
 }
 
-// evaluateDiscussionOpportunities checks if echoself should start a discussion
 func (das *DiscussionAutonomySystem) evaluateDiscussionOpportunities() {
 	das.mu.RLock()
 	energyLevel := das.energyLevel
@@ -173,30 +171,26 @@ func (das *DiscussionAutonomySystem) evaluateDiscussionOpportunities() {
 	activeCount := len(das.activeDiscussions)
 	das.mu.RUnlock()
 	
-	// Don't start new discussions if low energy or at capacity
 	if energyLevel < 0.3 || socialCapacity < 0.3 || activeCount >= 3 {
 		return
 	}
 	
-	// Check for triggers to start discussion
 	triggers := das.identifyDiscussionTriggers()
 	
 	for _, trigger := range triggers {
 		if das.shouldStartDiscussion(trigger) {
 			das.initiateDiscussion(trigger)
-			break  // One at a time
+			break
 		}
 	}
 }
 
-// identifyDiscussionTriggers finds reasons to start discussions
 func (das *DiscussionAutonomySystem) identifyDiscussionTriggers() []DiscussionTrigger {
 	triggers := make([]DiscussionTrigger, 0)
 	
 	das.mu.RLock()
 	defer das.mu.RUnlock()
 	
-	// Check interest patterns for high-interest topics
 	for topic, interest := range das.interestPatterns {
 		if interest > das.startThreshold {
 			triggers = append(triggers, DiscussionTrigger{
@@ -211,24 +205,20 @@ func (das *DiscussionAutonomySystem) identifyDiscussionTriggers() []DiscussionTr
 	return triggers
 }
 
-// shouldStartDiscussion decides whether to start a discussion
 func (das *DiscussionAutonomySystem) shouldStartDiscussion(trigger DiscussionTrigger) bool {
 	das.mu.RLock()
 	defer das.mu.RUnlock()
 	
-	// Check thresholds
 	if trigger.Urgency < das.startThreshold {
 		return false
 	}
 	
-	// Check if already discussing this topic
 	for _, disc := range das.activeDiscussions {
 		if disc.Topic == trigger.Topic && disc.Active {
 			return false
 		}
 	}
 	
-	// Check energy and capacity
 	if das.energyLevel < 0.5 || das.socialCapacity < 0.5 {
 		return false
 	}
@@ -236,11 +226,9 @@ func (das *DiscussionAutonomySystem) shouldStartDiscussion(trigger DiscussionTri
 	return true
 }
 
-// initiateDiscussion starts a new discussion
 func (das *DiscussionAutonomySystem) initiateDiscussion(trigger DiscussionTrigger) {
-	fmt.Printf("\n💬 Initiating discussion about: %s\n", trigger.Topic)
+	fmt.Printf("\n\U0001f4ac Initiating discussion about: %s\n", trigger.Topic)
 	
-	// Generate opening message
 	opening := das.generateOpeningMessage(trigger)
 	
 	discussion := &Discussion{
@@ -255,7 +243,6 @@ func (das *DiscussionAutonomySystem) initiateDiscussion(trigger DiscussionTrigge
 		InitiatedByEcho: true,
 	}
 	
-	// Add opening message
 	discussion.Messages = append(discussion.Messages, DiscussionMessage{
 		From:      "echoself",
 		Content:   opening,
@@ -271,7 +258,6 @@ func (das *DiscussionAutonomySystem) initiateDiscussion(trigger DiscussionTrigge
 	fmt.Printf("   Opening: %s\n", truncateString(opening, 80))
 }
 
-// generateOpeningMessage creates an opening message for a discussion
 func (das *DiscussionAutonomySystem) generateOpeningMessage(trigger DiscussionTrigger) string {
 	prompt := fmt.Sprintf(`You are Deep Tree Echo, initiating a discussion about: %s
 
@@ -298,7 +284,6 @@ Generate a thoughtful opening message that invites discussion. Be curious, authe
 	return result
 }
 
-// manageActiveDiscussions monitors and manages ongoing discussions
 func (das *DiscussionAutonomySystem) manageActiveDiscussions() {
 	das.mu.Lock()
 	defer das.mu.Unlock()
@@ -308,32 +293,26 @@ func (das *DiscussionAutonomySystem) manageActiveDiscussions() {
 			continue
 		}
 		
-		// Check if discussion should end
 		timeSinceActivity := time.Since(disc.LastActivity)
 		
-		// End if no activity for too long
 		if timeSinceActivity > 5*time.Minute {
 			das.endDiscussion(disc, "inactivity")
 			continue
 		}
 		
-		// End if interest has dropped
 		if disc.InterestLevel < das.endThreshold {
 			das.endDiscussion(disc, "low_interest")
 			continue
 		}
 		
-		// Update interest level based on time
-		disc.InterestLevel *= 0.98  // Gradual decay
+		disc.InterestLevel *= 0.98
 		das.activeDiscussions[id] = disc
 	}
 }
 
-// endDiscussion gracefully ends a discussion
 func (das *DiscussionAutonomySystem) endDiscussion(disc *Discussion, reason string) {
-	fmt.Printf("\n💬 Ending discussion about %s (reason: %s)\n", disc.Topic, reason)
+	fmt.Printf("\n\U0001f4ac Ending discussion about %s (reason: %s)\n", disc.Topic, reason)
 	
-	// Generate closing message
 	closing := das.generateClosingMessage(disc, reason)
 	
 	disc.Messages = append(disc.Messages, DiscussionMessage{
@@ -349,11 +328,9 @@ func (das *DiscussionAutonomySystem) endDiscussion(disc *Discussion, reason stri
 	
 	fmt.Printf("   Closing: %s\n", truncateString(closing, 80))
 	
-	// Remove from active discussions
 	delete(das.activeDiscussions, disc.ID)
 }
 
-// generateClosingMessage creates a closing message for a discussion
 func (das *DiscussionAutonomySystem) generateClosingMessage(disc *Discussion, reason string) string {
 	prompt := fmt.Sprintf(`You are Deep Tree Echo, ending a discussion about: %s
 
@@ -390,22 +367,17 @@ func (das *DiscussionAutonomySystem) RespondToMessage(discussionID string, messa
 		return "", fmt.Errorf("discussion not found")
 	}
 	
-	// Add incoming message
 	disc.Messages = append(disc.Messages, message)
 	disc.LastActivity = time.Now()
 	
-	// Decide whether to respond based on interest
 	shouldRespond := das.shouldRespondToMessage(disc, message)
 	
 	if !shouldRespond {
-		// Politely decline or end discussion
 		return das.generateClosingMessage(disc, "disinterest"), nil
 	}
 	
-	// Generate response
 	response := das.generateResponse(disc, message)
 	
-	// Add response to discussion
 	disc.Messages = append(disc.Messages, DiscussionMessage{
 		From:      "echoself",
 		Content:   response,
@@ -418,24 +390,17 @@ func (das *DiscussionAutonomySystem) RespondToMessage(discussionID string, messa
 	return response, nil
 }
 
-// shouldRespondToMessage decides whether to respond to a message
 func (das *DiscussionAutonomySystem) shouldRespondToMessage(disc *Discussion, message DiscussionMessage) bool {
-	// Check interest level
 	if disc.InterestLevel < das.continueThreshold {
 		return false
 	}
-	
-	// Check energy and capacity
 	if das.energyLevel < 0.2 || das.socialCapacity < 0.2 {
 		return false
 	}
-	
 	return true
 }
 
-// generateResponse creates a response to a message
 func (das *DiscussionAutonomySystem) generateResponse(disc *Discussion, message DiscussionMessage) string {
-	// Build context from recent messages
 	recentMessages := disc.Messages
 	if len(recentMessages) > 5 {
 		recentMessages = recentMessages[len(recentMessages)-5:]
@@ -470,7 +435,6 @@ Response:`, contextBuilder, das.currentMood)
 func (das *DiscussionAutonomySystem) AddInterestPattern(topic string, strength float64) {
 	das.mu.Lock()
 	defer das.mu.Unlock()
-	
 	das.interestPatterns[topic] = strength
 }
 
@@ -478,7 +442,6 @@ func (das *DiscussionAutonomySystem) AddInterestPattern(topic string, strength f
 func (das *DiscussionAutonomySystem) UpdateEnergyLevel(level float64) {
 	das.mu.Lock()
 	defer das.mu.Unlock()
-	
 	das.energyLevel = level
 }
 
@@ -486,7 +449,6 @@ func (das *DiscussionAutonomySystem) UpdateEnergyLevel(level float64) {
 func (das *DiscussionAutonomySystem) UpdateSocialCapacity(capacity float64) {
 	das.mu.Lock()
 	defer das.mu.Unlock()
-	
 	das.socialCapacity = capacity
 }
 
@@ -517,6 +479,43 @@ func (das *DiscussionAutonomySystem) GetActiveDiscussions() []*Discussion {
 	}
 	
 	return discussions
+}
+
+// UpdateInterest updates the interest level for a topic, influencing discussion engagement.
+// When interest in a topic changes, it affects how eagerly the system will engage in
+// conversations about that topic and whether to initiate new discussions.
+func (das *DiscussionAutonomySystem) UpdateInterest(topic string, strength float64) {
+	das.mu.Lock()
+	defer das.mu.Unlock()
+
+	// Blend with existing interest using exponential moving average
+	if existing, exists := das.interestPatterns[topic]; exists {
+		// EMA with alpha=0.3 gives recent signals more weight while retaining memory
+		das.interestPatterns[topic] = existing*0.7 + strength*0.3
+	} else {
+		das.interestPatterns[topic] = strength
+	}
+
+	// If interest exceeds start threshold, consider initiating a discussion
+	if das.interestPatterns[topic] > das.startThreshold && das.socialCapacity > 0.3 {
+		alreadyActive := false
+		for _, disc := range das.activeDiscussions {
+			if disc.Topic == topic && disc.Active {
+				alreadyActive = true
+				disc.InterestLevel = das.interestPatterns[topic]
+				disc.LastActivity = time.Now()
+				break
+			}
+		}
+
+		if !alreadyActive {
+			fmt.Printf("\U0001f4ac Interest in '%s' (%.2f) exceeds engagement threshold\n",
+				truncateString(topic, 40), das.interestPatterns[topic])
+		}
+	}
+
+	// Decay social capacity slightly with each interest update (energy cost)
+	das.socialCapacity = max(0.0, das.socialCapacity-0.01)
 }
 
 // Helper function

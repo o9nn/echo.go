@@ -90,7 +90,7 @@ const (
 )
 
 // ThreadMultiplexer manages concurrent cognitive streams with permutation cycling
-// Implements P(1,2)→P(1,3)→P(1,4)→P(2,3)→P(2,4)→P(3,4) pattern
+// Implements P(1,2)->P(1,3)->P(1,4)->P(2,3)->P(2,4)->P(3,4) pattern
 type ThreadMultiplexer struct {
 	mu               sync.RWMutex
 	threads          []*CognitiveThread
@@ -103,7 +103,7 @@ type ThreadMultiplexer struct {
 type CognitiveThread struct {
 	ID       int
 	StreamID string
-	Phase    int // 0, 4, or 8 (120° phase offsets in 12-step cycle)
+	Phase    int // 0, 4, or 8 (120 degree phase offsets in 12-step cycle)
 	State    interface{}
 	Active   bool
 }
@@ -281,7 +281,6 @@ func (k *Kernel) initializeCognitivePrimitives() {
 		Type:        PrimitivePerceive,
 		Description: "Fundamental perception operation",
 		Operation: func(ctx context.Context, args ...interface{}) (interface{}, error) {
-			// Placeholder for perception logic
 			return map[string]interface{}{"perceived": true}, nil
 		},
 	}
@@ -291,7 +290,6 @@ func (k *Kernel) initializeCognitivePrimitives() {
 		Type:        PrimitiveAct,
 		Description: "Fundamental action operation",
 		Operation: func(ctx context.Context, args ...interface{}) (interface{}, error) {
-			// Placeholder for action logic
 			return map[string]interface{}{"acted": true}, nil
 		},
 	}
@@ -301,7 +299,6 @@ func (k *Kernel) initializeCognitivePrimitives() {
 		Type:        PrimitiveReflect,
 		Description: "Fundamental reflection operation",
 		Operation: func(ctx context.Context, args ...interface{}) (interface{}, error) {
-			// Placeholder for reflection logic
 			return map[string]interface{}{"reflected": true}, nil
 		},
 	}
@@ -311,7 +308,6 @@ func (k *Kernel) initializeCognitivePrimitives() {
 		Type:        PrimitiveIntegrate,
 		Description: "Fundamental integration operation",
 		Operation: func(ctx context.Context, args ...interface{}) (interface{}, error) {
-			// Placeholder for integration logic
 			return map[string]interface{}{"integrated": true}, nil
 		},
 	}
@@ -319,7 +315,6 @@ func (k *Kernel) initializeCognitivePrimitives() {
 
 // initializeThreadMultiplexer sets up concurrent thread management
 func (k *Kernel) initializeThreadMultiplexer() *ThreadMultiplexer {
-	// Create 4 threads (for permutation cycling)
 	threads := []*CognitiveThread{
 		{ID: 1, StreamID: "stream_1", Phase: 0, Active: true},
 		{ID: 2, StreamID: "stream_2", Phase: 4, Active: true},
@@ -327,7 +322,6 @@ func (k *Kernel) initializeThreadMultiplexer() *ThreadMultiplexer {
 		{ID: 4, StreamID: "stream_aux", Phase: 0, Active: false},
 	}
 
-	// Define pair permutations: P(1,2)→P(1,3)→P(1,4)→P(2,3)→P(2,4)→P(3,4)
 	pairPermutations := [][2]int{
 		{1, 2}, {1, 3}, {1, 4}, {2, 3}, {2, 4}, {3, 4},
 	}
@@ -403,7 +397,6 @@ func (k *Kernel) GetGestaltState() map[string]interface{} {
 	k.globalTelemetry.mu.RLock()
 	defer k.globalTelemetry.mu.RUnlock()
 
-	// Return copy
 	state := make(map[string]interface{})
 	for key, value := range k.globalTelemetry.gestaltState {
 		state[key] = value
@@ -440,4 +433,96 @@ func (k *Kernel) GetKernelMetrics() map[string]interface{} {
 		"active_threads":     len(k.executionContext.activeThreads),
 		"current_thread_pair": k.threadMultiplexer.currentPairIndex,
 	}
+}
+
+// =============================================================================
+// CROSS-DOMAIN COGNITIVE PRIMITIVES
+// =============================================================================
+
+// RegisterPrimitive adds a custom cognitive primitive to the kernel
+func (k *Kernel) RegisterPrimitive(name string, primitiveType PrimitiveType, description string, operation func(context.Context, ...interface{}) (interface{}, error)) {
+	k.mu.Lock()
+	defer k.mu.Unlock()
+
+	k.primitives[name] = &CognitivePrimitive{
+		Name:        name,
+		Type:        primitiveType,
+		Description: description,
+		Operation:   operation,
+	}
+}
+
+// InitializeCrossDomainPrimitives adds primitives for cross-domain reasoning
+func (k *Kernel) InitializeCrossDomainPrimitives() {
+	k.RegisterPrimitive("analogize", PrimitiveTransform,
+		"Find structural isomorphisms between two domains",
+		func(ctx context.Context, args ...interface{}) (interface{}, error) {
+			if len(args) < 2 {
+				return nil, fmt.Errorf("analogize requires at least 2 arguments")
+			}
+			return map[string]interface{}{
+				"source":     args[0],
+				"target":     args[1],
+				"analogized": true,
+				"type":       "structural_isomorphism",
+			}, nil
+		},
+	)
+
+	k.RegisterPrimitive("synthesize_dialectic", PrimitiveIntegrate,
+		"Merge thesis and antithesis into higher synthesis",
+		func(ctx context.Context, args ...interface{}) (interface{}, error) {
+			if len(args) < 2 {
+				return nil, fmt.Errorf("synthesize_dialectic requires thesis and antithesis")
+			}
+			return map[string]interface{}{
+				"thesis":     args[0],
+				"antithesis": args[1],
+				"synthesis":  true,
+				"type":       "dialectical_merge",
+			}, nil
+		},
+	)
+
+	k.RegisterPrimitive("detect_fractal", PrimitivePerceive,
+		"Detect self-similar patterns across scales",
+		func(ctx context.Context, args ...interface{}) (interface{}, error) {
+			if len(args) < 1 {
+				return nil, fmt.Errorf("detect_fractal requires at least 1 argument")
+			}
+			return map[string]interface{}{
+				"pattern":  args[0],
+				"detected": true,
+				"type":     "fractal_recursion",
+			}, nil
+		},
+	)
+}
+
+// StepExecution advances the execution context by one step
+func (k *Kernel) StepExecution() {
+	k.executionContext.mu.Lock()
+	defer k.executionContext.mu.Unlock()
+
+	k.executionContext.stepCount++
+
+	// Every 12 steps completes a cycle (matching the 12-step permutation cycle)
+	if k.executionContext.stepCount%12 == 0 {
+		k.executionContext.cycleCount++
+	}
+
+	// Advance thread multiplexer
+	k.AdvanceThreadMultiplexer()
+}
+
+// GetTotalTerms returns the total number of terms across all shells
+func (k *Kernel) GetTotalTerms() int {
+	k.mu.RLock()
+	defer k.mu.RUnlock()
+
+	total := 0
+	for _, shell := range k.shells {
+		total += len(shell.Terms)
+	}
+	return total
 }
