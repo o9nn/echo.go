@@ -315,7 +315,7 @@ func (ae *AutonomousEchoself) Start() error {
 	go ae.memoryConsolidationLoop()
 	
 	fmt.Println("🌳 All systems active. Stream of consciousness initiated.")
-	fmt.Println("🌳 ═══════════════════════════════════════════════════════\n")
+	fmt.Print("🌳 ═══════════════════════════════════════════════════════\n\n")
 	
 	return nil
 }
@@ -345,7 +345,7 @@ func (ae *AutonomousEchoself) Stop() error {
 	// Print final metrics
 	ae.printMetrics()
 	
-	fmt.Println("🌳 ═══════════════════════════════════════════════════════\n")
+	fmt.Print("🌳 ═══════════════════════════════════════════════════════\n\n")
 	
 	return nil
 }

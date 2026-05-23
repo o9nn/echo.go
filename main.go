@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	fmt.Println(`
+	fmt.Print(`
 ╔═══════════════════════════════════════════════════════════╗
 ║                                                           ║
 ║              🌳 Deep Tree Echo - Echo9llama 🌳           ║

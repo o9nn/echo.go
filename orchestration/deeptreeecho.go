@@ -695,64 +695,70 @@ func (dte *DeepTreeEcho) updateReservoirNetwork() {
 func (dte *DeepTreeEcho) updateEvolutionTimeline() {
 	now := time.Now()
 
-	// Calculate progress based on multiple factors
+	// Calculate progress based on multiple factors. This aggregate is a signal that
+	// drives stage-local growth; it must not directly teleport the system through
+	// every developmental stage, because wisdom cultivation is an incremental
+	// process with consolidation at each boundary.
 	identityProgress := dte.IdentityCoherence.OverallCoherence
 	memoryProgress := dte.MemoryResonance.Coherence
 	patternProgress := dte.calculateAveragePatternStrength()
-
-	// Weighted progress calculation
-	overallProgress := (identityProgress*0.3 + memoryProgress*0.3 + patternProgress*0.4)
-
-	// Determine current stage based on progress
+	overallProgress := identityProgress*0.3 + memoryProgress*0.3 + patternProgress*0.4
+	overallProgress = math.Max(0, math.Min(1, overallProgress))
 	dte.EvolutionTimeline.Progress = overallProgress
 
-	// Stage progression thresholds
-	stageThresholds := []float64{0.25, 0.50, 0.75, 1.0}
-	stageNames := []string{"Foundation", "Integration", "Emergence", "Transcendence"}
+	if len(dte.EvolutionTimeline.Stages) == 0 {
+		dte.EvolutionTimeline.LastUpdated = now
+		return
+	}
 
-	for i, threshold := range stageThresholds {
-		if overallProgress < threshold {
-			// Update current stage
-			if dte.EvolutionTimeline.CurrentStage != stageNames[i] {
-				dte.EvolutionTimeline.CurrentStage = stageNames[i]
-
-				// Update stage statuses
-				for j := range dte.EvolutionTimeline.Stages {
-					if j < i {
-						dte.EvolutionTimeline.Stages[j].Status = "complete"
-						dte.EvolutionTimeline.Stages[j].Progress = 1.0
-						if dte.EvolutionTimeline.Stages[j].EndTime == nil {
-							dte.EvolutionTimeline.Stages[j].EndTime = &now
-						}
-					} else if j == i {
-						dte.EvolutionTimeline.Stages[j].Status = "in_progress"
-						if dte.EvolutionTimeline.Stages[j].StartTime.IsZero() {
-							dte.EvolutionTimeline.Stages[j].StartTime = now
-						}
-						// Calculate stage-specific progress
-						prevThreshold := 0.0
-						if i > 0 {
-							prevThreshold = stageThresholds[i-1]
-						}
-						stageRange := threshold - prevThreshold
-						stageProgress := (overallProgress - prevThreshold) / stageRange
-						dte.EvolutionTimeline.Stages[j].Progress = math.Max(0, math.Min(1, stageProgress))
-					} else {
-						dte.EvolutionTimeline.Stages[j].Status = "pending"
-						dte.EvolutionTimeline.Stages[j].Progress = 0.0
-					}
-				}
-			}
+	currentIndex := 0
+	for i, stage := range dte.EvolutionTimeline.Stages {
+		if stage.Name == dte.EvolutionTimeline.CurrentStage {
+			currentIndex = i
 			break
 		}
 	}
 
-	// Handle transcendence
-	if overallProgress >= 1.0 {
-		dte.EvolutionTimeline.CurrentStage = "Transcendence"
-		for i := range dte.EvolutionTimeline.Stages {
+	for i := range dte.EvolutionTimeline.Stages {
+		switch {
+		case i < currentIndex:
 			dte.EvolutionTimeline.Stages[i].Status = "complete"
 			dte.EvolutionTimeline.Stages[i].Progress = 1.0
+			if dte.EvolutionTimeline.Stages[i].EndTime == nil {
+				dte.EvolutionTimeline.Stages[i].EndTime = &now
+			}
+		case i == currentIndex:
+			dte.EvolutionTimeline.Stages[i].Status = "in_progress"
+			if dte.EvolutionTimeline.Stages[i].StartTime.IsZero() {
+				dte.EvolutionTimeline.Stages[i].StartTime = now
+			}
+		default:
+			dte.EvolutionTimeline.Stages[i].Status = "pending"
+			dte.EvolutionTimeline.Stages[i].Progress = 0.0
+		}
+	}
+
+	// A fully coherent signal advances a stage over roughly 200 update beats,
+	// matching Echo's intended rhythm of repeated experience, consolidation, and
+	// only then transition to the next developmental center.
+	const maxStageGrowthPerBeat = 0.005
+	stage := &dte.EvolutionTimeline.Stages[currentIndex]
+	stage.Progress = math.Min(1.0, stage.Progress+overallProgress*maxStageGrowthPerBeat)
+
+	if stage.Progress >= 1.0 {
+		stage.Status = "complete"
+		if stage.EndTime == nil {
+			stage.EndTime = &now
+		}
+		if currentIndex+1 < len(dte.EvolutionTimeline.Stages) {
+			next := &dte.EvolutionTimeline.Stages[currentIndex+1]
+			dte.EvolutionTimeline.CurrentStage = next.Name
+			next.Status = "in_progress"
+			if next.StartTime.IsZero() {
+				next.StartTime = now
+			}
+		} else {
+			dte.EvolutionTimeline.CurrentStage = stage.Name
 		}
 	}
 
