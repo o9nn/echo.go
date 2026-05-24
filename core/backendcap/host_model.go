@@ -209,7 +209,15 @@ func discoverGGUFFiles(paths []string) []string {
 // SnapshotWithModelPaths returns the normal backend snapshot enriched with specific local model files.
 func SnapshotWithModelPaths(paths []string) []Capability {
 	caps := append([]Capability{}, Snapshot()...)
-	caps = append(caps, DiscoverModelCapabilities(paths)...)
+	modelCaps := DiscoverModelCapabilities(paths)
+	if !cgoEnabled {
+		for i := range modelCaps {
+			modelCaps[i].Available = false
+			modelCaps[i].StressGrade = false
+			modelCaps[i].Reason = "native model unavailable: cgo is disabled; " + modelCaps[i].Reason
+		}
+	}
+	caps = append(caps, modelCaps...)
 	sort.SliceStable(caps, func(i, j int) bool { return caps[i].Name < caps[j].Name })
 	return caps
 }

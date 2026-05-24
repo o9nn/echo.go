@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 
 	"github.com/o9nn/echo.go/core/backendcap"
@@ -35,6 +36,10 @@ type EvolutionSystemConfig struct {
 	// LLM provider preferences (in order of preference)
 	PreferredProviders []string
 
+	// ModelPaths lists GGUF files or directories to probe for concrete local model capabilities.
+	// Defaults to ECHO_MODEL_PATHS plus LOCAL_MODEL_PATH when present.
+	ModelPaths []string
+
 	// EventBus receives backend capability and routing events. If nil, a local bus is created.
 	EventBus *CognitiveEventBus
 
@@ -48,10 +53,38 @@ type EvolutionSystemConfig struct {
 // DefaultEvolutionSystemConfig returns default configuration
 func DefaultEvolutionSystemConfig() EvolutionSystemConfig {
 	return EvolutionSystemConfig{
-		PreferredProviders: []string{"anthropic", "openrouter", "openai"},
+		PreferredProviders: []string{"local_gguf", "anthropic", "openrouter", "openai"},
+		ModelPaths:         modelPathsFromEnv(),
 		EvolutionConfig:    DefaultEvolutionConfig(),
 		Debug:              false,
 	}
+}
+
+func modelPathsFromEnv() []string {
+	var paths []string
+	appendSplit := func(raw string) {
+		for _, pathListPart := range strings.Split(raw, string(os.PathListSeparator)) {
+			for _, commaPart := range strings.Split(pathListPart, ",") {
+				path := strings.TrimSpace(commaPart)
+				if path != "" {
+					paths = append(paths, path)
+				}
+			}
+		}
+	}
+	appendSplit(os.Getenv("ECHO_MODEL_PATHS"))
+	if local := strings.TrimSpace(os.Getenv("LOCAL_MODEL_PATH")); local != "" {
+		paths = append(paths, local)
+	}
+	seen := make(map[string]bool, len(paths))
+	deduped := make([]string, 0, len(paths))
+	for _, path := range paths {
+		if !seen[path] {
+			seen[path] = true
+			deduped = append(deduped, path)
+		}
+	}
+	return deduped
 }
 
 // NewEvolutionSystem creates a new evolution system with real LLM integration
@@ -95,6 +128,18 @@ func NewEvolutionSystem(config EvolutionSystemConfig) (*EvolutionSystem, error) 
 // registerProviders registers available LLM providers
 func (es *EvolutionSystem) registerProviders(pm *llm.ProviderManager) error {
 	registered := 0
+
+	// Try a concrete local GGUF model selected from discovered model capabilities.
+	localDecision := es.BackendDecision()
+	if localDecision.Selected.ModelPath != "" && localDecision.Selected.Available {
+		provider := llm.NewLocalGGUFProviderFromCapability(localDecision.Selected)
+		if err := pm.RegisterProvider(provider); err == nil {
+			registered++
+			if es.config.Debug {
+				fmt.Printf("   ✓ Registered local GGUF provider: %s\n", localDecision.Selected.ModelPath)
+			}
+		}
+	}
 
 	// Try Anthropic
 	if os.Getenv("ANTHROPIC_API_KEY") != "" {
@@ -236,7 +281,8 @@ func (es *EvolutionSystem) GetStatus() map[string]interface{} {
 		"running":              es.running,
 		"providers":            es.providerManager.ListProviders(),
 		"provider_metrics":     es.providerManager.GetMetrics(),
-		"backend_capabilities": backendcap.Snapshot(),
+		"backend_capabilities": es.backendSnapshot(),
+		"model_paths":          append([]string{}, es.config.ModelPaths...),
 		"backend_decision":     backendDecision,
 		"backend_degraded":     backendDecision.Degraded,
 	}
@@ -256,7 +302,11 @@ func (es *EvolutionSystem) BackendDecision() backendcap.Decision {
 		PreferNative:  true,
 		MinMemoryTier: backendcap.MemoryConstrained,
 	}
-	return backendcap.Select(workload)
+	return backendcap.SelectWithModelPaths(workload, es.config.ModelPaths)
+}
+
+func (es *EvolutionSystem) backendSnapshot() []backendcap.Capability {
+	return backendcap.SnapshotWithModelPaths(es.config.ModelPaths)
 }
 
 // InjectStimulus injects an external stimulus into the evolution system

@@ -123,6 +123,14 @@ type Context struct {
 	numThreads int
 }
 
+func (c *Context) Free() {
+	if c == nil || c.c == nil {
+		return
+	}
+	C.llama_free(c.c)
+	c.c = nil
+}
+
 var ErrKvCacheFull = errors.New("could not find a kv cache slot")
 
 func (c *Context) Decode(batch *Batch) error {

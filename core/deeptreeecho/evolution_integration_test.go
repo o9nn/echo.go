@@ -2,18 +2,22 @@ package deeptreeecho
 
 import (
 	"context"
+	"encoding/binary"
 	"os"
+	"path/filepath"
 	"testing"
+
+	"github.com/o9nn/echo.go/core/backendcap"
 )
 
 func TestDefaultEvolutionSystemConfig(t *testing.T) {
 	config := DefaultEvolutionSystemConfig()
 
-	if len(config.PreferredProviders) != 3 {
-		t.Errorf("Expected 3 preferred providers, got %d", len(config.PreferredProviders))
+	if len(config.PreferredProviders) != 4 {
+		t.Errorf("Expected 4 preferred providers, got %d", len(config.PreferredProviders))
 	}
 
-	expectedProviders := []string{"anthropic", "openrouter", "openai"}
+	expectedProviders := []string{"local_gguf", "anthropic", "openrouter", "openai"}
 	for i, provider := range config.PreferredProviders {
 		if provider != expectedProviders[i] {
 			t.Errorf("Expected provider %s at index %d, got %s", expectedProviders[i], i, provider)
@@ -67,6 +71,96 @@ func TestEvolutionSystemWithoutAPIProvidersUsesContinuityFallback(t *testing.T) 
 	}
 }
 
+func TestEvolutionSystemModelPathsSurfaceConcreteCapabilities(t *testing.T) {
+	anthropicKey := os.Getenv("ANTHROPIC_API_KEY")
+	openrouterKey := os.Getenv("OPENROUTER_API_KEY")
+	openaiKey := os.Getenv("OPENAI_API_KEY")
+	modelPaths := os.Getenv("ECHO_MODEL_PATHS")
+	localModel := os.Getenv("LOCAL_MODEL_PATH")
+	os.Unsetenv("ANTHROPIC_API_KEY")
+	os.Unsetenv("OPENROUTER_API_KEY")
+	os.Unsetenv("OPENAI_API_KEY")
+	os.Unsetenv("ECHO_MODEL_PATHS")
+	os.Unsetenv("LOCAL_MODEL_PATH")
+	defer func() {
+		restoreEnv("ANTHROPIC_API_KEY", anthropicKey)
+		restoreEnv("OPENROUTER_API_KEY", openrouterKey)
+		restoreEnv("OPENAI_API_KEY", openaiKey)
+		restoreEnv("ECHO_MODEL_PATHS", modelPaths)
+		restoreEnv("LOCAL_MODEL_PATH", localModel)
+	}()
+
+	dir := t.TempDir()
+	modelPath := filepath.Join(dir, "tiny.gguf")
+	writeEvolutionTinyGGUF(t, modelPath)
+	config := DefaultEvolutionSystemConfig()
+	config.ModelPaths = []string{dir}
+	es, err := NewEvolutionSystem(config)
+	if err != nil {
+		t.Fatalf("expected fallback/local-capability backed system, got error: %v", err)
+	}
+	status := es.GetStatus()
+	caps, ok := status["backend_capabilities"].([]backendcap.Capability)
+	if !ok {
+		t.Fatalf("expected backend capabilities in status, got %T", status["backend_capabilities"])
+	}
+	found := false
+	for _, cap := range caps {
+		if cap.ModelPath == modelPath && cap.ContextLength == 2048 && cap.Quantization == "Q4_K_M" {
+			found = true
+		}
+	}
+	if !found {
+		t.Fatalf("expected concrete model capability in status, got %+v", caps)
+	}
+}
+
+func restoreEnv(name, value string) {
+	if value == "" {
+		os.Unsetenv(name)
+		return
+	}
+	os.Setenv(name, value)
+}
+
+func writeEvolutionTinyGGUF(t *testing.T, path string) {
+	t.Helper()
+	file, err := os.Create(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	file.Write([]byte("GGUF"))
+	binary.Write(file, binary.LittleEndian, uint32(3))
+	binary.Write(file, binary.LittleEndian, uint64(0))
+	binary.Write(file, binary.LittleEndian, uint64(4))
+	writeEvolutionKVString(t, file, "general.name", "tiny-echo")
+	writeEvolutionKVString(t, file, "general.architecture", "llama")
+	writeEvolutionKVUint32(t, file, "llama.context_length", 2048)
+	writeEvolutionKVUint32(t, file, "general.file_type", 15)
+}
+
+func writeEvolutionKVString(t *testing.T, file *os.File, key, value string) {
+	t.Helper()
+	writeEvolutionString(t, file, key)
+	binary.Write(file, binary.LittleEndian, uint32(8))
+	writeEvolutionString(t, file, value)
+}
+
+func writeEvolutionKVUint32(t *testing.T, file *os.File, key string, value uint32) {
+	t.Helper()
+	writeEvolutionString(t, file, key)
+	binary.Write(file, binary.LittleEndian, uint32(4))
+	binary.Write(file, binary.LittleEndian, value)
+}
+
+func writeEvolutionString(t *testing.T, file *os.File, value string) {
+	t.Helper()
+	binary.Write(file, binary.LittleEndian, uint64(len(value)))
+	if _, err := file.Write([]byte(value)); err != nil {
+		t.Fatal(err)
+	}
+}
 func TestEvolutionSystemStatus(t *testing.T) {
 	// This test only runs if at least one API key is set
 	if os.Getenv("ANTHROPIC_API_KEY") == "" &&

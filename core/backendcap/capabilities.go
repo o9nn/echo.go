@@ -136,7 +136,19 @@ func Snapshot() []Capability {
 // Select chooses the best backend capability for a workload while preserving a
 // degraded option instead of forcing orchestration failure.
 func Select(workload Workload) Decision {
-	caps := Snapshot()
+	return SelectFromCapabilities(workload, Snapshot())
+}
+
+// SelectWithModelPaths chooses a backend from the normal capability surface enriched
+// with concrete local GGUF model files discovered from explicit files or directories.
+func SelectWithModelPaths(workload Workload, paths []string) Decision {
+	return SelectFromCapabilities(workload, SnapshotWithModelPaths(paths))
+}
+
+// SelectFromCapabilities chooses the best backend from a caller-provided capability
+// snapshot. It is useful when a higher-level system has already enriched the snapshot
+// with concrete model files or test fixtures.
+func SelectFromCapabilities(workload Workload, caps []Capability) Decision {
 	candidates := make([]Capability, 0, len(caps))
 	for _, cap := range caps {
 		if !cap.Available {
@@ -149,6 +161,9 @@ func Select(workload Workload) Decision {
 			continue
 		}
 		if !satisfiesMemoryTier(cap.MemoryTier, workload.MinMemoryTier) {
+			continue
+		}
+		if workload.RequiredTokens > 0 && cap.ContextLength > 0 && cap.ContextLength < workload.RequiredTokens {
 			continue
 		}
 		candidates = append(candidates, cap)
@@ -224,6 +239,14 @@ func score(cap Capability, workload Workload) int {
 	}
 	if cap.StressGrade && workload.RequireStress {
 		score += 4
+	}
+	if cap.ModelPath != "" {
+		// Concrete model files are more schedulable than abstract native backends because
+		// they carry context length, quantization, and memory-footprint metadata.
+		score += 7
+		if workload.RequiredTokens > 0 && cap.ContextLength >= workload.RequiredTokens {
+			score += 2
+		}
 	}
 	switch cap.Kind {
 	case BackendNativeCPU, BackendNativeGPU:
