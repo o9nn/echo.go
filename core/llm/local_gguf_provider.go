@@ -340,6 +340,12 @@ func (lgp *LocalGGUFProvider) LoadError() error {
 	return lgp.loadErr
 }
 
+func (lgp *LocalGGUFProvider) loadModelForRegistryWarmup() error {
+	lgp.mu.Lock()
+	defer lgp.mu.Unlock()
+	return lgp.loadModelLocked()
+}
+
 func (lgp *LocalGGUFProvider) Close() error {
 	lgp.mu.Lock()
 	defer lgp.mu.Unlock()

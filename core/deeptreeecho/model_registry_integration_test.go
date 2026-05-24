@@ -59,3 +59,34 @@ func TestEvolutionSystemPublishesModelLoadFailedEvent(t *testing.T) {
 		t.Fatalf("expected model path %s, got %v", path, got)
 	}
 }
+
+func TestEvolutionSystemLocalModelRuntimeHooks(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "tiny.gguf")
+	writeEvolutionTinyGGUF(t, path)
+
+	bus := NewCognitiveEventBus(context.Background())
+	var coolingEvents []CognitiveEvent
+	bus.Subscribe(EventModelRuntimeCooling, func(event CognitiveEvent) {
+		coolingEvents = append(coolingEvents, event)
+	})
+
+	cfg := DefaultEvolutionSystemConfig()
+	cfg.ModelPaths = []string{dir}
+	cfg.EventBus = bus
+	es, err := NewEvolutionSystem(cfg)
+	if err != nil {
+		t.Fatalf("new evolution system: %v", err)
+	}
+	if es.LocalModelReady() {
+		t.Fatalf("expected synthetic fixture to start not ready")
+	}
+	_ = es.WarmupLocalModel(context.Background())
+	if es.LocalModelReady() {
+		t.Fatalf("expected invalid tiny fixture to remain not ready after failed warmup")
+	}
+	_ = es.CooldownLocalModel("test rest transition")
+	if len(coolingEvents) == 0 {
+		t.Fatalf("expected runtime cooling event")
+	}
+}

@@ -55,6 +55,9 @@ const (
 	EventModelLoaded              CognitiveEventType = "model_loaded"
 	EventModelUnloaded            CognitiveEventType = "model_unloaded"
 	EventModelLoadFailed          CognitiveEventType = "model_load_failed"
+	EventModelPolicyScored        CognitiveEventType = "model_policy_scored"
+	EventModelRuntimeReady        CognitiveEventType = "model_runtime_ready"
+	EventModelRuntimeCooling      CognitiveEventType = "model_runtime_cooling"
 
 	// Interest and attention events
 	EventInterestDetected CognitiveEventType = "interest_detected"

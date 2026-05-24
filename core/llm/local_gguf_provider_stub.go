@@ -89,6 +89,10 @@ func (lgp *LocalGGUFProvider) LoadError() error {
 	return nil
 }
 
+func (lgp *LocalGGUFProvider) loadModelForRegistryWarmup() error {
+	return fmt.Errorf("local GGUF support unavailable in this build (requires cgo and no nollama tag)")
+}
+
 func (lgp *LocalGGUFProvider) Close() error {
 	return nil
 }

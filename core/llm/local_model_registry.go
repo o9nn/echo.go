@@ -17,20 +17,37 @@ const (
 	ModelLifecycleUnloaded = "model_unloaded"
 	// ModelLifecycleLoadFailed is emitted when a selected local model cannot be loaded.
 	ModelLifecycleLoadFailed = "model_load_failed"
+	// ModelLifecyclePolicyScored is emitted when the registry evaluates a concrete model candidate.
+	ModelLifecyclePolicyScored = "model_policy_scored"
 )
+
+// ModelSelectionTask describes Echo's intent when selecting among concrete GGUF files.
+type ModelSelectionTask struct {
+	Intent                string
+	RequiredContextTokens int
+}
+
+// ModelScoringPolicy scores a concrete GGUF capability for a specific Echo task.
+// Higher scores are preferred. It operates below backend-class selection, where
+// backendcap.SelectFromCapabilities has already established that concrete model
+// files are schedulable native substrate candidates.
+type ModelScoringPolicy func(cap backendcap.Capability, task ModelSelectionTask) int
 
 // LocalModelEvent describes a state transition in the local model runtime registry.
 type LocalModelEvent struct {
-	Type                 string                     `json:"type"`
-	ModelName            string                     `json:"model_name,omitempty"`
-	ModelPath            string                     `json:"model_path,omitempty"`
-	Capability           backendcap.Capability      `json:"capability"`
-	EstimatedMemoryBytes uint64                     `json:"estimated_memory_bytes,omitempty"`
-	Loaded               bool                       `json:"loaded"`
-	Reason               string                     `json:"reason,omitempty"`
-	Error                string                     `json:"error,omitempty"`
-	Timestamp            time.Time                  `json:"timestamp"`
-	HostMemory           backendcap.HostMemoryProbe `json:"host_memory"`
+	Type                  string                     `json:"type"`
+	ModelName             string                     `json:"model_name,omitempty"`
+	ModelPath             string                     `json:"model_path,omitempty"`
+	Capability            backendcap.Capability      `json:"capability"`
+	EstimatedMemoryBytes  uint64                     `json:"estimated_memory_bytes,omitempty"`
+	Loaded                bool                       `json:"loaded"`
+	Reason                string                     `json:"reason,omitempty"`
+	Error                 string                     `json:"error,omitempty"`
+	PolicyScore           int                        `json:"policy_score,omitempty"`
+	PolicyIntent          string                     `json:"policy_intent,omitempty"`
+	RequiredContextTokens int                        `json:"required_context_tokens,omitempty"`
+	Timestamp             time.Time                  `json:"timestamp"`
+	HostMemory            backendcap.HostMemoryProbe `json:"host_memory"`
 }
 
 // LocalModelRegistryOptions configures persistent local GGUF model lifecycle management.
@@ -39,6 +56,8 @@ type LocalModelRegistryOptions struct {
 	ProviderName      string
 	MemorySafetyRatio float64
 	IdleUnloadAfter   time.Duration
+	ScoringPolicy     ModelScoringPolicy
+	SelectionTask     ModelSelectionTask
 	OnEvent           func(LocalModelEvent)
 	Now               func() time.Time
 }
@@ -79,6 +98,7 @@ type LocalModelRegistryState struct {
 	UnloadReason         string                     `json:"unload_reason,omitempty"`
 	HostMemory           backendcap.HostMemoryProbe `json:"host_memory"`
 	MemorySafe           bool                       `json:"memory_safe"`
+	RuntimeReady         bool                       `json:"runtime_ready"`
 }
 
 // NewLocalModelRegistry creates a registry and performs an initial discovery pass.
@@ -104,16 +124,7 @@ func (r *LocalModelRegistry) Refresh() LocalModelRegistryState {
 	defer r.mu.Unlock()
 
 	models := backendcap.DiscoverModelCapabilities(r.options.ModelPaths)
-	decision := backendcap.SelectFromCapabilities(backendcap.Workload{
-		NeedOffline:   false,
-		PreferNative:  true,
-		MinMemoryTier: backendcap.MemoryConstrained,
-	}, models)
-
-	var selected backendcap.Capability
-	if decision.Selected.ModelPath != "" {
-		selected = decision.Selected
-	}
+	selected := r.selectModelLocked(models)
 	changed := selected.ModelPath != r.selected.ModelPath
 	if changed && r.provider != nil {
 		r.unloadLocked("selected model changed")
@@ -129,6 +140,40 @@ func (r *LocalModelRegistry) Refresh() LocalModelRegistryState {
 		r.loadErr = nil
 	}
 	return r.stateLocked()
+}
+
+func (r *LocalModelRegistry) selectModelLocked(models []backendcap.Capability) backendcap.Capability {
+	if r.options.ScoringPolicy != nil {
+		var selected backendcap.Capability
+		bestScore := 0
+		hasSelection := false
+		for _, model := range models {
+			if model.ModelPath == "" || !model.Available {
+				continue
+			}
+			score := r.options.ScoringPolicy(model, r.options.SelectionTask)
+			r.emitPolicyScoreLocked(model, score)
+			if !hasSelection || score > bestScore {
+				selected = model
+				bestScore = score
+				hasSelection = true
+			}
+		}
+		if hasSelection {
+			return selected
+		}
+	}
+
+	decision := backendcap.SelectFromCapabilities(backendcap.Workload{
+		NeedOffline:   false,
+		PreferNative:  true,
+		MinMemoryTier: backendcap.MemoryConstrained,
+	}, models)
+
+	if decision.Selected.ModelPath != "" {
+		return decision.Selected
+	}
+	return backendcap.Capability{}
 }
 
 // Provider returns the registry-managed provider candidate, if a model is selected.
@@ -149,6 +194,54 @@ func (r *LocalModelRegistry) State() LocalModelRegistryState {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	return r.stateLocked()
+}
+
+// Warmup eagerly loads the selected local model through the registry-owned provider.
+// It is intended for wake transitions and explicit diagnostics; normal generation
+// still preserves lazy loading through the provider path.
+func (r *LocalModelRegistry) Warmup(ctx context.Context) error {
+	r.mu.Lock()
+	if r.selected.ModelPath == "" {
+		r.mu.Unlock()
+		return fmt.Errorf("no local GGUF model selected")
+	}
+	if r.provider == nil {
+		r.provider = &localModelRegistryProvider{registry: r, provider: NewLocalGGUFProviderFromCapability(r.selected)}
+	}
+	provider := r.provider.provider
+	r.mu.Unlock()
+
+	if ctx != nil {
+		select {
+		case <-ctx.Done():
+			r.recordUse(provider, ctx.Err())
+			return ctx.Err()
+		default:
+		}
+	}
+	err := provider.loadModelForRegistryWarmup()
+	r.recordUse(provider, err)
+	return err
+}
+
+// Cooldown explicitly releases a resident model, using memory-pressure language
+// for wake/rest policy consumers while still allowing deliberate rest transitions.
+func (r *LocalModelRegistry) Cooldown(reason string) bool {
+	if reason == "" {
+		reason = "runtime cooldown requested"
+	}
+	if r.MaybeUnloadForMemoryPressure(reason) {
+		return true
+	}
+	return r.Unload(reason)
+}
+
+// RuntimeReadiness reports whether the selected model is resident and memory-safe.
+func (r *LocalModelRegistry) RuntimeReadiness() bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	state := r.stateLocked()
+	return state.RuntimeReady
 }
 
 // MaybeUnloadForMemoryPressure releases the selected model if the current host
@@ -258,6 +351,7 @@ func (r *LocalModelRegistry) stateLocked() LocalModelRegistryState {
 		state.LoadError = r.loadErr.Error()
 	}
 	state.MemorySafe = r.memorySafeLocked(state.HostMemory)
+	state.RuntimeReady = state.SelectedModel.ModelPath != "" && state.Loaded && state.MemorySafe && state.LoadError == ""
 	return state
 }
 
@@ -266,6 +360,27 @@ func (r *LocalModelRegistry) memorySafeLocked(host backendcap.HostMemoryProbe) b
 		return true
 	}
 	return r.selected.EstimatedMemoryBytes <= uint64(float64(host.AvailableBytes)*r.options.MemorySafetyRatio)
+}
+
+func (r *LocalModelRegistry) emitPolicyScoreLocked(model backendcap.Capability, score int) {
+	if r.options.OnEvent == nil {
+		return
+	}
+	event := LocalModelEvent{
+		Type:                  ModelLifecyclePolicyScored,
+		ModelName:             strings.TrimPrefix(model.Name, "model:"),
+		ModelPath:             model.ModelPath,
+		Capability:            model,
+		EstimatedMemoryBytes:  model.EstimatedMemoryBytes,
+		Loaded:                r.loaded && model.ModelPath == r.selected.ModelPath,
+		Reason:                "registry scoring policy evaluated concrete GGUF candidate",
+		PolicyScore:           score,
+		PolicyIntent:          r.options.SelectionTask.Intent,
+		RequiredContextTokens: r.options.SelectionTask.RequiredContextTokens,
+		Timestamp:             r.options.Now(),
+		HostMemory:            backendcap.ProbeHostMemory(),
+	}
+	r.options.OnEvent(event)
 }
 
 func (r *LocalModelRegistry) emitLocked(eventType string, err error, reason string) {

@@ -349,6 +349,46 @@ func (es *EvolutionSystem) GetLocalModelRegistry() *llm.LocalModelRegistry {
 	return es.localModels
 }
 
+// WarmupLocalModel eagerly loads the registry-selected GGUF model for a wakeful runtime.
+func (es *EvolutionSystem) WarmupLocalModel(ctx context.Context) error {
+	if es.localModels == nil {
+		err := fmt.Errorf("local model registry not configured")
+		es.emitLocalModelRuntimeEvent(EventModelRuntimeCooling, "warmup unavailable", err)
+		return err
+	}
+	err := es.localModels.Warmup(ctx)
+	if err != nil {
+		es.emitLocalModelRuntimeEvent(EventModelRuntimeCooling, "warmup failed", err)
+		return err
+	}
+	es.emitLocalModelRuntimeEvent(EventModelRuntimeReady, "warmup completed", nil)
+	es.refreshBackendRouting("local model warmup")
+	return nil
+}
+
+// CooldownLocalModel releases the local model during rest or explicit memory cooling.
+func (es *EvolutionSystem) CooldownLocalModel(reason string) bool {
+	if es.localModels == nil {
+		es.emitLocalModelRuntimeEvent(EventModelRuntimeCooling, "cooldown unavailable", fmt.Errorf("local model registry not configured"))
+		return false
+	}
+	if reason == "" {
+		reason = "local model runtime cooldown"
+	}
+	unloaded := es.localModels.Cooldown(reason)
+	es.emitLocalModelRuntimeEvent(EventModelRuntimeCooling, reason, nil)
+	es.refreshBackendRouting("local model cooldown")
+	return unloaded
+}
+
+// LocalModelReady reports whether the selected local model is loaded and memory-safe.
+func (es *EvolutionSystem) LocalModelReady() bool {
+	if es.localModels == nil {
+		return false
+	}
+	return es.localModels.RuntimeReadiness()
+}
+
 // InjectStimulus injects an external stimulus into the evolution system
 func (es *EvolutionSystem) InjectStimulus(stimulus string, importance float64) {
 	if es.optimizer != nil {
@@ -406,16 +446,40 @@ func (es *EvolutionSystem) emitLocalModelLifecycleEvent(event llm.LocalModelEven
 	}
 	eventType := CognitiveEventType(event.Type)
 	es.eventBus.PublishSync(NewPriorityCognitiveEvent(eventType, "local_model_registry", map[string]interface{}{
-		"model_name":             event.ModelName,
-		"model_path":             event.ModelPath,
-		"capability":             event.Capability,
-		"estimated_memory_bytes": event.EstimatedMemoryBytes,
-		"loaded":                 event.Loaded,
-		"reason":                 event.Reason,
-		"error":                  event.Error,
-		"host_memory":            event.HostMemory,
-		"timestamp":              event.Timestamp,
+		"model_name":              event.ModelName,
+		"model_path":              event.ModelPath,
+		"capability":              event.Capability,
+		"estimated_memory_bytes":  event.EstimatedMemoryBytes,
+		"loaded":                  event.Loaded,
+		"reason":                  event.Reason,
+		"error":                   event.Error,
+		"policy_score":            event.PolicyScore,
+		"policy_intent":           event.PolicyIntent,
+		"required_context_tokens": event.RequiredContextTokens,
+		"host_memory":             event.HostMemory,
+		"timestamp":               event.Timestamp,
 	}, 0.9))
+}
+
+func (es *EvolutionSystem) emitLocalModelRuntimeEvent(eventType CognitiveEventType, reason string, err error) {
+	if es.eventBus == nil {
+		return
+	}
+	state := es.localModelRegistryState()
+	data := map[string]interface{}{
+		"reason":                 reason,
+		"ready":                  state.RuntimeReady,
+		"loaded":                 state.Loaded,
+		"memory_safe":            state.MemorySafe,
+		"model_path":             state.SelectedModel.ModelPath,
+		"selected_model":         state.SelectedModel,
+		"estimated_memory_bytes": state.EstimatedMemoryBytes,
+		"host_memory":            state.HostMemory,
+	}
+	if err != nil {
+		data["error"] = err.Error()
+	}
+	es.eventBus.PublishSync(NewPriorityCognitiveEvent(eventType, "evolution_system", data, 0.85))
 }
 
 func (es *EvolutionSystem) emitBackendCapabilityEvent(decision backendcap.Decision, providerRoute []string, reason string) {

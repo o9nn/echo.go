@@ -1,9 +1,11 @@
 package llm
 
 import (
+	"context"
 	"encoding/binary"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/o9nn/echo.go/core/backendcap"
@@ -23,6 +25,29 @@ func TestLocalGGUFProviderFromCapabilityPreservesProviderContract(t *testing.T) 
 	}
 	if provider.MaxTokens() < 0 {
 		t.Fatalf("unexpected negative max tokens: %d", provider.MaxTokens())
+	}
+}
+
+func TestLocalGGUFProviderGatedRealModelSmoke(t *testing.T) {
+	modelPath := strings.TrimSpace(os.Getenv("ECHO_TEST_GGUF_MODEL"))
+	if modelPath == "" {
+		t.Skip("set ECHO_TEST_GGUF_MODEL to run native real-model GGUF smoke test")
+	}
+	cap, err := backendcap.ProbeModelFile(modelPath)
+	if err != nil {
+		t.Fatalf("probe real GGUF model: %v", err)
+	}
+	provider := NewLocalGGUFProviderFromCapability(cap)
+	if !provider.Available() {
+		t.Skip("local GGUF provider is unavailable in this build or host memory envelope")
+	}
+	defer provider.Close()
+	result, err := provider.Generate(context.Background(), "Deep Tree Echo says", GenerateOptions{MaxTokens: 1})
+	if err != nil {
+		t.Fatalf("real GGUF one-token smoke generation failed: %v", err)
+	}
+	if strings.TrimSpace(result) == "" {
+		t.Fatalf("expected non-empty one-token smoke response")
 	}
 }
 
