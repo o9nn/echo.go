@@ -7,6 +7,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/o9nn/echo.go/core/backendcap"
 	"github.com/o9nn/echo.go/core/llm"
 )
 
@@ -23,15 +24,17 @@ type LocalModelProvider struct {
 	mu sync.RWMutex
 
 	// Model configuration
-	modelPath    string
-	modelName    string
-	contextSize  int
-	batchSize    int
-	threads      int
+	modelPath   string
+	modelName   string
+	contextSize int
+	batchSize   int
+	threads     int
 
 	// State
-	loaded       bool
-	available    bool
+	loaded          bool
+	available       bool
+	backendDecision backendcap.Decision
+	backendSnapshot []backendcap.Capability
 
 	// Fallback provider for when local execution is unavailable
 	fallbackProvider llm.LLMProvider
@@ -44,11 +47,11 @@ type LocalModelProvider struct {
 
 // LocalModelConfig configures the local model provider
 type LocalModelConfig struct {
-	ModelPath       string
-	ModelName       string
-	ContextSize     int
-	BatchSize       int
-	Threads         int
+	ModelPath        string
+	ModelName        string
+	ContextSize      int
+	BatchSize        int
+	Threads          int
 	FallbackProvider llm.LLMProvider
 }
 
@@ -84,20 +87,33 @@ func NewLocalModelProvider(config LocalModelConfig) *LocalModelProvider {
 func (lmp *LocalModelProvider) checkLocalAvailability() {
 	lmp.mu.Lock()
 	defer lmp.mu.Unlock()
+	lmp.refreshBackendDecisionLocked()
+}
 
-	// Check if model file exists
+func (lmp *LocalModelProvider) refreshBackendDecisionLocked() {
+	workload := backendcap.Workload{
+		NeedOffline:    true,
+		PreferNative:   true,
+		MinMemoryTier:  backendcap.MemoryStandard,
+		RequiredTokens: lmp.contextSize,
+	}
+	decision := backendcap.Select(workload)
+	lmp.backendDecision = decision
+	lmp.backendSnapshot = backendcap.Snapshot()
+
+	modelExists := false
 	if lmp.modelPath != "" {
 		if _, err := os.Stat(lmp.modelPath); err == nil {
-			// Model file exists, check if llama.cpp is available
-			// This would require CGO and the llama package to be properly compiled
-			// For now, we mark as unavailable and use fallback
-			lmp.available = false
-			fmt.Println("⚠️  Local model file found but llama.cpp bindings not available")
-			fmt.Println("    Using API fallback provider")
+			modelExists = true
 		}
 	}
 
-	// If no local model, check fallback
+	// Native local inference remains unavailable until model loading is wired to
+	// the maintained source-based llama binding. The decision is still captured so
+	// Echobeats and diagnostics can choose/downgrade work explicitly.
+	lmp.loaded = lmp.loaded && modelExists && decision.Selected.Native && decision.Selected.Available
+	lmp.available = lmp.loaded
+
 	if !lmp.available && lmp.fallbackProvider != nil {
 		lmp.available = lmp.fallbackProvider.Available()
 	}
@@ -297,15 +313,17 @@ func (lmp *LocalModelProvider) GetStats() map[string]interface{} {
 		"model_name":       lmp.modelName,
 		"context_size":     lmp.contextSize,
 		"available":        lmp.available,
+		"backend_decision": lmp.backendDecision,
+		"backend_snapshot": lmp.backendSnapshot,
 	}
 }
 
 // SetFallbackProvider sets the fallback API provider
 func (lmp *LocalModelProvider) SetFallbackProvider(provider llm.LLMProvider) {
 	lmp.mu.Lock()
-	defer lmp.mu.Unlock()
 	lmp.fallbackProvider = provider
-	lmp.checkLocalAvailability()
+	lmp.refreshBackendDecisionLocked()
+	lmp.mu.Unlock()
 }
 
 // IsLocalAvailable returns whether local inference is available
@@ -320,6 +338,22 @@ func (lmp *LocalModelProvider) GetFallbackProvider() llm.LLMProvider {
 	lmp.mu.RLock()
 	defer lmp.mu.RUnlock()
 	return lmp.fallbackProvider
+}
+
+// BackendDecision returns the last capability-aware backend decision used by the local provider.
+func (lmp *LocalModelProvider) BackendDecision() backendcap.Decision {
+	lmp.mu.RLock()
+	defer lmp.mu.RUnlock()
+	return lmp.backendDecision
+}
+
+// BackendSnapshot returns the most recent backend capability surface observed by the local provider.
+func (lmp *LocalModelProvider) BackendSnapshot() []backendcap.Capability {
+	lmp.mu.RLock()
+	defer lmp.mu.RUnlock()
+	out := make([]backendcap.Capability, len(lmp.backendSnapshot))
+	copy(out, lmp.backendSnapshot)
+	return out
 }
 
 // LocalModelProviderBuilder helps construct a LocalModelProvider

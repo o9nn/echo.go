@@ -6,38 +6,43 @@ import (
 	"sync"
 	"time"
 
+	"github.com/o9nn/echo.go/core/backendcap"
 	"github.com/o9nn/echo.go/core/llm"
 )
 
 // EchobeatsSchedulerV2 is an enhanced goal-directed scheduling system
 // that orchestrates cognitive event loops with self-directed timing
 type EchobeatsSchedulerV2 struct {
-	mu sync.RWMutex
-	ctx context.Context
+	mu     sync.RWMutex
+	ctx    context.Context
 	cancel context.CancelFunc
 
 	// LLM provider
 	llmProvider llm.LLMProvider
 
+	// Backend capability state
+	backendDecision backendcap.Decision
+	backendSnapshot []backendcap.Capability
+
 	// Goal management
-	goals           []ScheduledGoalV2
-	activeGoal      *ScheduledGoalV2
-	completedGoals  []ScheduledGoalV2
+	goals          []ScheduledGoalV2
+	activeGoal     *ScheduledGoalV2
+	completedGoals []ScheduledGoalV2
 
 	// Scheduling state
-	nextBeatTime    time.Time
-	beatInterval    time.Duration
-	adaptiveRate    float64  // Multiplier for beat interval based on cognitive load
+	nextBeatTime time.Time
+	beatInterval time.Duration
+	adaptiveRate float64 // Multiplier for beat interval based on cognitive load
 
 	// Cognitive rhythm
-	rhythmPhase     RhythmPhase
-	phaseStartTime  time.Time
-	phaseDuration   time.Duration
+	rhythmPhase    RhythmPhase
+	phaseStartTime time.Time
+	phaseDuration  time.Duration
 
 	// Self-orchestration
-	selfDirected    bool
-	urgencyLevel    float64
-	focusIntensity  float64
+	selfDirected   bool
+	urgencyLevel   float64
+	focusIntensity float64
 
 	// Metrics
 	totalBeats      uint64
@@ -46,26 +51,26 @@ type EchobeatsSchedulerV2 struct {
 	avgGoalDuration time.Duration
 
 	// Running state
-	running         bool
+	running bool
 }
 
 // ScheduledGoalV2 represents a goal with scheduling metadata (enhanced version)
 type ScheduledGoalV2 struct {
-	ID              string
-	Description     string
-	Priority        float64
-	Progress        float64
-	Status          GoalStatusV2
-	CreatedAt       time.Time
-	StartedAt       time.Time
-	CompletedAt     time.Time
-	Deadline        time.Time
-	EstimatedTime   time.Duration
-	ActualTime      time.Duration
-	SubGoals        []string
-	Dependencies    []string
-	Tags            []string
-	Metadata        map[string]interface{}
+	ID            string
+	Description   string
+	Priority      float64
+	Progress      float64
+	Status        GoalStatusV2
+	CreatedAt     time.Time
+	StartedAt     time.Time
+	CompletedAt   time.Time
+	Deadline      time.Time
+	EstimatedTime time.Duration
+	ActualTime    time.Duration
+	SubGoals      []string
+	Dependencies  []string
+	Tags          []string
+	Metadata      map[string]interface{}
 }
 
 // GoalStatusV2 represents the status of a goal (enhanced version)
@@ -111,19 +116,26 @@ func (rp RhythmPhase) String() string {
 // NewEchobeatsSchedulerV2 creates a new enhanced scheduler
 func NewEchobeatsSchedulerV2(llmProvider llm.LLMProvider) *EchobeatsSchedulerV2 {
 	ctx, cancel := context.WithCancel(context.Background())
+	decision := backendcap.Select(backendcap.Workload{
+		NeedOffline:   llmProvider == nil || !llmProvider.Available(),
+		PreferNative:  true,
+		MinMemoryTier: backendcap.MemoryConstrained,
+	})
 
 	return &EchobeatsSchedulerV2{
-		ctx:            ctx,
-		cancel:         cancel,
-		llmProvider:    llmProvider,
-		goals:          make([]ScheduledGoalV2, 0),
-		completedGoals: make([]ScheduledGoalV2, 0),
-		beatInterval:   10 * time.Second,
-		adaptiveRate:   1.0,
-		rhythmPhase:    RhythmFocus,
-		selfDirected:   true,
-		urgencyLevel:   0.5,
-		focusIntensity: 0.5,
+		ctx:             ctx,
+		cancel:          cancel,
+		llmProvider:     llmProvider,
+		goals:           make([]ScheduledGoalV2, 0),
+		completedGoals:  make([]ScheduledGoalV2, 0),
+		beatInterval:    10 * time.Second,
+		adaptiveRate:    1.0,
+		rhythmPhase:     RhythmFocus,
+		selfDirected:    true,
+		urgencyLevel:    0.5,
+		focusIntensity:  0.5,
+		backendDecision: decision,
+		backendSnapshot: backendcap.Snapshot(),
 	}
 }
 
@@ -168,12 +180,12 @@ func (es *EchobeatsSchedulerV2) runScheduler() {
 			return
 		case <-ticker.C:
 			es.processBeat()
-			
+
 			// Adapt the ticker interval
 			es.mu.RLock()
 			newInterval := time.Duration(float64(es.beatInterval) * es.adaptiveRate)
 			es.mu.RUnlock()
-			
+
 			ticker.Reset(newInterval)
 		}
 	}
@@ -184,6 +196,9 @@ func (es *EchobeatsSchedulerV2) processBeat() {
 	es.mu.Lock()
 	es.totalBeats++
 	es.mu.Unlock()
+
+	// Refresh backend capabilities before choosing the next cognitive act.
+	es.refreshBackendCapability()
 
 	// Check for phase transition
 	es.checkPhaseTransition()
@@ -204,6 +219,28 @@ func (es *EchobeatsSchedulerV2) processBeat() {
 	es.updateAdaptiveRate()
 }
 
+func (es *EchobeatsSchedulerV2) refreshBackendCapability() {
+	es.mu.Lock()
+	defer es.mu.Unlock()
+
+	providerAvailable := es.llmProvider != nil && es.llmProvider.Available()
+	es.backendDecision = backendcap.Select(backendcap.Workload{
+		NeedOffline:   !providerAvailable,
+		PreferNative:  true,
+		MinMemoryTier: backendcap.MemoryConstrained,
+	})
+	es.backendSnapshot = backendcap.Snapshot()
+
+	// A degraded substrate should slow exploratory/focused work rather than
+	// collapse the wakeful loop. This makes backend capacity part of rhythm.
+	if es.backendDecision.Degraded {
+		es.adaptiveRate = maxFloat(es.adaptiveRate, 1.5)
+		if es.backendDecision.Selected.Kind == backendcap.BackendFallback {
+			es.focusIntensity = minFloat(es.focusIntensity, 0.35)
+		}
+	}
+}
+
 // checkPhaseTransition checks if it's time to transition phases
 func (es *EchobeatsSchedulerV2) checkPhaseTransition() {
 	es.mu.Lock()
@@ -215,7 +252,7 @@ func (es *EchobeatsSchedulerV2) checkPhaseTransition() {
 		es.phaseStartTime = time.Now()
 		es.phaseDuration = es.calculatePhaseDuration()
 
-		fmt.Printf("🎵 Rhythm phase transition: %s (duration: %v)\n", 
+		fmt.Printf("🎵 Rhythm phase transition: %s (duration: %v)\n",
 			es.rhythmPhase.String(), es.phaseDuration)
 	}
 }
@@ -362,7 +399,7 @@ func (es *EchobeatsSchedulerV2) completeGoal() {
 	totalDuration += es.activeGoal.ActualTime
 	es.avgGoalDuration = totalDuration / time.Duration(es.goalsCompleted)
 
-	fmt.Printf("✅ Goal completed: %s (duration: %v)\n", 
+	fmt.Printf("✅ Goal completed: %s (duration: %v)\n",
 		es.activeGoal.Description, es.activeGoal.ActualTime)
 
 	es.activeGoal = nil
@@ -431,10 +468,28 @@ func (es *EchobeatsSchedulerV2) GetMetrics() map[string]interface{} {
 		"focus_intensity":   es.focusIntensity,
 		"avg_goal_duration": es.avgGoalDuration.String(),
 		"running":           es.running,
+		"backend_decision":  es.backendDecision,
+		"backend_snapshot":  es.backendSnapshot,
 	}
 }
 
 // GetActiveGoal returns the currently active goal
+// BackendDecision returns the latest scheduler-facing backend capability decision.
+func (es *EchobeatsSchedulerV2) BackendDecision() backendcap.Decision {
+	es.mu.RLock()
+	defer es.mu.RUnlock()
+	return es.backendDecision
+}
+
+// BackendSnapshot returns the latest backend capability surface observed by the scheduler.
+func (es *EchobeatsSchedulerV2) BackendSnapshot() []backendcap.Capability {
+	es.mu.RLock()
+	defer es.mu.RUnlock()
+	out := make([]backendcap.Capability, len(es.backendSnapshot))
+	copy(out, es.backendSnapshot)
+	return out
+}
+
 func (es *EchobeatsSchedulerV2) GetActiveGoal() *ScheduledGoalV2 {
 	es.mu.RLock()
 	defer es.mu.RUnlock()

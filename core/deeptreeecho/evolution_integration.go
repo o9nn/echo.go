@@ -6,6 +6,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/o9nn/echo.go/core/backendcap"
 	"github.com/o9nn/echo.go/core/llm"
 )
 
@@ -15,15 +16,15 @@ type EvolutionSystem struct {
 	mu sync.RWMutex
 
 	// Core components
-	optimizer        *EvolutionOptimizer
-	providerManager  *llm.ProviderManager
+	optimizer       *EvolutionOptimizer
+	providerManager *llm.ProviderManager
 
 	// Configuration
-	config           EvolutionSystemConfig
+	config EvolutionSystemConfig
 
 	// State
-	initialized      bool
-	running          bool
+	initialized bool
+	running     bool
 }
 
 // EvolutionSystemConfig configures the evolution system
@@ -193,11 +194,15 @@ func (es *EvolutionSystem) GetStatus() map[string]interface{} {
 	es.mu.RLock()
 	defer es.mu.RUnlock()
 
+	backendDecision := es.BackendDecision()
 	status := map[string]interface{}{
-		"initialized":       es.initialized,
-		"running":           es.running,
-		"providers":         es.providerManager.ListProviders(),
-		"provider_metrics":  es.providerManager.GetMetrics(),
+		"initialized":          es.initialized,
+		"running":              es.running,
+		"providers":            es.providerManager.ListProviders(),
+		"provider_metrics":     es.providerManager.GetMetrics(),
+		"backend_capabilities": backendcap.Snapshot(),
+		"backend_decision":     backendDecision,
+		"backend_degraded":     backendDecision.Degraded,
 	}
 
 	if es.optimizer != nil {
@@ -206,6 +211,16 @@ func (es *EvolutionSystem) GetStatus() map[string]interface{} {
 	}
 
 	return status
+}
+
+// BackendDecision returns the scheduler-facing backend selection for evolution inference work.
+func (es *EvolutionSystem) BackendDecision() backendcap.Decision {
+	workload := backendcap.Workload{
+		NeedOffline:   false,
+		PreferNative:  true,
+		MinMemoryTier: backendcap.MemoryConstrained,
+	}
+	return backendcap.Select(workload)
 }
 
 // InjectStimulus injects an external stimulus into the evolution system
