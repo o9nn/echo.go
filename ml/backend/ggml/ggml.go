@@ -1,3 +1,5 @@
+//go:build cgo
+
 package ggml
 
 // #cgo CPPFLAGS: -I${SRCDIR}/ggml/include

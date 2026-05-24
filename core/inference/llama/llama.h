@@ -469,17 +469,16 @@ void llama_sampler_apply(struct llama_sampler * smpl, struct llama_token_data_ar
 llama_token llama_sampler_sample(struct llama_sampler * smpl, struct llama_context * ctx, int32_t idx);
 
 // Sampler chain
-struct llama_sampler * llama_sampler_chain_init(struct llama_sampler_chain_params params);
-void llama_sampler_chain_add(struct llama_sampler * chain, struct llama_sampler * smpl);
-struct llama_sampler * llama_sampler_chain_get(const struct llama_sampler * chain, int32_t i);
-int32_t llama_sampler_chain_n(const struct llama_sampler * chain);
-struct llama_sampler * llama_sampler_chain_remove(struct llama_sampler * chain, int32_t i);
-
 struct llama_sampler_chain_params {
     bool no_perf;
 };
 
 struct llama_sampler_chain_params llama_sampler_chain_default_params(void);
+struct llama_sampler * llama_sampler_chain_init(struct llama_sampler_chain_params params);
+void llama_sampler_chain_add(struct llama_sampler * chain, struct llama_sampler * smpl);
+struct llama_sampler * llama_sampler_chain_get(const struct llama_sampler * chain, int32_t i);
+int32_t llama_sampler_chain_n(const struct llama_sampler * chain);
+struct llama_sampler * llama_sampler_chain_remove(struct llama_sampler * chain, int32_t i);
 
 // =============================================================================
 // LLAMA THREADING API

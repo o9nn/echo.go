@@ -1,5 +1,12 @@
-// Package llama provides Go bindings for llama.cpp inference
-// llama.cpp is a high-performance LLM inference library
+//go:build cgo && llama_legacy
+
+// Package llama provides Go bindings for llama.cpp inference.
+//
+// This file is the legacy direct-link wrapper that expects prebuilt
+// libs/libllama and libs/libggml* artifacts. The default package surface is
+// provided by llama_unavailable.go so normal repository builds do not fail when
+// those native artifacts are not present. Build with -tags llama_legacy after
+// validating native dependencies to exercise this implementation.
 package llama
 
 /*
@@ -152,10 +159,10 @@ type Model struct {
 // LoadModel loads a model from a file
 func LoadModel(path string, params ModelParams) (*Model, error) {
 	BackendInit()
-	
+
 	cPath := C.CString(path)
 	defer C.free(unsafe.Pointer(cPath))
-	
+
 	cParams := C.llama_model_default_params()
 	cParams.n_gpu_layers = C.int32_t(params.NGPULayers)
 	cParams.split_mode = C.enum_llama_split_mode(params.SplitMode)
@@ -163,12 +170,12 @@ func LoadModel(path string, params ModelParams) (*Model, error) {
 	cParams.vocab_only = C.bool(params.VocabOnly)
 	cParams.use_mmap = C.bool(params.UseMmap)
 	cParams.use_mlock = C.bool(params.UseMlock)
-	
+
 	model := C.llama_model_load_from_file(cPath, cParams)
 	if model == nil {
 		return nil, fmt.Errorf("failed to load model from %s", path)
 	}
-	
+
 	m := &Model{model: model}
 	runtime.SetFinalizer(m, (*Model).Free)
 	return m, nil
@@ -178,7 +185,7 @@ func LoadModel(path string, params ModelParams) (*Model, error) {
 func (m *Model) Free() {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	
+
 	if m.model != nil {
 		C.llama_model_free(m.model)
 		m.model = nil
@@ -252,7 +259,7 @@ func (m *Model) IsRecurrent() bool {
 func (m *Model) Description() string {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	
+
 	buf := make([]byte, 256)
 	n := C.llama_model_desc(m.model, (*C.char)(unsafe.Pointer(&buf[0])), C.size_t(len(buf)))
 	if n <= 0 {
@@ -265,13 +272,13 @@ func (m *Model) Description() string {
 func (m *Model) ChatTemplate(name string) string {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	
+
 	var cName *C.char
 	if name != "" {
 		cName = C.CString(name)
 		defer C.free(unsafe.Pointer(cName))
 	}
-	
+
 	tmpl := C.llama_model_chat_template(m.model, cName)
 	if tmpl == nil {
 		return ""
@@ -307,7 +314,7 @@ type Vocab struct {
 func (m *Model) GetVocab() *Vocab {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	
+
 	vocab := C.llama_model_get_vocab(m.model)
 	return &Vocab{vocab: vocab, model: m}
 }
@@ -366,26 +373,26 @@ func (v *Vocab) IsControl(token Token) bool {
 func (v *Vocab) Tokenize(text string, addSpecial, parseSpecial bool) ([]Token, error) {
 	cText := C.CString(text)
 	defer C.free(unsafe.Pointer(cText))
-	
+
 	// First call to get required size
 	nTokens := C.llama_tokenize(v.vocab, cText, C.int32_t(len(text)), nil, 0, C.bool(addSpecial), C.bool(parseSpecial))
 	if nTokens < 0 {
 		nTokens = -nTokens
 	}
-	
+
 	tokens := make([]Token, nTokens)
 	if nTokens == 0 {
 		return tokens, nil
 	}
-	
+
 	n := C.llama_tokenize(v.vocab, cText, C.int32_t(len(text)),
 		(*C.llama_token)(unsafe.Pointer(&tokens[0])), C.int32_t(nTokens),
 		C.bool(addSpecial), C.bool(parseSpecial))
-	
+
 	if n < 0 {
 		return nil, fmt.Errorf("tokenization failed: %d", n)
 	}
-	
+
 	return tokens[:n], nil
 }
 
@@ -394,14 +401,14 @@ func (v *Vocab) TokenToPiece(token Token, special bool) string {
 	buf := make([]byte, 128)
 	n := C.llama_token_to_piece(v.vocab, C.llama_token(token),
 		(*C.char)(unsafe.Pointer(&buf[0])), C.int32_t(len(buf)), 0, C.bool(special))
-	
+
 	if n < 0 {
 		// Buffer too small, try again with larger buffer
 		buf = make([]byte, -n)
 		n = C.llama_token_to_piece(v.vocab, C.llama_token(token),
 			(*C.char)(unsafe.Pointer(&buf[0])), C.int32_t(len(buf)), 0, C.bool(special))
 	}
-	
+
 	if n <= 0 {
 		return ""
 	}
@@ -413,13 +420,13 @@ func (v *Vocab) Detokenize(tokens []Token, removeSpecial, unparseSpecial bool) s
 	if len(tokens) == 0 {
 		return ""
 	}
-	
+
 	buf := make([]byte, len(tokens)*32)
 	n := C.llama_detokenize(v.vocab,
 		(*C.llama_token)(unsafe.Pointer(&tokens[0])), C.int32_t(len(tokens)),
 		(*C.char)(unsafe.Pointer(&buf[0])), C.int32_t(len(buf)),
 		C.bool(removeSpecial), C.bool(unparseSpecial))
-	
+
 	if n < 0 {
 		// Buffer too small
 		buf = make([]byte, -n)
@@ -428,7 +435,7 @@ func (v *Vocab) Detokenize(tokens []Token, removeSpecial, unparseSpecial bool) s
 			(*C.char)(unsafe.Pointer(&buf[0])), C.int32_t(len(buf)),
 			C.bool(removeSpecial), C.bool(unparseSpecial))
 	}
-	
+
 	if n <= 0 {
 		return ""
 	}
@@ -493,7 +500,7 @@ type Context struct {
 func (m *Model) NewContext(params ContextParams) (*Context, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
-	
+
 	cParams := C.llama_context_default_params()
 	cParams.n_ctx = C.uint32_t(params.NCtx)
 	cParams.n_batch = C.uint32_t(params.NBatch)
@@ -509,12 +516,12 @@ func (m *Model) NewContext(params ContextParams) (*Context, error) {
 	cParams.embeddings = C.bool(params.Embeddings)
 	cParams.flash_attn = C.bool(params.FlashAttn)
 	cParams.offload_kqv = C.bool(params.OffloadKQV)
-	
+
 	ctx := C.llama_init_from_model(m.model, cParams)
 	if ctx == nil {
 		return nil, errors.New("failed to create context")
 	}
-	
+
 	c := &Context{ctx: ctx, model: m}
 	runtime.SetFinalizer(c, (*Context).Free)
 	return c, nil
@@ -524,7 +531,7 @@ func (m *Model) NewContext(params ContextParams) (*Context, error) {
 func (c *Context) Free() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	
+
 	if c.ctx != nil {
 		C.llama_free(c.ctx)
 		c.ctx = nil
@@ -622,7 +629,7 @@ func (b *Batch) AddToken(token Token, pos Pos, seqID SeqID, logits bool) {
 func (c *Context) Decode(batch *Batch) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	
+
 	ret := C.llama_decode(c.ctx, batch.batch)
 	if ret != 0 {
 		return fmt.Errorf("decode failed with code %d", ret)
@@ -634,7 +641,7 @@ func (c *Context) Decode(batch *Batch) error {
 func (c *Context) Encode(batch *Batch) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	
+
 	ret := C.llama_encode(c.ctx, batch.batch)
 	if ret != 0 {
 		return fmt.Errorf("encode failed with code %d", ret)
@@ -650,12 +657,12 @@ func (c *Context) Encode(batch *Batch) error {
 func (c *Context) GetLogits() []float32 {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	
+
 	ptr := C.llama_get_logits(c.ctx)
 	if ptr == nil {
 		return nil
 	}
-	
+
 	nVocab := c.model.NVocab()
 	return unsafe.Slice((*float32)(unsafe.Pointer(ptr)), nVocab)
 }
@@ -664,12 +671,12 @@ func (c *Context) GetLogits() []float32 {
 func (c *Context) GetLogitsIth(i int32) []float32 {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	
+
 	ptr := C.llama_get_logits_ith(c.ctx, C.int32_t(i))
 	if ptr == nil {
 		return nil
 	}
-	
+
 	nVocab := c.model.NVocab()
 	return unsafe.Slice((*float32)(unsafe.Pointer(ptr)), nVocab)
 }
@@ -678,12 +685,12 @@ func (c *Context) GetLogitsIth(i int32) []float32 {
 func (c *Context) GetEmbeddings() []float32 {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	
+
 	ptr := C.llama_get_embeddings(c.ctx)
 	if ptr == nil {
 		return nil
 	}
-	
+
 	nEmbd := c.model.NEmbd()
 	return unsafe.Slice((*float32)(unsafe.Pointer(ptr)), nEmbd)
 }
@@ -692,12 +699,12 @@ func (c *Context) GetEmbeddings() []float32 {
 func (c *Context) GetEmbeddingsIth(i int32) []float32 {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
-	
+
 	ptr := C.llama_get_embeddings_ith(c.ctx, C.int32_t(i))
 	if ptr == nil {
 		return nil
 	}
-	
+
 	nEmbd := c.model.NEmbd()
 	return unsafe.Slice((*float32)(unsafe.Pointer(ptr)), nEmbd)
 }
@@ -921,7 +928,7 @@ type SamplerChain struct {
 func NewSamplerChain(noPerf bool) *SamplerChain {
 	params := C.llama_sampler_chain_default_params()
 	params.no_perf = C.bool(noPerf)
-	
+
 	chain := C.llama_sampler_chain_init(params)
 	sc := &SamplerChain{chain: chain, samplers: make([]*Sampler, 0)}
 	runtime.SetFinalizer(sc, (*SamplerChain).Free)
@@ -1007,43 +1014,43 @@ func ApplyChatTemplate(template string, messages []ChatMessage, addAss bool) (st
 	if len(messages) == 0 {
 		return "", nil
 	}
-	
+
 	// Convert messages to C structs
 	cMessages := make([]C.struct_llama_chat_message, len(messages))
 	cStrings := make([]*C.char, len(messages)*2) // Keep references
-	
+
 	for i, msg := range messages {
 		cStrings[i*2] = C.CString(msg.Role)
 		cStrings[i*2+1] = C.CString(msg.Content)
 		cMessages[i].role = cStrings[i*2]
 		cMessages[i].content = cStrings[i*2+1]
 	}
-	
+
 	defer func() {
 		for _, s := range cStrings {
 			C.free(unsafe.Pointer(s))
 		}
 	}()
-	
+
 	var cTmpl *C.char
 	if template != "" {
 		cTmpl = C.CString(template)
 		defer C.free(unsafe.Pointer(cTmpl))
 	}
-	
+
 	// First call to get required size
 	n := C.llama_chat_apply_template(cTmpl, &cMessages[0], C.size_t(len(messages)), C.bool(addAss), nil, 0)
 	if n < 0 {
 		return "", fmt.Errorf("failed to apply chat template: %d", n)
 	}
-	
+
 	buf := make([]byte, n+1)
 	n = C.llama_chat_apply_template(cTmpl, &cMessages[0], C.size_t(len(messages)), C.bool(addAss),
 		(*C.char)(unsafe.Pointer(&buf[0])), C.int32_t(len(buf)))
-	
+
 	if n < 0 {
 		return "", fmt.Errorf("failed to apply chat template: %d", n)
 	}
-	
+
 	return string(buf[:n]), nil
 }

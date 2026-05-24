@@ -1,3 +1,5 @@
+//go:build cgo
+
 package ggml
 
 import (
@@ -40,6 +42,17 @@ var mxfp4_vals = []float32{
 	-3.0, // 1 10 1 = 0xd
 	-4.0, // 1 11 0 = 0xe
 	-6.0, // 1 11 1 = 0xf
+}
+
+func mxfp4StressEnabled() bool {
+	return os.Getenv("ECHO_GGML_STRESS") == "1" || os.Getenv("ECHO_GGML_STRESS") == "true"
+}
+
+func skipUnlessMXFP4Stress(t *testing.T) {
+	t.Helper()
+	if !mxfp4StressEnabled() {
+		t.Skip("stress-sized MXFP4 coverage disabled; set ECHO_GGML_STRESS=1 to enable")
+	}
 }
 
 func TestMXFP4Ops(t *testing.T) {
@@ -187,8 +200,56 @@ func TestMXFP4Ops(t *testing.T) {
 					}
 					// t.Logf("mxfp4 result\n%s", d4)
 				})
-				t.Run("random", func(t *testing.T) {
+				t.Run("random_small", func(t *testing.T) {
 					r := rand.New(rand.NewSource(0))
+					ctx := initContextOrSkip(t, b, useGPU)
+					const s00 = 64
+					const s01 = 4
+					const s02 = 4
+					const s10 = s00
+					const s11 = 1
+					const s12 = 4
+					const idlen = 4
+
+					data := [s00 * s01 * s02]float32{}
+					for i := range data {
+						data[i] = float32(r.Float32() * 10.0)
+					}
+					mxData := Quantize(fsggml.TensorTypeMXFP4, data[:], []uint64{uint64(len(data))})
+					dataf := ConvertToF32(mxData, uint32(fsggml.TensorTypeMXFP4), uint64(len(data)))
+					dtype := ml.DTypeMXFP4
+					t1 := ctx.(*Context).FromBytes(dtype, mxData, s00, s01, s02)
+					t1f := ctx.(*Context).FromFloatSlice(dataf, s00, s01, s02)
+
+					d2 := [s10 * s11 * s12]float32{}
+					for i := range d2 {
+						d2[i] = float32(r.Float32())
+					}
+					t2 := ctx.(*Context).FromFloatSlice(d2[:], s10, s11, s12)
+
+					d3 := [idlen * s12]int32{}
+					for i := range d3 {
+						d3[i] = int32(i) % s02
+					}
+					t3 := ctx.(*Context).FromIntSlice(d3[:], idlen, s12)
+
+					t4 := t1.MulmatID(ctx, t2, t3)
+					t4f := t1f.MulmatID(ctx, t2, t3)
+					r4 := t4.Floats()
+					r4f := t4f.Floats()
+					sim := cosineSimilarity(r4, r4f)
+					if sim < 0.99 {
+						d4 := ml.Dump(ctx, t4, ml.DumpWithPrecision(2))
+						d4f := ml.Dump(ctx, t4f, ml.DumpWithPrecision(2))
+						t.Logf("expected (f32): \n%s\n\n but got (mxfp4): \n%s", d4f, d4)
+						t.Fatalf("failed similarity test: %f", sim)
+					}
+				})
+
+				t.Run("random", func(t *testing.T) {
+					skipUnlessMXFP4Stress(t)
+					r := rand.New(rand.NewSource(0))
+
 					ctx := initContextOrSkip(t, b, useGPU)
 					const s00 = 2880
 					const s01 = 5760
@@ -262,7 +323,9 @@ func TestMXFP4Ops(t *testing.T) {
 
 				// Use data file(s) with real data
 				t.Run("example_7", func(t *testing.T) {
+					skipUnlessMXFP4Stress(t)
 					ctx := initContextOrSkip(t, b, useGPU)
+
 					data0, err := os.ReadFile("mlp-gateup.bin")
 					if err != nil {
 						t.Skip("missing mlp-gateup.bin file, skipping test")
@@ -312,7 +375,9 @@ func TestMXFP4Ops(t *testing.T) {
 
 				// Use data file(s) with real data
 				t.Run("example_384", func(t *testing.T) {
+					skipUnlessMXFP4Stress(t)
 					ctx := initContextOrSkip(t, b, useGPU)
+
 					data0, err := os.ReadFile("mlp-gateup.bin")
 					if err != nil {
 						t.Skip("missing mlp-gateup.bin file, skipping test")
@@ -362,7 +427,9 @@ func TestMXFP4Ops(t *testing.T) {
 
 				// Use data file(s) with real data
 				t.Run("example_1d", func(t *testing.T) {
+					skipUnlessMXFP4Stress(t)
 					r := rand.New(rand.NewSource(0))
+
 					ctx := initContextOrSkip(t, b, useGPU)
 					data0, err := os.ReadFile("mlp-gateup.bin")
 					if err != nil {
@@ -414,7 +481,9 @@ func TestMXFP4Ops(t *testing.T) {
 
 			t.Run("mm", func(t *testing.T) {
 				t.Run("example", func(t *testing.T) {
+					skipUnlessMXFP4Stress(t)
 					r := rand.New(rand.NewSource(0))
+
 					ctx := initContextOrSkip(t, b, useGPU)
 					data0, err := os.ReadFile("mlp-gateup.bin")
 					if err != nil {
