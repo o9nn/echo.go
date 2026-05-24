@@ -30,16 +30,20 @@ const (
 
 // Capability describes a schedulable backend substrate.
 type Capability struct {
-	Name        string      `json:"name"`
-	Kind        BackendKind `json:"kind"`
-	Available   bool        `json:"available"`
-	Native      bool        `json:"native"`
-	Offline     bool        `json:"offline"`
-	StressGrade bool        `json:"stress_grade"`
-	MemoryTier  MemoryTier  `json:"memory_tier"`
-	BuildTags   []string    `json:"build_tags,omitempty"`
-	Reason      string      `json:"reason,omitempty"`
-	Guidance    string      `json:"guidance,omitempty"`
+	Name                 string      `json:"name"`
+	Kind                 BackendKind `json:"kind"`
+	Available            bool        `json:"available"`
+	Native               bool        `json:"native"`
+	Offline              bool        `json:"offline"`
+	StressGrade          bool        `json:"stress_grade"`
+	MemoryTier           MemoryTier  `json:"memory_tier"`
+	BuildTags            []string    `json:"build_tags,omitempty"`
+	ModelPath            string      `json:"model_path,omitempty"`
+	ContextLength        int         `json:"context_length,omitempty"`
+	Quantization         string      `json:"quantization,omitempty"`
+	EstimatedMemoryBytes uint64      `json:"estimated_memory_bytes,omitempty"`
+	Reason               string      `json:"reason,omitempty"`
+	Guidance             string      `json:"guidance,omitempty"`
 }
 
 // Workload describes an inference task from the perspective of the scheduler.
@@ -176,10 +180,14 @@ func Select(workload Workload) Decision {
 }
 
 func memoryTierForGGML(stress bool) MemoryTier {
-	if stress {
+	hostTier := HostMemoryTier()
+	if stress && tierRank(hostTier) >= tierRank(MemoryStress) {
 		return MemoryStress
 	}
-	return MemoryStandard
+	if tierRank(hostTier) >= tierRank(MemoryStandard) {
+		return MemoryStandard
+	}
+	return MemoryConstrained
 }
 
 func availabilityReason(name string, available bool) string {

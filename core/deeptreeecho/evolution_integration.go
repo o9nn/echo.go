@@ -18,6 +18,9 @@ type EvolutionSystem struct {
 	// Core components
 	optimizer       *EvolutionOptimizer
 	providerManager *llm.ProviderManager
+	eventBus        *CognitiveEventBus
+	lastBackend     backendcap.Decision
+	hasLastBackend  bool
 
 	// Configuration
 	config EvolutionSystemConfig
@@ -31,6 +34,9 @@ type EvolutionSystem struct {
 type EvolutionSystemConfig struct {
 	// LLM provider preferences (in order of preference)
 	PreferredProviders []string
+
+	// EventBus receives backend capability and routing events. If nil, a local bus is created.
+	EventBus *CognitiveEventBus
 
 	// Evolution configuration
 	EvolutionConfig EvolutionConfig
@@ -51,7 +57,11 @@ func DefaultEvolutionSystemConfig() EvolutionSystemConfig {
 // NewEvolutionSystem creates a new evolution system with real LLM integration
 func NewEvolutionSystem(config EvolutionSystemConfig) (*EvolutionSystem, error) {
 	es := &EvolutionSystem{
-		config: config,
+		config:   config,
+		eventBus: config.EventBus,
+	}
+	if es.eventBus == nil {
+		es.eventBus = NewCognitiveEventBus(context.Background())
 	}
 
 	// Initialize provider manager
@@ -63,6 +73,7 @@ func NewEvolutionSystem(config EvolutionSystemConfig) (*EvolutionSystem, error) 
 	}
 
 	es.providerManager = pm
+	es.refreshBackendRouting("initialization")
 
 	// Check if any provider is available
 	if !pm.Available() {
@@ -118,10 +129,35 @@ func (es *EvolutionSystem) registerProviders(pm *llm.ProviderManager) error {
 		}
 	}
 
-	// Set fallback chain based on preferences
-	availableProviders := pm.ListProviders()
-	if len(availableProviders) > 0 {
-		pm.SetFallbackChain(availableProviders)
+	// Always keep the simple continuity fallback registered so autonomous loops can degrade gracefully.
+	if err := pm.RegisterProvider(&llm.SimpleFallbackProvider{}); err == nil {
+		registered++
+		if es.config.Debug {
+			fmt.Println("   ✓ Registered SimpleFallback provider")
+		}
+	}
+
+	// Set fallback chain from explicit preferences, then append any remaining providers.
+	available := make(map[string]bool)
+	for _, name := range pm.ListProviders() {
+		available[name] = true
+	}
+	chain := make([]string, 0, len(available))
+	for _, preferred := range es.config.PreferredProviders {
+		if available[preferred] {
+			chain = append(chain, preferred)
+			delete(available, preferred)
+		}
+	}
+	if available["SimpleFallback"] {
+		delete(available, "SimpleFallback")
+	}
+	for name := range available {
+		chain = append(chain, name)
+	}
+	chain = append(chain, "SimpleFallback")
+	if len(chain) > 0 {
+		pm.SetFallbackChain(chain)
 	}
 
 	if registered == 0 {
@@ -232,7 +268,57 @@ func (es *EvolutionSystem) InjectStimulus(stimulus string, importance float64) {
 
 // Generate produces a completion using the LLM provider
 func (es *EvolutionSystem) Generate(ctx context.Context, prompt string, opts llm.GenerateOptions) (string, error) {
+	es.refreshBackendRouting("generation")
 	return es.providerManager.Generate(ctx, prompt, opts)
+}
+
+// GetEventBus returns the event stream used by the evolution system.
+func (es *EvolutionSystem) GetEventBus() *CognitiveEventBus {
+	return es.eventBus
+}
+
+func (es *EvolutionSystem) refreshBackendRouting(reason string) []string {
+	if es.providerManager == nil {
+		return nil
+	}
+	decision := es.BackendDecision()
+	providerRoute := es.providerManager.ApplyBackendDecision(decision)
+	if es.backendDecisionChanged(decision) {
+		es.emitBackendCapabilityEvent(decision, providerRoute, reason)
+		es.mu.Lock()
+		es.lastBackend = decision
+		es.hasLastBackend = true
+		es.mu.Unlock()
+	}
+	return providerRoute
+}
+
+func (es *EvolutionSystem) backendDecisionChanged(decision backendcap.Decision) bool {
+	es.mu.RLock()
+	defer es.mu.RUnlock()
+	if !es.hasLastBackend {
+		return true
+	}
+	return es.lastBackend.Selected.Name != decision.Selected.Name ||
+		es.lastBackend.Selected.Kind != decision.Selected.Kind ||
+		es.lastBackend.Degraded != decision.Degraded ||
+		es.lastBackend.Selected.MemoryTier != decision.Selected.MemoryTier
+}
+
+func (es *EvolutionSystem) emitBackendCapabilityEvent(decision backendcap.Decision, providerRoute []string, reason string) {
+	if es.eventBus == nil {
+		return
+	}
+	es.eventBus.PublishSync(NewPriorityCognitiveEvent(EventBackendCapabilityChanged, "evolution_system", map[string]interface{}{
+		"reason":                reason,
+		"decision":              decision,
+		"snapshot":              backendcap.Snapshot(),
+		"host_memory":           backendcap.ProbeHostMemory(),
+		"provider_route":        providerRoute,
+		"selected_backend":      decision.Selected.Name,
+		"selected_backend_kind": decision.Selected.Kind,
+		"degraded":              decision.Degraded,
+	}, 0.8))
 }
 
 // GetConsciousnessMetrics returns stream of consciousness metrics

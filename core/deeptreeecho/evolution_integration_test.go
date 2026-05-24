@@ -25,7 +25,7 @@ func TestDefaultEvolutionSystemConfig(t *testing.T) {
 	}
 }
 
-func TestEvolutionSystemWithoutProviders(t *testing.T) {
+func TestEvolutionSystemWithoutAPIProvidersUsesContinuityFallback(t *testing.T) {
 	// Save and clear environment variables
 	anthropicKey := os.Getenv("ANTHROPIC_API_KEY")
 	openrouterKey := os.Getenv("OPENROUTER_API_KEY")
@@ -49,10 +49,21 @@ func TestEvolutionSystemWithoutProviders(t *testing.T) {
 	}()
 
 	config := DefaultEvolutionSystemConfig()
-	_, err := NewEvolutionSystem(config)
+	es, err := NewEvolutionSystem(config)
 
-	if err == nil {
-		t.Error("Expected error when no providers are available")
+	if err != nil {
+		t.Fatalf("expected fallback-backed evolution system, got error: %v", err)
+	}
+
+	providers := es.GetStatus()["providers"].([]string)
+	foundFallback := false
+	for _, provider := range providers {
+		if provider == "SimpleFallback" {
+			foundFallback = true
+		}
+	}
+	if !foundFallback {
+		t.Fatalf("expected SimpleFallback provider in continuity mode, got %v", providers)
 	}
 }
 

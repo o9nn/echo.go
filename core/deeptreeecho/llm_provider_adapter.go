@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/o9nn/echo.go/core/backendcap"
 	"github.com/o9nn/echo.go/core/llm"
 )
 
@@ -221,8 +222,11 @@ func CreateLLMProviderManager(anthropicKey, openRouterKey, openAIKey string) *ll
 	if openAIKey != "" {
 		chain = append(chain, "openai")
 	}
+	pm.RegisterProvider(&llm.SimpleFallbackProvider{})
+	chain = append(chain, "SimpleFallback")
 	if len(chain) > 0 {
 		pm.SetFallbackChain(chain)
+		pm.ApplyBackendDecision(backendcap.Select(backendcap.Workload{PreferNative: true, MinMemoryTier: backendcap.MemoryConstrained}))
 	}
 
 	return pm
