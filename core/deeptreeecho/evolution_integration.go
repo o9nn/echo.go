@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/o9nn/echo.go/core/backendcap"
 	"github.com/o9nn/echo.go/core/llm"
@@ -20,6 +21,7 @@ type EvolutionSystem struct {
 	optimizer       *EvolutionOptimizer
 	providerManager *llm.ProviderManager
 	eventBus        *CognitiveEventBus
+	localModels     *llm.LocalModelRegistry
 	lastBackend     backendcap.Decision
 	hasLastBackend  bool
 
@@ -42,6 +44,9 @@ type EvolutionSystemConfig struct {
 
 	// EventBus receives backend capability and routing events. If nil, a local bus is created.
 	EventBus *CognitiveEventBus
+
+	// ModelIdleUnloadAfter optionally releases a loaded local model after idle time.
+	ModelIdleUnloadAfter time.Duration
 
 	// Evolution configuration
 	EvolutionConfig EvolutionConfig
@@ -96,6 +101,11 @@ func NewEvolutionSystem(config EvolutionSystemConfig) (*EvolutionSystem, error) 
 	if es.eventBus == nil {
 		es.eventBus = NewCognitiveEventBus(context.Background())
 	}
+	es.localModels = llm.NewLocalModelRegistry(llm.LocalModelRegistryOptions{
+		ModelPaths:      config.ModelPaths,
+		IdleUnloadAfter: config.ModelIdleUnloadAfter,
+		OnEvent:         es.emitLocalModelLifecycleEvent,
+	})
 
 	// Initialize provider manager
 	pm := llm.NewProviderManager()
@@ -129,14 +139,17 @@ func NewEvolutionSystem(config EvolutionSystemConfig) (*EvolutionSystem, error) 
 func (es *EvolutionSystem) registerProviders(pm *llm.ProviderManager) error {
 	registered := 0
 
-	// Try a concrete local GGUF model selected from discovered model capabilities.
-	localDecision := es.BackendDecision()
-	if localDecision.Selected.ModelPath != "" && localDecision.Selected.Available {
-		provider := llm.NewLocalGGUFProviderFromCapability(localDecision.Selected)
-		if err := pm.RegisterProvider(provider); err == nil {
-			registered++
-			if es.config.Debug {
-				fmt.Printf("   ✓ Registered local GGUF provider: %s\n", localDecision.Selected.ModelPath)
+	// Try the persistent local model registry before remote APIs so concrete GGUF
+	// capabilities become long-lived native substrate candidates instead of one-shot providers.
+	if es.localModels != nil {
+		provider := es.localModels.Provider()
+		if provider != nil {
+			if err := pm.RegisterProvider(provider); err == nil {
+				registered++
+				if es.config.Debug {
+					state := es.localModels.State()
+					fmt.Printf("   ✓ Registered local GGUF registry provider: %s\n", state.SelectedModel.ModelPath)
+				}
 			}
 		}
 	}
@@ -284,6 +297,7 @@ func (es *EvolutionSystem) GetStatus() map[string]interface{} {
 		"backend_capabilities": es.backendSnapshot(),
 		"model_paths":          append([]string{}, es.config.ModelPaths...),
 		"backend_decision":     backendDecision,
+		"local_model_registry": es.localModelRegistryState(),
 		"backend_degraded":     backendDecision.Degraded,
 	}
 
@@ -302,11 +316,37 @@ func (es *EvolutionSystem) BackendDecision() backendcap.Decision {
 		PreferNative:  true,
 		MinMemoryTier: backendcap.MemoryConstrained,
 	}
-	return backendcap.SelectWithModelPaths(workload, es.config.ModelPaths)
+	decision := backendcap.SelectWithModelPaths(workload, es.config.ModelPaths)
+	if es.localModels != nil {
+		state := es.localModels.State()
+		if state.SelectedModel.ModelPath != "" && state.MemorySafe {
+			selected := state.SelectedModel
+			selected.Available = true
+			return backendcap.Decision{
+				Selected:     selected,
+				Degraded:     decision.Degraded,
+				Reason:       "selected registry-managed local GGUF model candidate for lifecycle-aware native routing",
+				Alternatives: decision.Alternatives,
+			}
+		}
+	}
+	return decision
 }
 
 func (es *EvolutionSystem) backendSnapshot() []backendcap.Capability {
 	return backendcap.SnapshotWithModelPaths(es.config.ModelPaths)
+}
+
+func (es *EvolutionSystem) localModelRegistryState() llm.LocalModelRegistryState {
+	if es.localModels == nil {
+		return llm.LocalModelRegistryState{}
+	}
+	return es.localModels.State()
+}
+
+// GetLocalModelRegistry returns the persistent local model runtime manager.
+func (es *EvolutionSystem) GetLocalModelRegistry() *llm.LocalModelRegistry {
+	return es.localModels
 }
 
 // InjectStimulus injects an external stimulus into the evolution system
@@ -331,6 +371,11 @@ func (es *EvolutionSystem) refreshBackendRouting(reason string) []string {
 	if es.providerManager == nil {
 		return nil
 	}
+	if es.localModels != nil {
+		es.localModels.Refresh()
+		es.localModels.MaybeUnloadForMemoryPressure("backend routing refresh: " + reason)
+		es.localModels.UnloadIdle("backend routing idle policy: " + reason)
+	}
 	decision := es.BackendDecision()
 	providerRoute := es.providerManager.ApplyBackendDecision(decision)
 	if es.backendDecisionChanged(decision) {
@@ -353,6 +398,24 @@ func (es *EvolutionSystem) backendDecisionChanged(decision backendcap.Decision) 
 		es.lastBackend.Selected.Kind != decision.Selected.Kind ||
 		es.lastBackend.Degraded != decision.Degraded ||
 		es.lastBackend.Selected.MemoryTier != decision.Selected.MemoryTier
+}
+
+func (es *EvolutionSystem) emitLocalModelLifecycleEvent(event llm.LocalModelEvent) {
+	if es.eventBus == nil {
+		return
+	}
+	eventType := CognitiveEventType(event.Type)
+	es.eventBus.PublishSync(NewPriorityCognitiveEvent(eventType, "local_model_registry", map[string]interface{}{
+		"model_name":             event.ModelName,
+		"model_path":             event.ModelPath,
+		"capability":             event.Capability,
+		"estimated_memory_bytes": event.EstimatedMemoryBytes,
+		"loaded":                 event.Loaded,
+		"reason":                 event.Reason,
+		"error":                  event.Error,
+		"host_memory":            event.HostMemory,
+		"timestamp":              event.Timestamp,
+	}, 0.9))
 }
 
 func (es *EvolutionSystem) emitBackendCapabilityEvent(decision backendcap.Decision, providerRoute []string, reason string) {

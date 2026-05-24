@@ -326,6 +326,20 @@ func (lgp *LocalGGUFProvider) safeToLoadLocked() error {
 	return nil
 }
 
+// Loaded reports whether the native model and context are resident in memory.
+func (lgp *LocalGGUFProvider) Loaded() bool {
+	lgp.mu.Lock()
+	defer lgp.mu.Unlock()
+	return lgp.loaded && lgp.model != nil && lgp.context != nil
+}
+
+// LoadError returns the most recent load error, if any.
+func (lgp *LocalGGUFProvider) LoadError() error {
+	lgp.mu.Lock()
+	defer lgp.mu.Unlock()
+	return lgp.loadErr
+}
+
 func (lgp *LocalGGUFProvider) Close() error {
 	lgp.mu.Lock()
 	defer lgp.mu.Unlock()

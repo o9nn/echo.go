@@ -79,6 +79,16 @@ func (lgp *LocalGGUFProvider) MaxTokens() int {
 	return 0
 }
 
+// Loaded reports false when native GGUF support is unavailable.
+func (lgp *LocalGGUFProvider) Loaded() bool {
+	return false
+}
+
+// LoadError reports no retained native load error for the no-cgo stub.
+func (lgp *LocalGGUFProvider) LoadError() error {
+	return nil
+}
+
 func (lgp *LocalGGUFProvider) Close() error {
 	return nil
 }

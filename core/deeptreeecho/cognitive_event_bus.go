@@ -52,6 +52,9 @@ const (
 	EventSelfInsight              CognitiveEventType = "self_insight"
 	EventVitalSignsUpdate         CognitiveEventType = "vital_signs_update"
 	EventBackendCapabilityChanged CognitiveEventType = "backend_capability_changed"
+	EventModelLoaded              CognitiveEventType = "model_loaded"
+	EventModelUnloaded            CognitiveEventType = "model_unloaded"
+	EventModelLoadFailed          CognitiveEventType = "model_load_failed"
 
 	// Interest and attention events
 	EventInterestDetected CognitiveEventType = "interest_detected"
