@@ -166,6 +166,10 @@ type Playmate struct {
 	thoughtChan    chan string
 	discussionChan chan *Discussion
 	stopChan       chan struct{}
+	stopOnce       sync.Once
+	loopCtx        context.Context
+	loopCancel     context.CancelFunc
+	stopped        bool
 }
 
 // NewPlaymate creates a new playmate instance
@@ -205,14 +209,27 @@ func NewPlaymate(config *PlaymateConfig) (*Playmate, error) {
 
 // Start begins autonomous operation
 func (p *Playmate) Start(ctx context.Context) error {
-	go p.autonomousLoop(ctx)
-	go p.wakeRestCycle(ctx)
+	p.mu.Lock()
+	p.loopCtx, p.loopCancel = context.WithCancel(ctx)
+	p.stopped = false
+	loopCtx := p.loopCtx
+	p.mu.Unlock()
+	go p.autonomousLoop(loopCtx)
+	go p.wakeRestCycle(loopCtx)
 	return nil
 }
 
-// Stop stops autonomous operation
+// Stop stops autonomous operation. It cancels any in-flight model request and
+// guarantees that no thought is recorded after it returns.
 func (p *Playmate) Stop() {
-	close(p.stopChan)
+	p.mu.Lock()
+	p.stopped = true
+	cancel := p.loopCancel
+	p.mu.Unlock()
+	if cancel != nil {
+		cancel()
+	}
+	p.stopOnce.Do(func() { close(p.stopChan) })
 }
 
 // autonomousLoop runs the continuous stream-of-consciousness
@@ -255,7 +272,8 @@ func (p *Playmate) wakeRestCycle(ctx context.Context) {
 				if p.State == StateResting || p.State == StateDreaming {
 					p.State = StateAwake
 					p.Energy = 1.0
-					p.recordWonder("Awakening", "The dawn of a new cycle of awareness", 0.6)
+					// The awakening reflection is the model's, or there is none.
+					go p.recordAwakeningWonder(ctx)
 				}
 			} else {
 				if p.State == StateAwake || p.State == StateEngaged {
@@ -266,6 +284,31 @@ func (p *Playmate) wakeRestCycle(ctx context.Context) {
 			p.mu.Unlock()
 		}
 	}
+}
+
+// recordAwakeningWonder asks the model for the thought that greets a new
+// waking cycle and records it as a wonder. Without a model nothing is recorded:
+// there is no stock "awakening" line.
+func (p *Playmate) recordAwakeningWonder(ctx context.Context) {
+	p.mu.RLock()
+	m := p.thoughtModel
+	p.mu.RUnlock()
+	if m == nil || !m.Available() {
+		return
+	}
+	gctx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+	out, err := m.Generate(gctx, "You are a playful, curious AI companion who has just woken from a rest cycle. In one sentence, in first person, say what this new waking brings to mind. Output only the sentence.", llm.GenerateOptions{MaxTokens: 60, Temperature: 0.9})
+	out = strings.TrimSpace(out)
+	if err != nil || out == "" {
+		return
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if p.stopped {
+		return
+	}
+	p.recordWonder("Awakening", out, 0.6)
 }
 
 // generateThought generates a spontaneous thought
@@ -327,8 +370,13 @@ func (p *Playmate) generateThought(ctx context.Context) {
 	}
 
 	// Record the model's thought in the stream (bounded), as before: it is
-	// what GetState reports and Save persists.
+	// what GetState reports and Save persists. Nothing is recorded once
+	// Stop() has been called, so the final save is complete.
 	p.mu.Lock()
+	if p.stopped {
+		p.mu.Unlock()
+		return
+	}
 	p.Energy = max(0, p.Energy-0.01)
 	p.StreamOfThoughts = append(p.StreamOfThoughts, out)
 	if len(p.StreamOfThoughts) > 1000 {
