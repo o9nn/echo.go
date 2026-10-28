@@ -325,6 +325,19 @@ func (p *Playmate) generateThought(ctx context.Context) {
 	if err != nil || out == "" {
 		return
 	}
+
+	// Record the model's thought in the stream (bounded), as before: it is
+	// what GetState reports and Save persists.
+	p.mu.Lock()
+	p.Energy = max(0, p.Energy-0.01)
+	p.StreamOfThoughts = append(p.StreamOfThoughts, out)
+	if len(p.StreamOfThoughts) > 1000 {
+		p.StreamOfThoughts = p.StreamOfThoughts[500:]
+	}
+	p.LastThought = time.Now()
+	p.dirty = true
+	p.mu.Unlock()
+
 	select {
 	case p.thoughtChan <- out:
 	default:

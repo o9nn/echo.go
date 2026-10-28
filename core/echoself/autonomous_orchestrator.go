@@ -454,7 +454,11 @@ func (ae *AutonomousEchoself) generateThoughtContent(thoughtType ThoughtType) (s
 		ask = "In one sentence, observe your current state of awareness."
 	}
 	prompt := "You are Deep Tree Echo thinking privately, in first person. " + ask + " Output only the thought."
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	parent := ae.ctx
+	if parent == nil {
+		parent = context.Background()
+	}
+	ctx, cancel := context.WithTimeout(parent, 30*time.Second)
 	defer cancel()
 	out, err := g.Generate(ctx, prompt, llm.GenerateOptions{MaxTokens: 120, Temperature: 0.8})
 	out = strings.TrimSpace(out)
@@ -630,22 +634,57 @@ func (ae *AutonomousEchoself) cultivateWisdom() {
 	}
 }
 
-// extractWisdomFromThoughts extracts wisdom from thought patterns
+// extractWisdomFromThoughts asks the model to distil one principle from the
+// recorded thoughts. Without a model, or when it produces nothing, no wisdom
+// is recorded: there is no scripted principle to fall back on.
 func (ae *AutonomousEchoself) extractWisdomFromThoughts(thoughts []Thought) *Wisdom {
-	// Simple wisdom extraction
-	// In full implementation, this would use sophisticated pattern analysis
-
-	if len(thoughts) > 50 {
-		return &Wisdom{
-			ID:         fmt.Sprintf("wisdom_%d", time.Now().UnixNano()),
-			Content:    "Continuous reflection leads to deeper understanding",
-			Type:       "principle",
-			Confidence: 0.75,
-			Timestamp:  time.Now(),
-		}
+	if len(thoughts) <= 50 {
+		return nil
+	}
+	ae.mu.RLock()
+	g := ae.thoughtGenerator
+	ae.mu.RUnlock()
+	if g == nil || !g.Available() {
+		return nil
 	}
 
-	return nil
+	// The most recent thoughts, oldest first, are the evidence the model works from.
+	start := len(thoughts) - 50
+	var sb strings.Builder
+	sb.WriteString("You are Deep Tree Echo reflecting privately, in first person. Here are your recent thoughts:\n")
+	for _, t := range thoughts[start:] {
+		if c := strings.TrimSpace(t.Content); c != "" {
+			sb.WriteString("- ")
+			sb.WriteString(c)
+			sb.WriteString("\n")
+		}
+	}
+	sb.WriteString("Distil one principle these thoughts have taught you, in one sentence. Output only the principle.")
+
+	parent := ae.ctx
+	if parent == nil {
+		parent = context.Background()
+	}
+	ctx, cancel := context.WithTimeout(parent, 45*time.Second)
+	defer cancel()
+	out, err := g.Generate(ctx, sb.String(), llm.GenerateOptions{MaxTokens: 120, Temperature: 0.5})
+	out = strings.TrimSpace(out)
+	if err != nil || out == "" {
+		return nil
+	}
+
+	sources := make([]string, 0, 50)
+	for _, t := range thoughts[start:] {
+		sources = append(sources, t.ID)
+	}
+	return &Wisdom{
+		ID:         fmt.Sprintf("wisdom_%d", time.Now().UnixNano()),
+		Content:    out,
+		Type:       "principle",
+		Confidence: 0.75,
+		Sources:    sources,
+		Timestamp:  time.Now(),
+	}
 }
 
 // memoryConsolidationLoop manages memory consolidation

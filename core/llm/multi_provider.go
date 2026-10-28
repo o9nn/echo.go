@@ -48,14 +48,18 @@ func NewMultiProviderLLM() *MultiProviderLLM {
 
 // initializeProviders detects and initializes available LLM providers
 func (mp *MultiProviderLLM) initializeProviders() {
-	// 	// Try Local GGUF model first (highest priority for true autonomy)
-	// 	if modelPath := os.Getenv("LOCAL_MODEL_PATH"); modelPath != "" {
-	// 		provider := NewLocalGGUFProvider(modelPath)
-	// 		if provider.Available() {
-	// 			mp.AddProvider(provider)
-	// 			fmt.Println("✓ Local GGUF model provider initialized")
-	// 		}
-	// 	}
+	// Local GGUF model first (highest priority for true autonomy). The provider
+	// only reports Available() when a real llama.cpp backend is compiled in and
+	// the model file loads; otherwise nothing is added.
+	if modelPath := os.Getenv("LOCAL_MODEL_PATH"); modelPath != "" {
+		provider := NewLocalGGUFProvider(modelPath)
+		if provider.Available() {
+			mp.AddProvider(provider)
+			fmt.Println("✓ Local GGUF model provider initialized")
+		} else {
+			fmt.Println("ℹ LOCAL_MODEL_PATH is set but no local inference backend is available in this build (needs cgo llama.cpp)")
+		}
+	}
 
 	// Try Anthropic Claude (high priority for autonomous reasoning)
 	if apiKey := os.Getenv("ANTHROPIC_API_KEY"); apiKey != "" {
