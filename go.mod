@@ -39,7 +39,6 @@ require (
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/go-co-op/gocron/v2 v2.19.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/google/flatbuffers v24.3.25+incompatible // indirect
 	github.com/jonboulle/clockwork v0.5.0 // indirect
@@ -61,7 +60,6 @@ require (
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
-	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gorgonia.org/vecf32 v0.9.0 // indirect
 	gorgonia.org/vecf64 v0.9.0 // indirect
 )
@@ -96,6 +94,7 @@ require (
 
 require (
 	github.com/dgraph-io/dgo/v230 v230.0.1
+	github.com/go-co-op/gocron/v2 v2.19.1
 	github.com/labstack/echo/v4 v4.15.0
 	github.com/pdevine/tensor v0.0.0-20250402003834-09d804610a08
 	golang.org/x/time v0.14.0
