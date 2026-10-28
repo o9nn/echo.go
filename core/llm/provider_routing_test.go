@@ -23,7 +23,14 @@ func (p routingTestProvider) StreamGenerate(ctx context.Context, prompt string, 
 	return ch, nil
 }
 
-func (p routingTestProvider) Name() string    { return p.name }
+func (p routingTestProvider) Name() string { return p.name }
+
+// fallbackKindTestProvider is a test-only provider whose name resolves to the
+// fallback backend kind, so routing tests can still exercise that branch.
+// Production code no longer ships any text-producing fallback provider.
+type fallbackKindTestProvider struct{ routingTestProvider }
+
+func (fallbackKindTestProvider) Name() string { return "test_fallback_kind" }
 func (p routingTestProvider) Available() bool { return p.available }
 func (p routingTestProvider) MaxTokens() int  { return 4096 }
 
@@ -31,8 +38,8 @@ func TestApplyBackendDecisionRoutesNativeBeforeRemote(t *testing.T) {
 	pm := NewProviderManager()
 	mustRegister(t, pm, routingTestProvider{name: "anthropic", available: true})
 	mustRegister(t, pm, routingTestProvider{name: "local_gguf", available: true})
-	mustRegister(t, pm, &SimpleFallbackProvider{})
-	if err := pm.SetFallbackChain([]string{"anthropic", "local_gguf", "SimpleFallback"}); err != nil {
+	mustRegister(t, pm, fallbackKindTestProvider{routingTestProvider{name: "test_fallback_kind", available: true}})
+	if err := pm.SetFallbackChain([]string{"anthropic", "local_gguf", "test_fallback_kind"}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -53,8 +60,8 @@ func TestApplyBackendDecisionRoutesNativeBeforeRemote(t *testing.T) {
 func TestApplyBackendDecisionRoutesRemoteBeforeFallback(t *testing.T) {
 	pm := NewProviderManager()
 	mustRegister(t, pm, routingTestProvider{name: "openai", available: true})
-	mustRegister(t, pm, &SimpleFallbackProvider{})
-	if err := pm.SetFallbackChain([]string{"SimpleFallback", "openai"}); err != nil {
+	mustRegister(t, pm, fallbackKindTestProvider{routingTestProvider{name: "test_fallback_kind", available: true}})
+	if err := pm.SetFallbackChain([]string{"test_fallback_kind", "openai"}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -67,13 +74,13 @@ func TestApplyBackendDecisionRoutesRemoteBeforeFallback(t *testing.T) {
 func TestApplyBackendDecisionRoutesFallbackWhenSelected(t *testing.T) {
 	pm := NewProviderManager()
 	mustRegister(t, pm, routingTestProvider{name: "openai", available: true})
-	mustRegister(t, pm, &SimpleFallbackProvider{})
-	if err := pm.SetFallbackChain([]string{"openai", "SimpleFallback"}); err != nil {
+	mustRegister(t, pm, fallbackKindTestProvider{routingTestProvider{name: "test_fallback_kind", available: true}})
+	if err := pm.SetFallbackChain([]string{"openai", "test_fallback_kind"}); err != nil {
 		t.Fatal(err)
 	}
 
 	route := pm.ApplyBackendDecision(backendcap.Decision{Selected: backendcap.Capability{Name: "simple_fallback", Kind: backendcap.BackendFallback}, Degraded: true})
-	if got := route[0]; got != "SimpleFallback" {
+	if got := route[0]; got != "test_fallback_kind" {
 		t.Fatalf("expected fallback provider first, got route %v", route)
 	}
 }

@@ -55,19 +55,16 @@ func TestEvolutionSystemWithoutAPIProvidersUsesContinuityFallback(t *testing.T) 
 	config := DefaultEvolutionSystemConfig()
 	es, err := NewEvolutionSystem(config)
 
-	if err != nil {
-		t.Fatalf("expected fallback-backed evolution system, got error: %v", err)
-	}
-
-	providers := es.GetStatus()["providers"].([]string)
-	foundFallback := false
-	for _, provider := range providers {
-		if provider == "SimpleFallback" {
-			foundFallback = true
+	// With no model configured there is deliberately no stub provider: the
+	// character must not speak from pattern-matched text. Either construction
+	// fails with a clear error, or it succeeds with zero providers registered.
+	if err == nil {
+		providers := es.GetStatus()["providers"].([]string)
+		for _, provider := range providers {
+			if provider == "SimpleFallback" {
+				t.Fatalf("stub fallback provider must not be registered, got %v", providers)
+			}
 		}
-	}
-	if !foundFallback {
-		t.Fatalf("expected SimpleFallback provider in continuity mode, got %v", providers)
 	}
 }
 
