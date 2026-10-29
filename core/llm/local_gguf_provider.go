@@ -314,7 +314,13 @@ func (lgp *LocalGGUFProvider) safeToLoadLocked() error {
 		capability = cap
 		lgp.config.Capability = cap
 	}
-	if capability.ContextLength > 0 && (lgp.config.ContextSize <= 0 || lgp.config.ContextSize > capability.ContextLength) {
+	if lgp.config.ContextSize <= 0 {
+		// Default to a modest window rather than the model's full declared
+		// context, which for long-context models would allocate a KV cache
+		// far larger than any single thought needs.
+		lgp.config.ContextSize = defaultLocalGGUFContext
+	}
+	if capability.ContextLength > 0 && lgp.config.ContextSize > capability.ContextLength {
 		lgp.config.ContextSize = capability.ContextLength
 	}
 	if lgp.config.BatchSize <= 0 || lgp.config.BatchSize > lgp.config.ContextSize {

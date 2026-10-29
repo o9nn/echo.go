@@ -285,7 +285,7 @@ func ReadGGUFModelMetadata(path string) (ModelFileMetadata, error) {
 	context := intFromMetadata(metadata, arch+".context_length", "llama.context_length", "context_length")
 	quantization := quantizationFromMetadata(metadata)
 	fileSize := uint64(stat.Size())
-	estimate := estimateModelMemory(fileSize, context)
+	estimate := estimateModelMemory(fileSize, context, kvBytesPerToken(metadata, arch))
 
 	metadata["gguf.version"] = uint64(version)
 	metadata["gguf.tensor_count"] = tensorCount
@@ -439,10 +439,36 @@ func quantizationFromMetadata(metadata map[string]interface{}) string {
 	return "unknown"
 }
 
-func estimateModelMemory(fileSize uint64, contextLength int) uint64 {
+// fallbackKVBytesPerToken is used when the GGUF metadata does not describe the
+// attention geometry; it corresponds to a large (~70B class) model so that an
+// unknown model is treated conservatively.
+const fallbackKVBytesPerToken = 512 * 1024
+
+// kvBytesPerToken derives the KV-cache cost of one context token from the
+// model's attention geometry: K and V per layer, each head_count_kv × head_dim
+// values stored as 16-bit floats.
+func kvBytesPerToken(metadata map[string]interface{}, arch string) uint64 {
+	layers := intFromMetadata(metadata, arch+".block_count", "llama.block_count")
+	embedding := intFromMetadata(metadata, arch+".embedding_length", "llama.embedding_length")
+	heads := intFromMetadata(metadata, arch+".attention.head_count", "llama.attention.head_count")
+	kvHeads := intFromMetadata(metadata, arch+".attention.head_count_kv", "llama.attention.head_count_kv")
+	if layers <= 0 || embedding <= 0 || heads <= 0 {
+		return fallbackKVBytesPerToken
+	}
+	if kvHeads <= 0 {
+		kvHeads = heads
+	}
+	headDim := embedding / heads
+	if headDim <= 0 {
+		return fallbackKVBytesPerToken
+	}
+	return uint64(2) * uint64(layers) * uint64(kvHeads) * uint64(headDim) * 2
+}
+
+func estimateModelMemory(fileSize uint64, contextLength int, kvPerToken uint64) uint64 {
 	estimate := uint64(float64(fileSize) * 1.20)
 	if contextLength > 0 {
-		estimate += uint64(contextLength) * 512 * 1024
+		estimate += uint64(contextLength) * kvPerToken
 	}
 	if estimate < fileSize {
 		return fileSize
