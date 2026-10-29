@@ -417,7 +417,8 @@ func providerBackendKind(name string) backendcap.BackendKind {
 	switch name {
 	case "local_gguf", "local_gguf_stub", "llama", "llama_legacy", "ggml":
 		return backendcap.BackendNativeCPU
-	case "SimpleFallback", "simple_fallback", "fallback":
+	case "test_fallback_kind":
+		// Reserved for routing tests; no production provider uses this name.
 		return backendcap.BackendFallback
 	default:
 		return backendcap.BackendRemoteAPI

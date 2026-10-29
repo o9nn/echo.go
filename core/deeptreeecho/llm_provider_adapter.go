@@ -222,8 +222,8 @@ func CreateLLMProviderManager(anthropicKey, openRouterKey, openAIKey string) *ll
 	if openAIKey != "" {
 		chain = append(chain, "openai")
 	}
-	pm.RegisterProvider(&llm.SimpleFallbackProvider{})
-	chain = append(chain, "SimpleFallback")
+	// No stub provider is registered: when no key is configured the chain is
+	// empty and generation errors instead of producing pattern-matched text.
 	if len(chain) > 0 {
 		pm.SetFallbackChain(chain)
 		pm.ApplyBackendDecision(backendcap.Select(backendcap.Workload{PreferNative: true, MinMemoryTier: backendcap.MemoryConstrained}))

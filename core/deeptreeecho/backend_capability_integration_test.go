@@ -8,8 +8,24 @@ import (
 	"github.com/o9nn/echo.go/core/llm"
 )
 
+// testModelProvider stands in for a real remote model in tests only.
+type testModelProvider struct{ reply string }
+
+func (p testModelProvider) Generate(_ context.Context, _ string, _ llm.GenerateOptions) (string, error) {
+	return p.reply, nil
+}
+func (p testModelProvider) StreamGenerate(_ context.Context, _ string, _ llm.GenerateOptions) (<-chan llm.StreamChunk, error) {
+	ch := make(chan llm.StreamChunk, 1)
+	ch <- llm.StreamChunk{Content: p.reply, Done: true}
+	close(ch)
+	return ch, nil
+}
+func (testModelProvider) Name() string    { return "test_model" }
+func (testModelProvider) Available() bool { return true }
+func (testModelProvider) MaxTokens() int  { return 4096 }
+
 func TestLocalModelProviderExposesBackendDecisionAndFallsBack(t *testing.T) {
-	fallback := &llm.SimpleFallbackProvider{}
+	fallback := testModelProvider{reply: "a reply from the test model"}
 	provider := NewLocalModelProvider(LocalModelConfig{
 		ModelPath:        "/tmp/nonexistent-echo-model.gguf",
 		ModelName:        "nonexistent",
@@ -31,8 +47,18 @@ func TestLocalModelProviderExposesBackendDecisionAndFallsBack(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected fallback generation to succeed: %v", err)
 	}
-	if response == "" {
-		t.Fatalf("expected non-empty fallback response")
+	if response != "a reply from the test model" {
+		t.Fatalf("expected the fallback *model* to answer, got %q", response)
+	}
+}
+
+func TestLocalModelProviderWithoutAnyModelErrors(t *testing.T) {
+	provider := NewLocalModelProvider(LocalModelConfig{
+		ModelPath: "/tmp/nonexistent-echo-model.gguf",
+		ModelName: "nonexistent",
+	})
+	if _, err := provider.Generate(context.Background(), "hello", llm.GenerateOptions{MaxTokens: 8}); err == nil {
+		t.Fatalf("expected an error when no model is available; the character must not answer from a stub")
 	}
 }
 

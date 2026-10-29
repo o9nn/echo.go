@@ -17,12 +17,12 @@ type MultiProviderLLM struct {
 
 // ProviderStats tracks provider performance
 type ProviderStats struct {
-	TotalCalls    int64
-	SuccessCalls  int64
-	FailedCalls   int64
-	TotalLatency  time.Duration
-	LastUsed      time.Time
-	Available     bool
+	TotalCalls   int64
+	SuccessCalls int64
+	FailedCalls  int64
+	TotalLatency time.Duration
+	LastUsed     time.Time
+	Available    bool
 }
 
 // Provider interface for LLM providers
@@ -48,14 +48,18 @@ func NewMultiProviderLLM() *MultiProviderLLM {
 
 // initializeProviders detects and initializes available LLM providers
 func (mp *MultiProviderLLM) initializeProviders() {
-// 	// Try Local GGUF model first (highest priority for true autonomy)
-// 	if modelPath := os.Getenv("LOCAL_MODEL_PATH"); modelPath != "" {
-// 		provider := NewLocalGGUFProvider(modelPath)
-// 		if provider.Available() {
-// 			mp.AddProvider(provider)
-// 			fmt.Println("✓ Local GGUF model provider initialized")
-// 		}
-// 	}
+	// Local GGUF model first (highest priority for true autonomy). The provider
+	// only reports Available() when a real llama.cpp backend is compiled in and
+	// the model file loads; otherwise nothing is added.
+	if modelPath := os.Getenv("LOCAL_MODEL_PATH"); modelPath != "" {
+		provider := NewLocalGGUFProvider(modelPath)
+		if provider.Available() {
+			mp.AddProvider(provider)
+			fmt.Println("✓ Local GGUF model provider initialized")
+		} else {
+			fmt.Println("ℹ LOCAL_MODEL_PATH is set but no local inference backend is available in this build (needs cgo llama.cpp)")
+		}
+	}
 
 	// Try Anthropic Claude (high priority for autonomous reasoning)
 	if apiKey := os.Getenv("ANTHROPIC_API_KEY"); apiKey != "" {
@@ -79,11 +83,11 @@ func (mp *MultiProviderLLM) initializeProviders() {
 		fmt.Println("✓ OpenAI provider initialized")
 	}
 
-	// Fallback to simple provider if no API keys available
+	// No stub provider: if no model is configured the pool stays empty and
+	// Generate returns an error. Every word the character says must come from a
+	// real model (a local GGUF/Ollama counts), never from pattern-matched text.
 	if len(mp.providers) == 0 {
-		provider := &SimpleFallbackProvider{}
-		mp.AddProvider(provider)
-		fmt.Println("⚠ Using simple fallback provider (no API keys found)")
+		fmt.Println("⚠ No LLM providers configured — set LOCAL_MODEL_PATH, ANTHROPIC_API_KEY, OPENROUTER_API_KEY or OPENAI_API_KEY; the character cannot speak until one is available")
 	}
 }
 
@@ -107,7 +111,7 @@ func (mp *MultiProviderLLM) Generate(ctx context.Context, prompt string, opts Ge
 	mp.mu.RUnlock()
 
 	var lastErr error
-	
+
 	// Try providers in order of priority
 	for _, provider := range providers {
 		if !provider.Available() {
@@ -116,7 +120,7 @@ func (mp *MultiProviderLLM) Generate(ctx context.Context, prompt string, opts Ge
 
 		// Track timing
 		start := time.Now()
-		
+
 		// Attempt generation
 		result, err := provider.Generate(ctx, prompt, opts)
 		latency := time.Since(start)

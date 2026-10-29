@@ -187,14 +187,6 @@ func (es *EvolutionSystem) registerProviders(pm *llm.ProviderManager) error {
 		}
 	}
 
-	// Always keep the simple continuity fallback registered so autonomous loops can degrade gracefully.
-	if err := pm.RegisterProvider(&llm.SimpleFallbackProvider{}); err == nil {
-		registered++
-		if es.config.Debug {
-			fmt.Println("   ✓ Registered SimpleFallback provider")
-		}
-	}
-
 	// Set fallback chain from explicit preferences, then append any remaining providers.
 	available := make(map[string]bool)
 	for _, name := range pm.ListProviders() {
@@ -207,13 +199,9 @@ func (es *EvolutionSystem) registerProviders(pm *llm.ProviderManager) error {
 			delete(available, preferred)
 		}
 	}
-	if available["SimpleFallback"] {
-		delete(available, "SimpleFallback")
-	}
 	for name := range available {
 		chain = append(chain, name)
 	}
-	chain = append(chain, "SimpleFallback")
 	if len(chain) > 0 {
 		pm.SetFallbackChain(chain)
 	}
